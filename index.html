@@ -185,25 +185,23 @@
     </footer>
 
     <script type="module">
-        // 1. Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // 2. PASTE YOUR FIREBASE CONFIG HERE
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT.firebasedatabase.app",
-            projectId: "YOUR_PROJECT",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123:web:abc"
+            apiKey: "AIzaSyAdQtFwyOHoixp2rALMKBllaeqg2jvCl5w",
+            authDomain: "sekuwa-by-kilo.firebaseapp.com",
+            databaseURL: "https://sekuwa-by-kilo-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sekuwa-by-kilo",
+            storageBucket: "sekuwa-by-kilo.firebasestorage.app",
+            messagingSenderId: "524646744577",
+            appId: "1:524646744577:web:5b8f1a500b8f09cea43600"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Security & Cache
         function escapeHTML(str) {
             if (!str) return '';
             return String(str).replace(/[&<>'"]/g, match => {
@@ -231,9 +229,8 @@
 
         let cart = [];
         let selectedTable = null;
-        let myLatestOrder = null; // Stores this device's most recent order for the status screen
+        let myLatestOrder = null;
 
-        // Window attachments so HTML buttons can click them in a module
         window.proceedToTableSelect = function() {
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
@@ -270,7 +267,6 @@
                 status: 'Pending'
             };
             
-            // Push to Firebase instantly
             push(ref(db, 'waiter_calls'), callObj).then(() => {
                 alert(`Request successfully sent from Table No. ${selectedTable}.`);
             }).catch(() => alert("Connection error."));
@@ -395,9 +391,8 @@
                 status: 'Pending'
             };
 
-            // PUSH ORDER TO CLOUD
             push(ref(db, 'kitchen_orders'), orderPayload).then(() => {
-                myLatestOrder = orderPayload; // Save to local memory for the status screen
+                myLatestOrder = orderPayload; 
                 cart = [];
                 updateCartUI();
                 renderMenu();
@@ -430,7 +425,6 @@
             document.getElementById('menu-screen').classList.remove('hidden');
         };
 
-        // Initialize UI
         renderMenu();
         updateCartUI();
     </script>
