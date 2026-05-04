@@ -68,8 +68,26 @@
         <button onclick="factoryReset()" class="text-red-500 hover:text-red-400 uppercase font-bold border border-red-900/50 px-3 py-1 rounded cursor-pointer transition-colors"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Emergency Reset Data</button>
     </footer>
 
-    <script>
-        // --- SECURITY UTILS ---
+    <script type="module">
+        // 1. Import Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, push, set, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // 2. PASTE THE EXACT SAME FIREBASE CONFIG HERE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT.firebasedatabase.app",
+            projectId: "YOUR_PROJECT",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123:web:abc"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Security & Cache
         function escapeHTML(str) {
             if (!str) return '';
             return String(str).replace(/[&<>'"]/g, match => {
@@ -78,34 +96,7 @@
             });
         }
 
-        // --- DATA VALIDATION HELPER ---
-        function getValidArray(key) {
-            try {
-                let data = localStorage.getItem(key);
-                let parsed = data ? JSON.parse(data) : [];
-                if (!Array.isArray(parsed)) return [];
-                return parsed.filter(item => item !== null && item !== undefined && Array.isArray(item.items));
-            } catch (e) {
-                console.error(`Corrupted data found in ${key}, resetting array.`);
-                return []; 
-            }
-        }
-
-        function getCalls() {
-            try {
-                const data = localStorage.getItem('waiter_calls');
-                return data ? JSON.parse(data).filter(Boolean) : [];
-            } catch(e) { return []; }
-        }
-
-        // --- UTILS ---
-        function calculateTotal(items) {
-            return items.reduce((acc, curr) => acc + (Number(curr.price) * Number(curr.quantity)), 0);
-        }
-
-        // --- DOM RENDERER (Optimized) ---
         const renderCache = { calls: '', orders: '', prep: '', history: '' };
-
         function updateDOM(elementId, cacheKey, htmlString) {
             if (renderCache[cacheKey] !== htmlString) {
                 document.getElementById(elementId).innerHTML = htmlString;
@@ -113,7 +104,10 @@
             }
         }
 
-        // --- AUDIO ---
+        function calculateTotal(items) {
+            return items ? items.reduce((acc, curr) => acc + (Number(curr.price) * Number(curr.quantity)), 0) : 0;
+        }
+
         function playBeep() {
             try {
                 const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -127,15 +121,47 @@
                 gainNode.connect(context.destination);
                 oscillator.start();
                 oscillator.stop(context.currentTime + 0.8);
-            } catch (err) { console.log("Audio playback blocked by browser policy."); }
+            } catch (err) {}
         }
 
-        // --- RENDER FUNCTIONS ---
-        function loadNotifications() {
-            const calls = getCalls();
+        // Global state objects holding Firebase data
+        let globalCalls = {};
+        let globalOrders = {};
+        let globalPrep = {};
+        let globalHistory = {};
+        let lastCallCount = 0;
+
+        // --- FIREBASE REAL-TIME LISTENERS ---
+        onValue(ref(db, 'waiter_calls'), (snapshot) => {
+            globalCalls = snapshot.val() || {};
+            const count = Object.keys(globalCalls).length;
+            if (count > lastCallCount) playBeep();
+            lastCallCount = count;
+            renderCalls();
+        });
+
+        onValue(ref(db, 'kitchen_orders'), (snapshot) => {
+            globalOrders = snapshot.val() || {};
+            renderOrders();
+        });
+
+        onValue(ref(db, 'prep_orders'), (snapshot) => {
+            globalPrep = snapshot.val() || {};
+            renderPrep();
+        });
+
+        onValue(ref(db, 'order_history'), (snapshot) => {
+            globalHistory = snapshot.val() || {};
+            renderHistory();
+        });
+
+        // --- RENDERING FUNCTIONS ---
+        // Notice how we use Object.entries to get the Firebase [key, data] pair
+        function renderCalls() {
+            const calls = Object.entries(globalCalls);
             let html = calls.length === 0 
                 ? `<div class="col-span-4 text-center py-6 text-slate-600 bg-slate-900/40 border border-slate-900/50 rounded-2xl text-xs">No service requests currently active.</div>`
-                : calls.map((call, index) => `
+                : calls.map(([key, call]) => `
                     <div class="bg-slate-900 border border-red-500/30 p-4 rounded-2xl flex flex-col justify-between shadow-xl">
                         <div>
                             <div class="flex justify-between items-center mb-2">
@@ -144,21 +170,18 @@
                             </div>
                             <p class="text-xs text-slate-300 mb-2">Request from Table No. <b class="text-red-400 text-sm">${escapeHTML(call.table)}</b></p>
                         </div>
-                        <button onclick="dismissCall(${index})" class="w-full bg-slate-800 text-slate-400 hover:text-red-400 text-[10px] font-bold py-2.5 rounded-xl border border-slate-700/60 transition-all cursor-pointer">Dismiss</button>
+                        <button onclick="dismissCall('${key}')" class="w-full bg-slate-800 text-slate-400 hover:text-red-400 text-[10px] font-bold py-2.5 rounded-xl border border-slate-700/60 transition-all cursor-pointer">Dismiss</button>
                     </div>`).join('');
-            
             updateDOM('bell-container', 'calls', html);
         }
 
-        function loadOrders() {
-            const orders = getValidArray('kitchen_orders');
+        function renderOrders() {
+            const orders = Object.entries(globalOrders);
             let html = orders.length === 0 
                 ? `<div class="col-span-3 text-center py-20 text-slate-600 bg-slate-900 border border-slate-800 rounded-3xl shadow-xl">
-                    <i class="fa-solid fa-circle-check text-4xl mb-4 text-slate-800"></i>
-                    <p class="font-bold text-slate-300 text-sm">All caught up!</p>
-                    <p class="text-[10px] text-slate-500 mt-1">No pending orders found.</p>
+                    <i class="fa-solid fa-circle-check text-4xl mb-4 text-slate-800"></i><p class="font-bold text-slate-300 text-sm">All caught up!</p><p class="text-[10px] text-slate-500 mt-1">No pending orders found.</p>
                    </div>`
-                : orders.map((order, index) => `
+                : orders.map(([key, order]) => `
                     <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl flex flex-col justify-between hover:border-amber-500/20 transition-all">
                         <div>
                             <div class="flex justify-between items-center mb-6">
@@ -166,7 +189,7 @@
                                 <span class="text-[10px] text-slate-500"><i class="fa-regular fa-clock mr-1"></i>${escapeHTML(order.time)}</span>
                             </div>
                             <ul class="space-y-3 mb-6 text-xs divide-y divide-slate-800/50">
-                                ${order.items.map(i => `
+                                ${(order.items || []).map(i => `
                                     <li class="flex justify-between pt-2 text-slate-300">
                                         <span class="font-medium">${escapeHTML(i.name)} × <b class="text-amber-500">${escapeHTML(i.quantity)}</b></span>
                                         <span class="font-bold text-white">Rs. ${(i.price * i.quantity).toLocaleString()}</span>
@@ -178,155 +201,99 @@
                                 <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Total Amount</span>
                                 <span class="text-base font-black text-amber-500">Rs. ${calculateTotal(order.items).toLocaleString()}</span>
                             </div>
-                            <button onclick="moveToPreparation(${index})" class="w-full bg-amber-500 text-slate-950 text-[10px] font-extrabold py-3.5 px-6 rounded-xl hover:bg-amber-400 transition-all shadow-md cursor-pointer"><i class="fa-solid fa-fire-burner mr-2"></i> Prepare Order</button>
+                            <button onclick="moveToPreparation('${key}')" class="w-full bg-amber-500 text-slate-950 text-[10px] font-extrabold py-3.5 px-6 rounded-xl hover:bg-amber-400 transition-all shadow-md cursor-pointer"><i class="fa-solid fa-fire-burner mr-2"></i> Prepare Order</button>
                         </div>
                     </div>`).join('');
-
             updateDOM('order-container', 'orders', html);
         }
 
-        function loadPrepOrders() {
-            const prepOrders = getValidArray('prep_orders');
+        function renderPrep() {
+            const prepOrders = Object.entries(globalPrep);
             let html = prepOrders.length === 0 
                 ? `<div class="col-span-3 text-center py-10 text-slate-700 bg-slate-900/50 border border-slate-900 rounded-2xl text-xs">No orders in the kitchen preparation queue.</div>`
-                : prepOrders.map((order, index) => `
+                : prepOrders.map(([key, order]) => `
                     <div class="bg-slate-900/80 border border-amber-500/30 p-5 rounded-2xl flex flex-col justify-between shadow-lg">
                         <div>
                             <div class="flex justify-between text-[9px] text-slate-500 mb-4 border-b border-slate-900 pb-2">
-                                <span>Table No: <b class="text-amber-500 font-bold">${escapeHTML(order.table)}</b></span>
-                                <span>${escapeHTML(order.time)}</span>
+                                <span>Table No: <b class="text-amber-500 font-bold">${escapeHTML(order.table)}</b></span><span>${escapeHTML(order.time)}</span>
                             </div>
                             <ul class="text-xs text-slate-400 space-y-1 mb-4">
-                                ${order.items.map(i => `
-                                    <li class="flex justify-between">
-                                        <span>${escapeHTML(i.name)} <b class="text-amber-400">×${escapeHTML(i.quantity)}</b></span>
-                                        <span>Rs. ${(i.price * i.quantity).toLocaleString()}</span>
-                                    </li>`).join('')}
+                                ${(order.items || []).map(i => `
+                                    <li class="flex justify-between"><span>${escapeHTML(i.name)} <b class="text-amber-400">×${escapeHTML(i.quantity)}</b></span><span>Rs. ${(i.price * i.quantity).toLocaleString()}</span></li>
+                                `).join('')}
                             </ul>
                         </div>
                         <div class="border-t border-slate-900/80 pt-3">
                             <div class="flex justify-between text-xs font-bold text-slate-300 mb-4">
-                                <span>TOTAL PENDING</span>
-                                <span class="text-amber-500">Rs. ${calculateTotal(order.items).toLocaleString()}</span>
+                                <span>TOTAL PENDING</span><span class="text-amber-500">Rs. ${calculateTotal(order.items).toLocaleString()}</span>
                             </div>
-                            <button onclick="moveToHistory(${index})" class="w-full bg-green-500 text-slate-950 text-xs font-extrabold py-3 rounded-lg hover:bg-green-400 cursor-pointer shadow-md transition-all"><i class="fa-solid fa-wallet mr-1"></i> Customer Paid</button>
+                            <button onclick="moveToHistory('${key}')" class="w-full bg-green-500 text-slate-950 text-xs font-extrabold py-3 rounded-lg hover:bg-green-400 cursor-pointer shadow-md transition-all"><i class="fa-solid fa-wallet mr-1"></i> Customer Paid</button>
                         </div>
                     </div>`).join('');
-
             updateDOM('prep-container', 'prep', html);
         }
 
-        function loadHistory() {
-            const history = getValidArray('order_history');
+        function renderHistory() {
+            const history = Object.entries(globalHistory);
             let html = history.length === 0 
                 ? `<div class="col-span-3 text-center py-10 text-slate-700 bg-slate-900/50 border border-slate-900 rounded-2xl"><p class="text-xs">No records available yet.</p></div>`
-                : history.map(h => `
+                : history.map(([key, h]) => `
                     <div class="bg-slate-900/60 border border-slate-900/80 p-5 rounded-2xl">
                         <div class="flex justify-between items-center text-[10px] text-slate-500 mb-4 border-b border-slate-900 pb-2">
-                            <span>Table No: <b class="text-amber-500 font-bold">${escapeHTML(h.table)}</b></span>
-                            <span>${escapeHTML(h.date || 'Today')} - ${escapeHTML(h.time)}</span>
+                            <span>Table No: <b class="text-amber-500 font-bold">${escapeHTML(h.table)}</b></span><span>${escapeHTML(h.date || 'Today')} - ${escapeHTML(h.time)}</span>
                         </div>
                         <ul class="text-xs text-slate-400 space-y-1 mb-4">
-                            ${h.items.map(i => `
-                                <li class="flex justify-between">
-                                    <span>${escapeHTML(i.name)} <b class="text-amber-400">×${escapeHTML(i.quantity)}</b></span>
-                                    <span>Rs. ${(i.price * i.quantity).toLocaleString()}</span>
-                                </li>`).join('')}
+                            ${(h.items || []).map(i => `
+                                <li class="flex justify-between"><span>${escapeHTML(i.name)} <b class="text-amber-400">×${escapeHTML(i.quantity)}</b></span><span>Rs. ${(i.price * i.quantity).toLocaleString()}</span></li>
+                            `).join('')}
                         </ul>
                         <div class="border-t border-slate-900/80 pt-3 flex justify-between text-xs font-extrabold text-slate-300">
-                            <span>TOTAL RECEIVED</span>
-                            <span class="text-amber-500">Rs. ${calculateTotal(h.items).toLocaleString()}</span>
+                            <span>TOTAL RECEIVED</span><span class="text-amber-500">Rs. ${calculateTotal(h.items).toLocaleString()}</span>
                         </div>
                     </div>`).join('');
-
             updateDOM('history-container', 'history', html);
         }
 
-        // --- DATA MUTATION ACTIONS ---
-        function moveOrder(fromKey, toKey, index, transformFn = null) {
-            let fromArr = getValidArray(fromKey);
-            let toArr = getValidArray(toKey);
-
-            if (fromArr[index]) {
-                let targetOrder = fromArr[index];
-                if (transformFn) targetOrder = transformFn(targetOrder);
-                
-                toArr.unshift(targetOrder);
-                fromArr.splice(index, 1);
-                
-                localStorage.setItem(toKey, JSON.stringify(toArr));
-                localStorage.setItem(fromKey, JSON.stringify(fromArr));
-                loadAllSections();
+        // --- CLOUD MUTATION ACTIONS ---
+        // Instead of shifting local arrays, we tell the cloud to move the specific object key
+        window.moveToPreparation = function(key) {
+            const orderToMove = globalOrders[key];
+            if(orderToMove) {
+                push(ref(db, 'prep_orders'), orderToMove).then(() => {
+                    remove(ref(db, `kitchen_orders/${key}`));
+                });
             }
-        }
+        };
 
-        function moveToPreparation(index) {
-            moveOrder('kitchen_orders', 'prep_orders', index);
-        }
-
-        function moveToHistory(index) {
-            moveOrder('prep_orders', 'order_history', index, (order) => {
-                order.date = new Date().toISOString().split('T')[0];
-                return order;
-            });
-        }
-
-        // --- DELETION UTILS ---
-        function dismissCall(index) {
-            let calls = getCalls();
-            if (calls[index]) {
-                calls.splice(index, 1);
-                localStorage.setItem('waiter_calls', JSON.stringify(calls));
-                loadNotifications();
+        window.moveToHistory = function(key) {
+            const orderToMove = globalPrep[key];
+            if(orderToMove) {
+                orderToMove.date = new Date().toISOString().split('T')[0];
+                push(ref(db, 'order_history'), orderToMove).then(() => {
+                    remove(ref(db, `prep_orders/${key}`));
+                });
             }
-        }
+        };
 
-        function clearAllCalls() {
-            localStorage.removeItem('waiter_calls');
-            loadNotifications();
-        }
+        window.dismissCall = function(key) {
+            remove(ref(db, `waiter_calls/${key}`));
+        };
 
-        function clearHistory() {
-            if(confirm("Are you sure you want to clear the completed orders ledger?")) {
-                localStorage.removeItem('order_history');
-                loadHistory();
+        window.clearAllCalls = function() {
+            remove(ref(db, 'waiter_calls'));
+        };
+
+        window.clearHistory = function() {
+            if(confirm("Are you sure you want to clear the completed orders ledger from the cloud?")) {
+                remove(ref(db, 'order_history'));
             }
-        }
+        };
 
-        function factoryReset() {
-            if(confirm("DANGER: This will delete all pending orders, prep queues, and history data. Proceed?")) {
-                localStorage.clear();
-                location.reload();
+        window.factoryReset = function() {
+            if(confirm("DANGER: This will delete ALL data across the entire database. Proceed?")) {
+                remove(ref(db, '/'));
             }
-        }
-
-        // --- LIFECYCLE & SYNC ---
-        function loadAllSections() {
-            loadOrders();
-            loadPrepOrders();
-            loadHistory();
-            loadNotifications();
-        }
-
-        let lastCallCount = getCalls().length;
-        
-        function handleStorageEvent() {
-            loadAllSections();
-            
-            // Check if a new call was added to trigger the beep
-            const currentCalls = getCalls().length;
-            if (currentCalls > lastCallCount) playBeep();
-            lastCallCount = currentCalls;
-        }
-
-        // Listen for updates from other tabs/waiter stations
-        window.addEventListener('storage', handleStorageEvent);
-
-        // Initial Load
-        loadAllSections();
-        
-        // Throttled interval to act as a fallback state-checker
-        setInterval(handleStorageEvent, 3000);
+        };
     </script>
 </body>
 </html>
