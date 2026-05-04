@@ -4,44 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sekuwa by Kilo - Lazimpat</title>
-    
     <link rel="icon" type="image/jpeg" href="logo.jpg" onerror="this.href='data:image/x-icon;base64,'">
-
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
         body { font-family: 'Inter', sans-serif; }
-
-        @keyframes slideUp {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
-
-        .branch-bg {
-            background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('lazimpat.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-
-        .modal-content-bg {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('pic.jpg');
-            background-size: cover;
-            background-position: center;
-        }
-
-        .animated-pills {
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @media (max-width: 768px) {
-            button, select, input {
-                min-height: 48px;
-            }
-        }
+        .branch-bg { background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('lazimpat.jpg'); background-size: cover; background-position: center; background-attachment: fixed; }
+        .modal-content-bg { background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('pic.jpg'); background-size: cover; background-position: center; }
+        .animated-pills { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        @media (max-width: 768px) { button, select, input { min-height: 48px; } }
     </style>
 </head>
 <body class="branch-bg text-slate-100 min-h-screen flex flex-col justify-between">
@@ -52,12 +26,10 @@
                 <img src="logo.jpg" alt="Sekuwa by Kilo" class="h-10 w-auto object-contain rounded-md border border-amber-500/20" onerror="this.style.display='none'">
                 <span class="text-xs text-slate-400 hidden sm:inline font-medium">Lazimpat Branch</span>
             </div>
-            
             <div class="flex items-center gap-3">
                 <span id="nav-table-tag" class="hidden text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold px-4 py-1.5 rounded-full flex items-center gap-2">
                     <i class="fa-solid fa-utensils"></i> <span>Table No: <span id="nav-table-num">0</span></span>
                 </span>
-                
                 <button id="call-waiter-btn" class="hidden bg-red-600 hover:bg-red-500 text-white text-[10px] font-extrabold px-3 py-2 rounded-full shadow-lg transition-all cursor-pointer" onclick="callWaiter()">
                     <i class="fa-solid fa-bell fa-shake mr-1"></i> CALL WAITER
                 </button>
@@ -67,23 +39,16 @@
 
     <div id="welcome-screen" class="fixed inset-0 z-20 flex flex-col items-center justify-end p-6" style="background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);">
         <div class="modal-content-bg border-4 border-amber-400 max-w-3xl w-full p-6 rounded-3xl shadow-2xl animate-slide-up text-slate-100 flex flex-col md:flex-row items-center justify-between gap-6 relative mb-12">
-            
             <div class="flex flex-col items-center text-center md:text-left">
                 <img src="logo.jpg" alt="Sekuwa by Kilo" class="h-14 w-auto object-contain mb-3 rounded-xl shadow-sm" onerror="this.style.display='none'">
-                <span class="text-[9px] font-extrabold tracking-widest text-amber-300 uppercase mb-3 bg-amber-500/10 px-3 py-0.5 rounded-md">
-                    Lazimpat Branch
-                </span>
-                <p class="text-xs text-slate-100 max-w-xs leading-relaxed">
-                    Start the table dining experience and explore the freshly prepared charcoal-grilled recipes.
-                </p>
+                <span class="text-[9px] font-extrabold tracking-widest text-amber-300 uppercase mb-3 bg-amber-500/10 px-3 py-0.5 rounded-md">Lazimpat Branch</span>
+                <p class="text-xs text-slate-100 max-w-xs leading-relaxed">Start the table dining experience and explore the freshly prepared charcoal-grilled recipes.</p>
             </div>
-
             <div class="flex flex-col items-center gap-2">
                 <button onclick="proceedToTableSelect()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-extrabold text-xs px-10 py-4 rounded-2xl shadow-xl hover:shadow-orange-500/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-3 tracking-wide cursor-pointer">
                     START <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
-
             <button onclick="proceedToTableSelect()" class="absolute top-3 right-3 bg-slate-900 text-slate-400 hover:text-red-500 p-2 rounded-full text-xs shadow-sm cursor-pointer border border-slate-800 transition-colors">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -112,9 +77,7 @@
                 </div>
                 <div>
                     <h3 class="text-sm font-extrabold text-amber-400 mb-1 tracking-tight">OPERATING PROCEDURES</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                        Click <b class="text-slate-200">"Add"</b> to initialize an item, and adjust quantities using <b class="text-slate-200">"+"</b> or <b class="text-slate-200">"-"</b>. Confirm using the <b class="text-slate-200">"Order Now"</b> button.
-                    </p>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Click <b class="text-slate-200">"Add"</b> to initialize an item, and adjust quantities using <b class="text-slate-200">"+"</b> or <b class="text-slate-200">"-"</b>. Confirm using the <b class="text-slate-200">"Order Now"</b> button.</p>
                     <span class="text-[10px] bg-slate-800 px-3 py-1 rounded-full text-slate-400"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i> No service charge added</span>
                 </div>
             </div>
@@ -157,11 +120,9 @@
                     <span class="text-xs font-extrabold text-slate-200">Total</span>
                     <span id="cart-total" class="text-xl font-black text-amber-500">Rs. 0</span>
                 </div>
-                
                 <button onclick="placeOrder()" class="w-full mt-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-4 px-6 rounded-xl shadow-md transition-all cursor-pointer">
                     ORDER NOW
                 </button>
-
                 <button onclick="openExternalPage()" class="w-full mt-1 bg-slate-950/80 text-amber-400 border border-amber-500/20 text-xs font-bold py-4 px-6 rounded-xl shadow-sm hover:bg-amber-500/10 transition-all cursor-pointer">
                     <i class="fa-solid fa-circle-info mr-2"></i> Check Order Status
                 </button>
@@ -189,11 +150,9 @@
                     <span id="confirm-total" class="font-bold text-amber-500">Rs. 0</span>
                 </div>
             </div>
-            
             <button onclick="confirmFinalOrder()" class="w-full bg-green-600 hover:bg-green-500 text-white font-extrabold py-4 px-6 rounded-xl shadow-md transition-all cursor-pointer">
                 <i class="fa-solid fa-check mr-1"></i> Send to Kitchen
             </button>
-
             <button onclick="editOrder()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-extrabold py-4 px-6 rounded-xl border border-slate-800 shadow-md transition-all mt-3 cursor-pointer">
                 <i class="fa-solid fa-pen-to-square mr-1"></i> Edit Order
             </button>
@@ -225,8 +184,26 @@
         &copy; 2026 Sekuwa by Kilo. Designed for Lazimpat.
     </footer>
 
-    <script>
-        // --- SECURITY UTILS ---
+    <script type="module">
+        // 1. Import Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // 2. PASTE YOUR FIREBASE CONFIG HERE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT.firebasedatabase.app",
+            projectId: "YOUR_PROJECT",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123:web:abc"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Security & Cache
         function escapeHTML(str) {
             if (!str) return '';
             return String(str).replace(/[&<>'"]/g, match => {
@@ -235,20 +212,6 @@
             });
         }
 
-        // --- DATA VALIDATION HELPER ---
-        function getValidArray(key) {
-            try {
-                let data = localStorage.getItem(key);
-                let parsed = data ? JSON.parse(data) : [];
-                if (!Array.isArray(parsed)) return [];
-                return parsed.filter(item => item !== null && item !== undefined);
-            } catch (e) {
-                console.error(`Corrupted data found in ${key}, resetting array.`);
-                return []; 
-            }
-        }
-
-        // --- DOM RENDER CACHE (Prevents flashing/thrashing) ---
         const renderCache = { menu: '', cart: '', tokens: '' };
         function updateDOM(elementId, cacheKey, htmlString) {
             if (renderCache[cacheKey] !== htmlString) {
@@ -268,20 +231,20 @@
 
         let cart = [];
         let selectedTable = null;
+        let myLatestOrder = null; // Stores this device's most recent order for the status screen
 
-        function proceedToTableSelect() {
+        // Window attachments so HTML buttons can click them in a module
+        window.proceedToTableSelect = function() {
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
             generateGameTokens();
-        }
+        };
 
         function generateGameTokens() {
             const tables = [1, 2, 3, 4, 5, 6];
             let html = tables.map(num => `
                 <button onclick="selectTable(${num})" class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg group hover:border-amber-500/50 transition-all cursor-pointer">
-                    <div class="w-14 h-14 rounded-2xl bg-slate-950 text-amber-500 font-extrabold flex items-center justify-center text-base mb-4 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all shadow-inner">
-                        ${num}
-                    </div>
+                    <div class="w-14 h-14 rounded-2xl bg-slate-950 text-amber-500 font-extrabold flex items-center justify-center text-base mb-4 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all shadow-inner">${num}</div>
                     <span class="text-[10px] font-medium text-slate-500 group-hover:text-slate-400">Table</span>
                     <span class="text-xs font-bold text-slate-300 group-hover:text-amber-400">No. ${num}</span>
                 </button>
@@ -289,48 +252,29 @@
             updateDOM('token-container', 'tokens', html);
         }
 
-        function selectTable(num) {
+        window.selectTable = function(num) {
             selectedTable = num;
-            
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('menu-screen').classList.remove('hidden');
             document.getElementById('nav-table-tag').classList.remove('hidden');
             document.getElementById('call-waiter-btn').classList.remove('hidden');
             document.getElementById('nav-table-num').textContent = escapeHTML(num);
-
             renderMenu();
-        }
+        };
 
-        function callWaiter() {
-            let callList = getValidArray('waiter_calls');
+        window.callWaiter = function() {
             const callObj = {
                 table: selectedTable,
                 time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
                 date: new Date().toISOString().split('T')[0],
                 status: 'Pending'
             };
-            callList.push(callObj);
-            localStorage.setItem('waiter_calls', JSON.stringify(callList));
             
-            playBeep();
-            alert(`Request successfully sent from Table No. ${selectedTable}.`);
-        }
-
-        function playBeep() {
-            try {
-                const context = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = context.createOscillator();
-                const gainNode = context.createGain();
-                oscillator.type = 'sine';
-                oscillator.frequency.value = 1400;
-                gainNode.gain.setValueAtTime(0.5, context.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.8);
-                oscillator.connect(gainNode);
-                gainNode.connect(context.destination);
-                oscillator.start();
-                oscillator.stop(context.currentTime + 0.8);
-            } catch(e) { console.log("Audio play blocked."); }
-        }
+            // Push to Firebase instantly
+            push(ref(db, 'waiter_calls'), callObj).then(() => {
+                alert(`Request successfully sent from Table No. ${selectedTable}.`);
+            }).catch(() => alert("Connection error."));
+        };
 
         function getQuantity(id) {
             const item = cart.find(c => c.id === id);
@@ -340,24 +284,18 @@
         function renderMenu() {
             let html = menuData.map(item => {
                 const isAdded = getQuantity(item.id) > 0;
-                
                 return `
                     <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md flex flex-col justify-between">
                         <div>
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-md">
-                                ${escapeHTML(item.category)}
-                            </span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-md">${escapeHTML(item.category)}</span>
                             <h4 class="text-base sm:text-md font-extrabold text-white mt-4 mb-2 leading-snug tracking-tight">${escapeHTML(item.name)}</h4>
                             <p class="text-lg sm:text-xl font-black text-amber-500 mt-2">Rs. ${item.price.toLocaleString()}</p>
                             <span class="text-[10px] text-green-500 font-medium"><i class="fa-solid fa-bolt mr-1 text-[8px]"></i> 9 mins</span>
                         </div>
-
                         <div class="mt-6 flex justify-end">
                             <div id="control-wrapper-${item.id}">
                                 ${!isAdded ? `
-                                    <button onclick="initiallyAddItem(${item.id})" class="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-black text-xs py-2.5 px-6 rounded-xl hover:bg-amber-500 hover:text-slate-950 transition-all cursor-pointer">
-                                        <i class="fa-solid fa-plus mr-1"></i> Add
-                                    </button>
+                                    <button onclick="initiallyAddItem(${item.id})" class="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-black text-xs py-2.5 px-6 rounded-xl hover:bg-amber-500 hover:text-slate-950 transition-all cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Add</button>
                                 ` : `
                                     <div class="flex items-center justify-between bg-slate-950 p-1 rounded-full border border-slate-800/60 shadow-inner animated-pills w-28">
                                         <button onclick="decrementMenuQuantity(${item.id})" class="bg-slate-900 hover:bg-red-500/20 text-red-400 text-xs font-black cursor-pointer w-7 h-7 flex items-center justify-center rounded-full transition-all">-</button>
@@ -370,61 +308,41 @@
                     </div>
                 `;
             }).join('');
-            
             updateDOM('menu-items', 'menu', html);
         }
 
-        function initiallyAddItem(id) {
-            addToCart(id);
-            renderMenu();
-        }
-
-        function incrementMenuQuantity(id) {
-            addToCart(id);
-            renderMenu(); 
-        }
-
-        function decrementMenuQuantity(id) {
+        window.initiallyAddItem = function(id) { addToCart(id); renderMenu(); };
+        window.incrementMenuQuantity = function(id) { addToCart(id); renderMenu(); };
+        window.decrementMenuQuantity = function(id) {
             const itemInCart = cart.find(c => c.id === id);
             if (itemInCart) {
-                if (itemInCart.quantity > 1) {
-                    itemInCart.quantity -= 1;
-                } else {
-                    cart = cart.filter(c => c.id !== id);
-                }
+                if (itemInCart.quantity > 1) itemInCart.quantity -= 1;
+                else cart = cart.filter(c => c.id !== id);
             }
             updateCartUI();
             renderMenu();
-        }
+        };
 
         function addToCart(id) {
             const item = menuData.find(m => m.id === id);
             const existing = cart.find(c => c.id === id);
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                cart.push({ ...item, quantity: 1 });
-            }
+            if (existing) existing.quantity += 1;
+            else cart.push({ ...item, quantity: 1 });
             updateCartUI();
         }
 
-        function removeFromCart(id) {
+        window.removeFromCart = function(id) {
             cart = cart.filter(item => item.id !== id);
             updateCartUI();
             renderMenu();
-        }
+        };
 
         function updateCartUI() {
             const subtotalElement = document.getElementById('cart-subtotal');
             const totalElement = document.getElementById('cart-total');
 
             if (cart.length === 0) {
-                let emptyHtml = `
-                    <div class="text-center py-16 text-slate-600">
-                        <i class="fa-solid fa-basket-shopping text-2xl mb-2"></i>
-                        <p class="text-xs font-medium">Your basket is empty</p>
-                    </div>`;
-                updateDOM('cart-items', 'cart', emptyHtml);
+                updateDOM('cart-items', 'cart', `<div class="text-center py-16 text-slate-600"><i class="fa-solid fa-basket-shopping text-2xl mb-2"></i><p class="text-xs font-medium">Your basket is empty</p></div>`);
                 subtotalElement.textContent = "Rs. 0";
                 totalElement.textContent = "Rs. 0";
                 return;
@@ -453,30 +371,20 @@
             totalElement.textContent = "Rs. " + subtotal.toLocaleString();
         }
 
-        function placeOrder() {
+        window.placeOrder = function() {
             if (cart.length === 0) return alert("Select at least one item from the menu to proceed.");
-
             document.getElementById('confirm-table').textContent = escapeHTML(selectedTable);
-            
             let total = 0;
-            const itemContainer = document.getElementById('confirm-items');
-            itemContainer.innerHTML = cart.map(i => {
+            document.getElementById('confirm-items').innerHTML = cart.map(i => {
                 total += i.price * i.quantity;
-                return `
-                    <li class="flex justify-between text-slate-400">
-                        <span>${escapeHTML(i.name)} × <b class="text-amber-500">${escapeHTML(i.quantity)}</b></span>
-                        <span class="font-bold text-slate-200">Rs. ${(i.price * i.quantity).toLocaleString()}</span>
-                    </li>
-                `;
+                return `<li class="flex justify-between text-slate-400"><span>${escapeHTML(i.name)} × <b class="text-amber-500">${escapeHTML(i.quantity)}</b></span><span class="font-bold text-slate-200">Rs. ${(i.price * i.quantity).toLocaleString()}</span></li>`;
             }).join('');
-
             document.getElementById('confirm-total').textContent = "Rs. " + total.toLocaleString();
-
             document.getElementById('menu-screen').classList.add('hidden');
             document.getElementById('confirmation-screen').classList.remove('hidden');
-        }
+        };
 
-        function confirmFinalOrder() {
+        window.confirmFinalOrder = function() {
             if (cart.length === 0) return alert("Basket is empty.");
             
             const orderPayload = {
@@ -487,56 +395,42 @@
                 status: 'Pending'
             };
 
-            let orderList = getValidArray('kitchen_orders');
-            orderList.push(orderPayload);
-            localStorage.setItem('kitchen_orders', JSON.stringify(orderList));
-            
-            // FIX: Clear the cart logic after successful push to kitchen
-            cart = [];
-            updateCartUI();
-            renderMenu();
+            // PUSH ORDER TO CLOUD
+            push(ref(db, 'kitchen_orders'), orderPayload).then(() => {
+                myLatestOrder = orderPayload; // Save to local memory for the status screen
+                cart = [];
+                updateCartUI();
+                renderMenu();
+                openExternalPage();
+            }).catch(() => alert("Connection error. Order failed."));
+        };
 
-            openExternalPage();
-        }
-
-        function editOrder() {
+        window.editOrder = function() {
             document.getElementById('confirmation-screen').classList.add('hidden');
             document.getElementById('menu-screen').classList.remove('hidden');
-        }
+        };
 
-        function openExternalPage() {
-            const orders = getValidArray('kitchen_orders');
+        window.openExternalPage = function() {
+            if (!myLatestOrder) return alert("No active orders placed by this device yet.");
             
-            // Find the most recent order for this specific table session
-            const latestOrder = [...orders].reverse().find(o => o.table === selectedTable);
-
-            if (!latestOrder) {
-                return alert("No active orders placed for this table yet.");
-            }
-
-            const extContainer = document.getElementById('external-summary-items');
-            extContainer.innerHTML = latestOrder.items.map(i => `
-                <li class="flex justify-between">
-                    <span>${escapeHTML(i.name)} × ${escapeHTML(i.quantity)}</span>
-                    <span class="text-amber-400">Rs. ${(i.price * i.quantity).toLocaleString()}</span>
-                </li>
+            document.getElementById('external-summary-items').innerHTML = myLatestOrder.items.map(i => `
+                <li class="flex justify-between"><span>${escapeHTML(i.name)} × ${escapeHTML(i.quantity)}</span><span class="text-amber-400">Rs. ${(i.price * i.quantity).toLocaleString()}</span></li>
             `).join('');
 
-            let totalItemCount = latestOrder.items.reduce((acc, item) => acc + Number(item.quantity), 0);
-            let approxMinutes = 15 + (totalItemCount * 3);
-            document.getElementById('approx-time').textContent = `${approxMinutes} Mins`;
+            let totalItemCount = myLatestOrder.items.reduce((acc, item) => acc + Number(item.quantity), 0);
+            document.getElementById('approx-time').textContent = `${15 + (totalItemCount * 3)} Mins`;
 
             document.getElementById('menu-screen').classList.add('hidden');
             document.getElementById('confirmation-screen').classList.add('hidden');
             document.getElementById('external-screen').classList.remove('hidden');
-        }
+        };
 
-        function backToMenuScreen() {
+        window.backToMenuScreen = function() {
             document.getElementById('external-screen').classList.add('hidden');
             document.getElementById('menu-screen').classList.remove('hidden');
-        }
+        };
 
-        // Init
+        // Initialize UI
         renderMenu();
         updateCartUI();
     </script>
