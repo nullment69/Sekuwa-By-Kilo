@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Station - Sekuwa by Kilo</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg" onerror="this.href='data:image/x-icon;base64,'">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .candy-font { font-family: 'Fredoka One', cursive; }
+    </style>
+</head>
+<body class="bg-slate-950 min-h-screen text-slate-100 flex flex-col justify-between">
+    <header class="bg-slate-900/50 backdrop-blur-md border-b border-slate-900 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="logo.jpg" alt="Sekuwa by Kilo" class="h-8 w-auto object-contain brightness-90 contrast-125 rounded-md" onerror="this.style.display='none'">
+                <span class="candy-font text-xs tracking-tight text-white">Sekuwa by <span class="text-amber-500">Kilo</span></span>
+                <span class="text-[9px] bg-slate-900 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider ml-2">Station</span>
+            </div>
+            <div class="text-xs text-slate-500 flex items-center gap-2">
+                <i class="fa-solid fa-circle text-green-500 text-[8px] animate-pulse"></i> 
+                <span class="text-[10px] uppercase font-bold tracking-wider">Live Station Link</span>
+            </div>
+        </div>
+    </header>
+    
+    <main class="max-w-7xl mx-auto px-6 py-10 flex-grow w-full space-y-12">
+        <div>
+            <h2 class="text-xl font-extrabold mb-2 text-white flex items-center justify-between">
+                <span><i class="fa-solid fa-bell mr-2 text-red-500"></i> Service Desk Notifications</span>
+                <button onclick="clearAllCalls()" class="text-[10px] text-slate-600 hover:text-red-400 uppercase tracking-widest cursor-pointer transition-colors"><i class="fa-solid fa-trash mr-1"></i> Clear All Alerts</button>
+            </h2>
+            <p class="text-xs text-slate-500 mb-8">Real-time alerts for customer-called service requests.</p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="bell-container"></div>
+        </div>
+                
+        <div class="border-t border-slate-900 pt-10">
+            <h1 class="text-xl font-extrabold mb-2 tracking-tight text-white">Incoming Orders</h1>
+            <p class="text-xs text-slate-500 mb-8">Process pending orders from dining tables.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="order-container"></div>
+        </div>
+
+        <div class="border-t border-slate-900 pt-10">
+            <h2 class="text-xl font-extrabold mb-2 text-white">
+                <i class="fa-solid fa-burger mr-2 text-amber-500"></i> In Preparation (Awaiting Payment)
+            </h2>
+            <p class="text-xs text-slate-500 mb-8">Orders currently being prepared in the kitchen before checkout.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="prep-container"></div>
+        </div>
+
+        <div class="border-t border-slate-900 pt-10">
+            <h2 class="text-xl font-extrabold mb-2 text-white flex items-center justify-between">
+                <span><i class="fa-solid fa-clock-rotate-left mr-2 text-amber-500"></i> Completed Order History</span>
+                <button onclick="clearHistory()" class="text-[10px] text-slate-600 hover:text-red-400 uppercase tracking-widest cursor-pointer transition-colors"><i class="fa-solid fa-trash mr-1"></i> Clear Ledger</button>
+            </h2>
+            <p class="text-xs text-slate-500 mb-8">Full historical record of paid orders.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="history-container"></div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 border-t border-slate-900 py-6 text-center text-[10px] text-slate-600">
+        &copy; 2026 Sekuwa by Kilo. Kitchen & Waiter Sync.
+        <br><br>
+        <button onclick="factoryReset()" class="text-red-500 hover:text-red-400 uppercase font-bold border border-red-900/50 px-3 py-1 rounded cursor-pointer transition-colors"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Emergency Reset Data</button>
+    </footer>
+
+    <script>
+        // --- SECURITY UTILS ---
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, match => {
+                const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
+                return escapeMap[match];
+            });
+        }
+
+        // --- DATA VALIDATION HELPER ---
+        function getValidArray(key) {
+            try {
+                let data = localStorage.getItem(key);
+                let parsed = data ? JSON.parse(data) : [];
+                if (!Array.isArray(parsed)) return [];
+                return parsed.filter(item => item !== null && item !== undefined && Array.isArray(item.items));
+            } catch (e) {
+                console.error(`Corrupted data found in ${key}, resetting array.`);
+                return []; 
+            }
+        }
+
+        function getCalls() {
+            try {
+                const data = localStorage.getItem('waiter_calls');
+                return data ? JSON.parse(data).filter(Boolean) : [];
+            } catch(e) { return []; }
+        }
+
+        // --- UTILS ---
+        function calculateTotal(items) {
+            return items.reduce((acc, curr) => acc + (Number(curr.price) * Number(curr.quantity)), 0);
+        }
+
+        // --- DOM RENDERER (Optimized) ---
+        const renderCache = { calls: '', orders: '', prep: '', history: '' };
+
+        function updateDOM(elementId, cacheKey, htmlString) {
+            if (renderCache[cacheKey] !== htmlString) {
+                document.getElementById(elementId).innerHTML = htmlString;
+                renderCache[cacheKey] = htmlString;
+            }
+        }
+
+        // --- AUDIO ---
+        function playBeep() {
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                const gainNode = context.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.value = 1400;
+                gainNode.gain.setValueAtTime(0.5, context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.8);
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+                oscillator.start();
+                oscillator.stop(context.currentTime + 0.8);
+            } catch (err) { console.log("Audio playback blocked by browser policy."); }
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function loadNotifications() {
+            const calls = getCalls();
+            let html = calls.length === 0 
+                ? `<div class="col-span-4 text-center py-6 text-slate-600 bg-slate-900/40 border border-slate-900/50 rounded-2xl text-xs">No service requests currently active.</div>`
+                : calls.map((call, index) => `
+                    <div class="bg-slate-900 border border-red-500/30 p-4 rounded-2xl flex flex-col justify-between shadow-xl">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[10px] bg-red-600 text-white font-extrabold px-2 py-0.5 rounded uppercase tracking-wider"><i class="fa-solid fa-bell mr-1"></i> Waiter Call</span>
+                                <span class="text-[9px] text-slate-500">${escapeHTML(call.time)}</span>
+                            </div>
+                            <p class="text-xs text-slate-300 mb-2">Request from Table No. <b class="text-red-400 text-sm">${escapeHTML(call.table)}</b></p>
+                        </div>
+                        <button onclick="dismissCall(${index})" class="w-full bg-slate-800 text-slate-400 hover:text-red-400 text-[10px] font-bold py-2.5 rounded-xl border border-slate-700/60 transition-all cursor-pointer">Dismiss</button>
+                    </div>`).join('');
+            
+            updateDOM('bell-container', 'calls', html);
+        }
+
+        function loadOrders() {
+            const orders = getValidArray('kitchen_orders');
+            let html = orders.length === 0 
+                ? `<div class="col-span-3 text-center py-20 text-slate-600 bg-slate-900 border border-slate-800 rounded-3xl shadow-xl">
+                    <i class="fa-solid fa-circle-check text-4xl mb-4 text-slate-800"></i>
+                    <p class="font-bold text-slate-300 text-sm">All caught up!</p>
+                    <p class="text-[10px] text-slate-500 mt-1">No pending orders found.</p>
+                   </div>`
+                : orders.map((order, index) => `
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl flex flex-col justify-between hover:border-amber-500/20 transition-all">
+                        <div>
+                            <div class="flex justify-between items-center mb-6">
+                                <span class="text-[9px] bg-amber-500 text-slate-950 font-extrabold px-3 py-1 rounded-lg tracking-widest uppercase"><i class="fa-solid fa-utensils mr-1"></i> Table No: ${escapeHTML(order.table)}</span>
+                                <span class="text-[10px] text-slate-500"><i class="fa-regular fa-clock mr-1"></i>${escapeHTML(order.time)}</span>
+                            </div>
+                            <ul class="space-y-3 mb-6 text-xs divide-y divide-slate-800/50">
+                                ${order.items.map(i => `
+                                    <li class="flex justify-between pt-2 text-slate-300">
+                                        <span class="font-medium">${escapeHTML(i.name)} × <b class="text-amber-500">${escapeHTML(i.quantity)}</b></span>
+                                        <span class="font-bold text-white">Rs. ${(i.price * i.quantity).toLocaleString()}</span>
+                                    </li>`).join('')}
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center border-t border-slate-800/80 pt-4 mb-6">
+                                <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Total Amount</span>
+                                <span class="text-base font-black text-amber-500">Rs. ${calculateTotal(order.items).toLocaleString()}</span>
+                            </div>
+                            <button onclick="moveToPreparation(${index})" class="w-full bg-amber-500 text-slate-950 text-[10px] font-extrabold py-3.5 px-6 rounded-xl hover:bg-amber-400 transition-all shadow-md cursor-pointer"><i class="fa-solid fa-fire-burner mr-2"></i> Prepare Order</button>
+                        </div>
+                    </div>`).join('');
+
+            updateDOM('order-container', 'orders', html);
+        }
+
+        function loadPrepOrders() {
+            const prepOrders = getValidArray('prep_orders');
+            let html = prepOrders.length === 0 
+                ? `<div class="col-span-3 text-center py-10 text-slate-700 bg-slate-900/50 border border-slate-900 rounded-2xl text-xs">No orders in the kitchen preparation queue.</div>`
+                : prepOrders.map((order, index) => `
+                    <div class="bg-slate-900/80 border border-amber-500/30 p-5 rounded-2xl flex flex-col justify-between shadow-lg">
+                        <div>
+                            <div class="flex justify-between text-[9px] text-slate-500 mb-4 border-b border-slate-900 pb-2">
+                                <span>Table No: <b class="text-amber-500 font-bold">${escapeHTML(order.table)}</b></span>
+                                <span>${escapeHTML(order.time)}</span>
+                            </div>
+                            <ul class="text-xs text-slate-400 space-y-1 mb-4">
+                                ${order.items.map(i => `
+                                    <li class="flex justify-between">
+                                        <span>${escapeHTML(i.name)} <b class="text-amber-400">×${escapeHTML(i.quantity)}</b></span>
+                                        <span>Rs. ${(i.price * i.quantity).toLocaleString()}</span>
+                                    </li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="border-t border-slate-900/80 pt-3">
+                            <div class="flex justify-between text-xs font-bold text-slate-300 mb-4">
+                                <span>TOTAL PENDING</span>
+                                <span class="text-amber-500">Rs. ${calculateTotal(order.items).toLocaleString()}</span>
+                            </div>
+                            <button onclick="moveToHistory(${index})" class="w-full bg-green-500 text-slate-950 text-xs font-extrabold py-3 rounded-lg hover:bg-green-400 cursor-pointer shadow-md transition-all"><i class="fa-solid fa-wallet mr-1"></i> Customer Paid</button>
+                        </div>
+                    </div>`).join('');
+
+            updateDOM('prep-container', 'prep', html);
+        }
+
+        function loadHistory() {
+            const history = getValidArray('order_history');
+            let html = history.length === 0 
+                ? `<div class="col-span-3 text-center py-10 text-slate-700 bg-slate-900/50 border border-slate-900 rounded-2xl"><p class="text-xs">No records available yet.</p></div>`
+                : history.map(h => `
+                    <div class="bg-slate-900/60 border border-slate-900/80 p-5 rounded-2xl">
+                        <div class="flex justify-between items-center text-[10px] text-slate-500 mb-4 border-b border-slate-900 pb-2">
+                            <span>Table No: <b class="text-amber-500 font-bold">${escapeHTML(h.table)}</b></span>
+                            <span>${escapeHTML(h.date || 'Today')} - ${escapeHTML(h.time)}</span>
+                        </div>
+                        <ul class="text-xs text-slate-400 space-y-1 mb-4">
+                            ${h.items.map(i => `
+                                <li class="flex justify-between">
+                                    <span>${escapeHTML(i.name)} <b class="text-amber-400">×${escapeHTML(i.quantity)}</b></span>
+                                    <span>Rs. ${(i.price * i.quantity).toLocaleString()}</span>
+                                </li>`).join('')}
+                        </ul>
+                        <div class="border-t border-slate-900/80 pt-3 flex justify-between text-xs font-extrabold text-slate-300">
+                            <span>TOTAL RECEIVED</span>
+                            <span class="text-amber-500">Rs. ${calculateTotal(h.items).toLocaleString()}</span>
+                        </div>
+                    </div>`).join('');
+
+            updateDOM('history-container', 'history', html);
+        }
+
+        // --- DATA MUTATION ACTIONS ---
+        function moveOrder(fromKey, toKey, index, transformFn = null) {
+            let fromArr = getValidArray(fromKey);
+            let toArr = getValidArray(toKey);
+
+            if (fromArr[index]) {
+                let targetOrder = fromArr[index];
+                if (transformFn) targetOrder = transformFn(targetOrder);
+                
+                toArr.unshift(targetOrder);
+                fromArr.splice(index, 1);
+                
+                localStorage.setItem(toKey, JSON.stringify(toArr));
+                localStorage.setItem(fromKey, JSON.stringify(fromArr));
+                loadAllSections();
+            }
+        }
+
+        function moveToPreparation(index) {
+            moveOrder('kitchen_orders', 'prep_orders', index);
+        }
+
+        function moveToHistory(index) {
+            moveOrder('prep_orders', 'order_history', index, (order) => {
+                order.date = new Date().toISOString().split('T')[0];
+                return order;
+            });
+        }
+
+        // --- DELETION UTILS ---
+        function dismissCall(index) {
+            let calls = getCalls();
+            if (calls[index]) {
+                calls.splice(index, 1);
+                localStorage.setItem('waiter_calls', JSON.stringify(calls));
+                loadNotifications();
+            }
+        }
+
+        function clearAllCalls() {
+            localStorage.removeItem('waiter_calls');
+            loadNotifications();
+        }
+
+        function clearHistory() {
+            if(confirm("Are you sure you want to clear the completed orders ledger?")) {
+                localStorage.removeItem('order_history');
+                loadHistory();
+            }
+        }
+
+        function factoryReset() {
+            if(confirm("DANGER: This will delete all pending orders, prep queues, and history data. Proceed?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // --- LIFECYCLE & SYNC ---
+        function loadAllSections() {
+            loadOrders();
+            loadPrepOrders();
+            loadHistory();
+            loadNotifications();
+        }
+
+        let lastCallCount = getCalls().length;
+        
+        function handleStorageEvent() {
+            loadAllSections();
+            
+            // Check if a new call was added to trigger the beep
+            const currentCalls = getCalls().length;
+            if (currentCalls > lastCallCount) playBeep();
+            lastCallCount = currentCalls;
+        }
+
+        // Listen for updates from other tabs/waiter stations
+        window.addEventListener('storage', handleStorageEvent);
+
+        // Initial Load
+        loadAllSections();
+        
+        // Throttled interval to act as a fallback state-checker
+        setInterval(handleStorageEvent, 3000);
+    </script>
+</body>
+</html>
