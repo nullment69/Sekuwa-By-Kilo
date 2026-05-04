@@ -69,25 +69,23 @@
     </footer>
 
     <script type="module">
-        // 1. Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, onValue, push, set, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // 2. PASTE THE EXACT SAME FIREBASE CONFIG HERE
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT.firebasedatabase.app",
-            projectId: "YOUR_PROJECT",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123:web:abc"
+            apiKey: "AIzaSyAdQtFwyOHoixp2rALMKBllaeqg2jvCl5w",
+            authDomain: "sekuwa-by-kilo.firebaseapp.com",
+            databaseURL: "https://sekuwa-by-kilo-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sekuwa-by-kilo",
+            storageBucket: "sekuwa-by-kilo.firebasestorage.app",
+            messagingSenderId: "524646744577",
+            appId: "1:524646744577:web:5b8f1a500b8f09cea43600"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Security & Cache
         function escapeHTML(str) {
             if (!str) return '';
             return String(str).replace(/[&<>'"]/g, match => {
@@ -124,14 +122,12 @@
             } catch (err) {}
         }
 
-        // Global state objects holding Firebase data
         let globalCalls = {};
         let globalOrders = {};
         let globalPrep = {};
         let globalHistory = {};
         let lastCallCount = 0;
 
-        // --- FIREBASE REAL-TIME LISTENERS ---
         onValue(ref(db, 'waiter_calls'), (snapshot) => {
             globalCalls = snapshot.val() || {};
             const count = Object.keys(globalCalls).length;
@@ -155,8 +151,6 @@
             renderHistory();
         });
 
-        // --- RENDERING FUNCTIONS ---
-        // Notice how we use Object.entries to get the Firebase [key, data] pair
         function renderCalls() {
             const calls = Object.entries(globalCalls);
             let html = calls.length === 0 
@@ -254,8 +248,6 @@
             updateDOM('history-container', 'history', html);
         }
 
-        // --- CLOUD MUTATION ACTIONS ---
-        // Instead of shifting local arrays, we tell the cloud to move the specific object key
         window.moveToPreparation = function(key) {
             const orderToMove = globalOrders[key];
             if(orderToMove) {
