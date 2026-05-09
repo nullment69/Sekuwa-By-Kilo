@@ -9,186 +9,363 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; }
-        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        @keyframes slideUp {
+            from { transform: translateY(80px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
         .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
-        .branch-bg { background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('lazimpat.jpg'); background-size: cover; background-position: center; background-attachment: fixed; }
-        .modal-content-bg { background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('pic.jpg'); background-size: cover; background-position: center; }
-        .animated-pills { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        @media (max-width: 768px) { button, select, input { min-height: 48px; } }
+
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20%     { transform: translateX(-7px); }
+            40%     { transform: translateX(7px); }
+            60%     { transform: translateX(-4px); }
+            80%     { transform: translateX(4px); }
+        }
+        .shake { animation: shake 0.42s ease; }
+
+        .branch-bg {
+            background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('lazimpat.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        .modal-content-bg {
+            background-image: linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.78)), url('pic.jpg');
+            background-size: cover; background-position: center;
+        }
+
+        .styled-scroll::-webkit-scrollbar { width: 4px; }
+        .styled-scroll::-webkit-scrollbar-track { background: transparent; }
+        .styled-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+        .qty-pill { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        @media (max-width: 768px) {
+            button, select, input, textarea { min-height: 44px; }
+            .qty-pill button { min-height: unset; }
+        }
+
+        /* ── Slide to confirm ── */
+        .slide-track {
+            position: relative; width: 100%; height: 56px;
+            background: rgba(22,163,74,0.12); border: 1px solid rgba(22,163,74,0.3);
+            border-radius: 100px; overflow: hidden; user-select: none; touch-action: none;
+        }
+        .slide-fill {
+            position: absolute; left: 0; top: 0; bottom: 0; width: 56px;
+            background: rgba(22,163,74,0.25); border-radius: 100px;
+            transition: width 0.05s linear; pointer-events: none;
+        }
+        .slide-label {
+            position: absolute; inset: 0; display: flex; align-items: center;
+            justify-content: center; font-size: 12px; font-weight: 700;
+            letter-spacing: 0.06em; color: rgba(134,239,172,0.7);
+            pointer-events: none; transition: opacity 0.2s;
+        }
+        .slide-thumb {
+            position: absolute; left: 4px; top: 4px; width: 48px; height: 48px;
+            background: #16a34a; border-radius: 100px; display: flex; align-items: center;
+            justify-content: center; color: white; font-size: 18px; cursor: grab;
+            transition: background 0.2s, left 0.08s linear; will-change: left;
+            box-shadow: 0 2px 12px rgba(22,163,74,0.4); z-index: 2;
+        }
+        .slide-thumb:active { cursor: grabbing; }
+        .slide-track.confirmed .slide-fill  { width: 100% !important; background: rgba(22,163,74,0.35); }
+        .slide-track.confirmed .slide-label { opacity: 0; }
+        .slide-track.confirmed .slide-thumb { left: calc(100% - 52px) !important; background: #15803d; cursor: default; }
+
+        .menu-card { transition: border-color 0.15s, transform 0.15s; }
+        .menu-card:hover { border-color: rgba(245,158,11,0.3) !important; transform: translateY(-1px); }
+
+        .special-notes { transition: border-color 0.15s; }
+        .special-notes:focus { outline: none; border-color: rgba(245,158,11,0.4) !important; }
+
+        .filter-pill { transition: all 0.15s; cursor: pointer; }
+        .filter-pill.active, .filter-pill:hover {
+            background: rgba(245,158,11,0.15) !important;
+            border-color: rgba(245,158,11,0.4) !important;
+            color: #fbbf24 !important;
+        }
+
+        /* Status badges */
+        .s-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 10px; font-weight: 700; padding: 2px 9px;
+            border-radius: 100px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .s-pending   { background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); }
+        .s-preparing { background:rgba(59,130,246,0.15);  color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
+        .s-ready     { background:rgba(34,197,94,0.15);   color:#4ade80; border:1px solid rgba(34,197,94,0.3); }
+        .s-paid      { background:rgba(168,85,247,0.15);  color:#c084fc; border:1px solid rgba(168,85,247,0.3); }
+        .s-rush      { background:rgba(239,68,68,0.15);   color:#f87171; border:1px solid rgba(239,68,68,0.3); }
+
+        /* Status progress steps */
+        .step-dot {
+            width: 22px; height: 22px; border-radius: 50%; border: 2px solid;
+            display: flex; align-items: center; justify-content: center; font-size: 9px;
+            flex-shrink: 0; transition: all 0.4s ease;
+        }
+        .step-dot.done    { background: #16a34a; border-color: #16a34a; color: white; }
+        .step-dot.active  { background: transparent; border-color: #f59e0b; color: #f59e0b; }
+        .step-dot.pending { background: transparent; border-color: #334155; color: #334155; }
+        .step-connector   { flex: 1; height: 2px; background: #1e293b; border-radius: 2px; margin: 0 3px; transition: background 0.4s ease; }
+        .step-connector.done { background: rgba(34,197,94,0.45); }
+
+        #toast { transition: opacity 0.3s; pointer-events: none; }
+
+        @keyframes pulseReady {
+            0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+            50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0.15); }
+        }
+        .pulse-ready { animation: pulseReady 1.8s ease-in-out infinite; }
     </style>
 </head>
 <body class="branch-bg text-slate-100 min-h-screen flex flex-col justify-between">
 
-    <nav class="bg-slate-950/70 backdrop-blur-md border-b border-slate-900 sticky top-0 z-30 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <img src="logo.jpg" alt="Sekuwa by Kilo" class="h-10 w-auto object-contain rounded-md border border-amber-500/20" onerror="this.style.display='none'">
-                <span class="text-xs text-slate-400 hidden sm:inline font-medium">Lazimpat Branch</span>
-            </div>
+    <!-- ── NAV ── -->
+    <nav class="bg-slate-950/75 backdrop-blur-md border-b border-slate-900 sticky top-0 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
-                <span id="nav-table-tag" class="hidden text-xs bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold px-4 py-1.5 rounded-full flex items-center gap-2">
-                    <i class="fa-solid fa-utensils"></i> <span>Table No: <span id="nav-table-num">0</span></span>
+                <img src="logo.jpg" alt="Sekuwa by Kilo logo"
+                     class="h-9 w-auto object-contain rounded-lg border border-amber-500/20"
+                     onerror="this.style.display='none'">
+                <div class="hidden sm:block">
+                    <p class="text-xs font-semibold text-white leading-none">Sekuwa by Kilo</p>
+                    <p class="text-[10px] text-slate-500 mt-0.5">Lazimpat Branch</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <span id="nav-table-tag"
+                      class="hidden text-[11px] bg-amber-500/10 border border-amber-500/30 text-amber-400
+                             font-semibold px-3 py-1.5 rounded-full items-center gap-1.5">
+                    <i class="fa-solid fa-utensils text-[10px]"></i>
+                    Table <span id="nav-table-num">0</span>
                 </span>
-                <button id="call-waiter-btn" class="hidden bg-red-600 hover:bg-red-500 text-white text-[10px] font-extrabold px-3 py-2 rounded-full shadow-lg transition-all cursor-pointer" onclick="callWaiter()">
-                    <i class="fa-solid fa-bell fa-shake mr-1"></i> CALL WAITER
+                <button id="call-waiter-btn"
+                        class="hidden bg-red-600 hover:bg-red-500 text-white text-[10px] font-bold
+                               px-3 py-2 rounded-full shadow-lg transition-all cursor-pointer items-center gap-1.5"
+                        onclick="callWaiter()">
+                    <i class="fa-solid fa-bell fa-shake"></i> Call Waiter
                 </button>
             </div>
         </div>
     </nav>
 
-    <div id="welcome-screen" class="fixed inset-0 z-20 flex flex-col items-center justify-end p-6" style="background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);">
-        <div class="modal-content-bg border-4 border-amber-400 max-w-3xl w-full p-6 rounded-3xl shadow-2xl animate-slide-up text-slate-100 flex flex-col md:flex-row items-center justify-between gap-6 relative mb-12">
-            <div class="flex flex-col items-center text-center md:text-left">
-                <img src="logo.jpg" alt="Sekuwa by Kilo" class="h-14 w-auto object-contain mb-3 rounded-xl shadow-sm" onerror="this.style.display='none'">
-                <span class="text-[9px] font-extrabold tracking-widest text-amber-300 uppercase mb-3 bg-amber-500/10 px-3 py-0.5 rounded-md">Lazimpat Branch</span>
-                <p class="text-xs text-slate-100 max-w-xs leading-relaxed">Start the table dining experience and explore the freshly prepared charcoal-grilled recipes.</p>
+    <!-- ── WELCOME SCREEN ── -->
+    <div id="welcome-screen"
+         class="fixed inset-0 z-20 flex flex-col items-center justify-end p-6"
+         style="background:rgba(0,0,0,0.7); backdrop-filter:blur(5px);">
+        <div class="modal-content-bg border-2 border-amber-400/70 max-w-2xl w-full p-6 rounded-3xl
+                    shadow-2xl animate-slide-up text-slate-100 flex flex-col md:flex-row
+                    items-center justify-between gap-6 relative mb-10">
+            <div class="flex flex-col items-center md:items-start text-center md:text-left">
+                <img src="logo.jpg" alt="Sekuwa by Kilo"
+                     class="h-12 w-auto object-contain mb-3 rounded-xl" onerror="this.style.display='none'">
+                <span class="text-[9px] font-bold tracking-widest text-amber-300 uppercase mb-3
+                             bg-amber-500/10 px-3 py-0.5 rounded-md">Lazimpat Branch</span>
+                <p class="text-xs text-slate-300 max-w-xs leading-relaxed">
+                    Start your table dining experience and explore freshly prepared charcoal-grilled recipes.
+                </p>
             </div>
-            <div class="flex flex-col items-center gap-2">
-                <button onclick="proceedToTableSelect()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-extrabold text-xs px-10 py-4 rounded-2xl shadow-xl hover:shadow-orange-500/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-3 tracking-wide cursor-pointer">
-                    START <i class="fa-solid fa-chevron-right"></i>
+            <div class="flex flex-col items-center gap-2 shrink-0">
+                <button onclick="proceedToTableSelect()"
+                        class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400
+                               hover:to-orange-400 text-white font-bold text-xs px-10 py-4 rounded-2xl
+                               shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center
+                               gap-3 tracking-wide cursor-pointer">
+                    GET STARTED <i class="fa-solid fa-chevron-right text-[10px]"></i>
                 </button>
             </div>
-            <button onclick="proceedToTableSelect()" class="absolute top-3 right-3 bg-slate-900 text-slate-400 hover:text-red-500 p-2 rounded-full text-xs shadow-sm cursor-pointer border border-slate-800 transition-colors">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
     </div>
 
+    <!-- ── TABLE SELECT SCREEN ── -->
     <div id="game-screen" class="hidden fixed inset-0 z-10 bg-slate-950 flex flex-col items-center justify-center p-6">
-        <div class="max-w-md w-full text-center space-y-8">
+        <div class="max-w-sm w-full text-center space-y-8">
             <div>
-                <span class="bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                    <i class="fa-solid fa-circle-dot mr-1"></i> Level 1: Table Assignment
+                <span class="bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full text-[10px]
+                             font-bold uppercase tracking-wider">
+                    <i class="fa-solid fa-circle-dot mr-1"></i> Step 1
                 </span>
-                <h2 class="text-3xl font-extrabold text-white mt-4 tracking-tight">Assign Dining Location</h2>
-                <p class="text-slate-400 text-xs mt-2">Select your current table number to initialize the menu system.</p>
+                <h2 class="text-2xl font-extrabold text-white mt-4 tracking-tight">Select Your Table</h2>
+                <p class="text-slate-500 text-xs mt-2">Tap your table number to begin.</p>
             </div>
-            <div class="grid grid-cols-3 gap-5" id="token-container"></div>
-            <p class="text-[10px] text-slate-500 mt-4">Connecting to station server...</p>
+            <div class="grid grid-cols-3 gap-4" id="token-container"></div>
         </div>
     </div>
 
-    <main id="menu-screen" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex items-start gap-5 shadow-sm">
-                <div class="w-12 h-12 bg-amber-500 text-slate-950 rounded-xl flex items-center justify-center text-lg flex-shrink-0">
+    <!-- ── MENU SCREEN ── -->
+    <main id="menu-screen"
+          class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow
+                 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
+
+        <!-- Left: Menu -->
+        <div class="lg:col-span-2 space-y-5">
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl flex items-start gap-4">
+                <div class="w-10 h-10 bg-amber-500/15 text-amber-400 rounded-xl flex items-center
+                            justify-center text-base flex-shrink-0">
                     <i class="fa-solid fa-book-open"></i>
                 </div>
                 <div>
-                    <h3 class="text-sm font-extrabold text-amber-400 mb-1 tracking-tight">OPERATING PROCEDURES</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Click <b class="text-slate-200">"Add"</b> to initialize an item, and adjust quantities using <b class="text-slate-200">"+"</b> or <b class="text-slate-200">"-"</b>. Confirm using the <b class="text-slate-200">"Order Now"</b> button.</p>
-                    <span class="text-[10px] bg-slate-800 px-3 py-1 rounded-full text-slate-400"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i> No service charge added</span>
+                    <p class="text-[11px] font-bold text-amber-400 mb-1 tracking-widest uppercase">How to order</p>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Tap <b class="text-slate-200">Add</b> on any item, adjust quantities with
+                        <b class="text-slate-200">+</b> / <b class="text-slate-200">−</b>, then hit
+                        <b class="text-slate-200">Order Now</b>.
+                    </p>
+                    <span class="mt-2 inline-flex items-center gap-1.5 text-[10px] bg-slate-800
+                                 text-slate-500 px-3 py-1 rounded-full">
+                        <i class="fa-solid fa-bolt text-amber-500 text-[9px]"></i> No service charge
+                    </span>
                 </div>
             </div>
 
-            <div class="bg-gradient-to-r from-amber-600/20 to-amber-950/20 border border-amber-500/20 p-5 rounded-2xl flex items-center justify-between">
+            <div class="flex items-end justify-between">
                 <div>
-                    <span class="bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-extrabold text-[8px] uppercase tracking-widest">Special</span>
-                    <h4 class="text-sm font-bold mt-2 text-white">Combo Platter Deal Available</h4>
-                    <p class="text-[10px] text-slate-400 mt-1">Combine any Momo and Sekuwa set for additional loyalty points.</p>
+                    <h2 class="text-xl font-black text-white tracking-tight">Charcoal &amp; BBQ</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Pick from our freshly prepared categories</p>
                 </div>
-                <button onclick="document.getElementById('menu-items').scrollIntoView({behavior: 'smooth'})" class="bg-slate-800 text-amber-400 text-[10px] font-extrabold px-4 py-2 rounded-xl hover:bg-amber-500 hover:text-slate-950 transition-all cursor-pointer">
-                    View Deals
-                </button>
+                <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20
+                             px-2.5 py-1 rounded-lg font-semibold hidden sm:block">
+                    <i class="fa-solid fa-fire mr-1"></i> Live grill
+                </span>
             </div>
 
-            <div>
-                <h2 class="text-2xl font-black text-white tracking-tight sm:text-3xl mt-2">Authentic Charcoal & BBQ</h2>
-                <p class="text-xs text-slate-500">Pick from our freshly prepared categories.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="menu-items"></div>
+            <div class="flex gap-2 flex-wrap" id="filter-row"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="menu-items"></div>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl sticky top-24 flex flex-col max-h-[80vh]">
-            <div class="border-b border-slate-800 pb-4 mb-4 flex justify-between items-center">
-                <h3 class="text-sm font-extrabold text-slate-100">Order Summary</h3>
-                <span class="text-[10px] font-bold tracking-wider text-amber-500 uppercase">Current Session</span>
+        <!-- Right: Cart sidebar -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl
+                    sticky top-20 flex flex-col max-h-[85vh]">
+            <div class="border-b border-slate-800 pb-3 mb-4 flex justify-between items-center">
+                <h3 class="text-sm font-bold text-slate-100">Order Summary</h3>
+                <span class="text-[10px] font-bold tracking-wider text-amber-500 uppercase">Session</span>
             </div>
-            <div class="flex-grow overflow-y-auto space-y-3 max-h-[38vh] pr-2" id="cart-items">
-                <div class="text-center py-16 text-slate-600" id="empty-cart">
-                    <i class="fa-solid fa-basket-shopping text-2xl mb-2"></i>
+
+            <div class="flex-grow overflow-y-auto space-y-2.5 styled-scroll pr-1" id="cart-items">
+                <div class="text-center py-12 text-slate-600" id="empty-cart">
+                    <i class="fa-solid fa-basket-shopping text-xl mb-2 block"></i>
                     <p class="text-xs font-medium">Your basket is empty</p>
                 </div>
             </div>
-            <div class="border-t border-slate-800 pt-4 mt-4 space-y-3">
-                <div class="flex items-center justify-between text-xs text-slate-400">
+
+            <div class="mt-3">
+                <textarea id="special-notes"
+                          class="special-notes w-full bg-slate-950/70 border border-slate-800 rounded-xl
+                                 text-slate-400 text-xs p-3 resize-none placeholder-slate-600"
+                          rows="2"
+                          placeholder="Special requests or allergies…"></textarea>
+            </div>
+
+            <div class="border-t border-slate-800 pt-3 mt-3 space-y-2">
+                <div class="flex justify-between text-xs text-slate-500">
                     <span>Subtotal</span>
-                    <span id="cart-subtotal" class="font-bold text-slate-200">Rs. 0</span>
+                    <span id="cart-subtotal" class="font-semibold text-slate-300">Rs. 0</span>
                 </div>
-                <div class="flex items-center justify-between border-t border-slate-800 pt-3">
-                    <span class="text-xs font-extrabold text-slate-200">Total</span>
+                <div class="flex justify-between items-center border-t border-slate-800 pt-2.5">
+                    <span class="text-xs font-bold text-slate-200">Total</span>
                     <span id="cart-total" class="text-xl font-black text-amber-500">Rs. 0</span>
                 </div>
-                <button onclick="placeOrder()" class="w-full mt-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-4 px-6 rounded-xl shadow-md transition-all cursor-pointer">
+                <button id="order-now-btn" onclick="placeOrder()"
+                        class="w-full mt-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold
+                               py-3.5 px-6 rounded-xl shadow-md transition-all cursor-pointer text-sm">
                     ORDER NOW
                 </button>
-                <button onclick="openExternalPage()" class="w-full mt-1 bg-slate-950/80 text-amber-400 border border-amber-500/20 text-xs font-bold py-4 px-6 rounded-xl shadow-sm hover:bg-amber-500/10 transition-all cursor-pointer">
-                    <i class="fa-solid fa-circle-info mr-2"></i> Check Order Status
+                <button onclick="openOrderStatus()"
+                        class="w-full bg-slate-950/60 text-amber-400 border border-amber-500/20 text-xs
+                               font-semibold py-3 px-6 rounded-xl hover:bg-amber-500/10 transition-all
+                               cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-info"></i> Check Order Status
                 </button>
             </div>
         </div>
     </main>
 
-    <div id="confirmation-screen" class="hidden fixed inset-0 z-20 bg-slate-950 flex flex-col items-center justify-center p-6">
-        <div class="max-w-md w-full text-center space-y-8 bg-slate-900 border border-slate-900 p-8 rounded-3xl shadow-2xl">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400 text-2xl">
-                <i class="fa-solid fa-circle-check animate-bounce"></i>
+    <!-- ── CONFIRMATION SCREEN ── -->
+    <div id="confirmation-screen"
+         class="hidden fixed inset-0 z-20 bg-slate-950/95 flex flex-col items-center justify-center p-6">
+        <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6">
+            <div class="text-center">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl
+                            bg-green-500/10 border border-green-500/20 text-green-400 text-xl mb-4">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h2 class="text-xl font-extrabold text-white tracking-tight">Review Your Order</h2>
+                <p class="text-xs text-slate-500 mt-1">Confirm before sending to the kitchen.</p>
             </div>
-            <div>
-                <h2 class="text-2xl font-extrabold text-white mb-2 tracking-tight">Review Your Order</h2>
-                <p class="text-xs text-slate-500">Review your items before sending to the kitchen station.</p>
-            </div>
-            <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800/50 text-left">
-                <div class="flex justify-between items-center text-xs pb-3 border-b border-slate-900 mb-3">
-                    <span class="text-slate-500">Dining Table</span>
-                    <span id="confirm-table" class="font-bold text-amber-500">0</span>
+
+            <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 text-left">
+                <div class="flex justify-between text-xs pb-3 border-b border-slate-800 mb-3">
+                    <span class="text-slate-500">Table</span>
+                    <span id="confirm-table" class="font-bold text-amber-400">0</span>
                 </div>
                 <ul class="space-y-2 text-xs" id="confirm-items"></ul>
-                <div class="flex justify-between items-center text-sm border-t border-slate-900 pt-3 mt-3">
+                <div id="confirm-notes-row" class="hidden mt-3 pt-3 border-t border-slate-800">
+                    <p class="text-slate-500 text-xs">Notes:</p>
+                    <p id="confirm-notes-text" class="text-slate-400 text-xs mt-1 italic"></p>
+                </div>
+                <div class="flex justify-between text-sm border-t border-slate-800 pt-3 mt-3">
                     <span class="text-slate-500">Grand Total</span>
-                    <span id="confirm-total" class="font-bold text-amber-500">Rs. 0</span>
+                    <span id="confirm-total" class="font-bold text-amber-400">Rs. 0</span>
                 </div>
             </div>
-            <button onclick="confirmFinalOrder()" class="w-full bg-green-600 hover:bg-green-500 text-white font-extrabold py-4 px-6 rounded-xl shadow-md transition-all cursor-pointer">
-                <i class="fa-solid fa-check mr-1"></i> Send to Kitchen
-            </button>
-            <button onclick="editOrder()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-extrabold py-4 px-6 rounded-xl border border-slate-800 shadow-md transition-all mt-3 cursor-pointer">
-                <i class="fa-solid fa-pen-to-square mr-1"></i> Edit Order
+
+            <div class="slide-track" id="slide-track">
+                <div class="slide-fill"  id="slide-fill"></div>
+                <div class="slide-label" id="slide-label">
+                    <span>SLIDE TO SEND &nbsp;›››</span>
+                </div>
+                <div class="slide-thumb" id="slide-thumb">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+            </div>
+            <button onclick="editOrder()"
+                    class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold
+                           py-3.5 px-6 rounded-xl border border-slate-800 transition-all cursor-pointer text-xs">
+                <i class="fa-solid fa-pen-to-square mr-2"></i> Edit Order
             </button>
         </div>
     </div>
 
-    <div id="external-screen" class="hidden fixed inset-0 z-25 bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-        <div class="max-w-lg w-full bg-slate-900 border border-slate-900 p-8 rounded-3xl shadow-2xl space-y-6">
-            <i class="fa-solid fa-fire-burner text-4xl text-amber-500 animate-pulse"></i>
-            <div>
-                <h3 class="text-xl font-extrabold text-white mb-2 tracking-tight">Order Received</h3>
-                <p class="text-xs text-slate-500">Your order is being reviewed by station operators.</p>
+    <!-- ── ORDER STATUS SCREEN ── -->
+    <div id="external-screen"
+         class="hidden fixed inset-0 z-25 bg-slate-950/95 flex flex-col items-center justify-start p-6 overflow-y-auto">
+        <div class="max-w-md w-full space-y-4 py-8">
+            <div class="text-center">
+                <i class="fa-solid fa-fire-burner text-4xl text-amber-500 animate-pulse block mb-3"></i>
+                <h3 class="text-xl font-extrabold text-white mb-1" id="status-headline">Your Orders</h3>
+                <p class="text-xs text-slate-500" id="status-subline">Live updates from the kitchen.</p>
             </div>
-            <div class="p-6 bg-slate-950 rounded-2xl text-left border border-slate-800">
-                <p class="text-xs font-semibold text-slate-400 mb-2">Most Recent Order Summary:</p>
-                <ul class="text-xs text-slate-400 space-y-1" id="external-summary-items"></ul>
-                <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-xs">
-                    <span class="text-slate-500">Approx. Delivery Time:</span>
-                    <span id="approx-time" class="font-bold text-amber-400">0 Mins</span>
-                </div>
-            </div>
-            <button onclick="backToMenuScreen()" class="w-full bg-slate-900 text-amber-500 border border-slate-800 text-xs font-extrabold py-4 px-6 rounded-xl hover:bg-amber-500/10 transition-all cursor-pointer">
-                <i class="fa-solid fa-arrow-left mr-2"></i> Start a New Order
+
+            <div id="status-orders-list" class="space-y-3"></div>
+
+            <button onclick="backToMenuScreen()"
+                    class="w-full bg-slate-900 text-amber-400 border border-slate-800 text-xs
+                           font-bold py-3.5 px-6 rounded-xl hover:bg-amber-500/10 transition-all cursor-pointer">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Place Another Order
             </button>
         </div>
     </div>
 
-    <footer class="bg-slate-900 border-t border-slate-800 py-6 text-center text-[10px] text-slate-600">
-        &copy; 2026 Sekuwa by Kilo. Designed for Lazimpat.
+    <!-- Toast notification -->
+    <div id="toast"
+         class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700
+                text-white text-xs font-semibold px-5 py-3 rounded-full shadow-2xl opacity-0
+                whitespace-nowrap">
+    </div>
+
+    <footer class="bg-slate-900/80 border-t border-slate-800 py-5 text-center text-[10px] text-slate-700">
+        &copy; 2026 Sekuwa by Kilo &mdash; Lazimpat Branch
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, get, update, off }
+            from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAdQtFwyOHoixp2rALMKBllaeqg2jvCl5w",
             authDomain: "sekuwa-by-kilo.firebaseapp.com",
@@ -200,233 +377,574 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        const db  = getDatabase(app);
 
-        function escapeHTML(str) {
-            if (!str) return '';
-            return String(str).replace(/[&<>'"]/g, match => {
-                const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
-                return escapeMap[match];
-            });
+        // ── Helpers ──────────────────────────────────────────────────────────
+        function esc(str) {
+            if (!str && str !== 0) return '';
+            return String(str).replace(/[&<>'"]/g,
+                m => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' })[m]);
         }
 
-        const renderCache = { menu: '', cart: '', tokens: '' };
-        function updateDOM(elementId, cacheKey, htmlString) {
-            if (renderCache[cacheKey] !== htmlString) {
-                document.getElementById(elementId).innerHTML = htmlString;
-                renderCache[cacheKey] = htmlString;
-            }
+        function fmt(n) { return 'Rs.\u00a0' + Number(n).toLocaleString(); }
+
+        function nowStamp() {
+            return {
+                time:      new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false }),
+                date:      new Date().toISOString().split('T')[0],
+                createdAt: new Date().toISOString()
+            };
         }
 
+        let _toastTimer;
+        function showToast(msg, duration = 3500) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.opacity = '1';
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => { t.style.opacity = '0'; }, duration);
+        }
+
+        function showScreen(id) {
+            ['welcome-screen','game-screen','menu-screen','confirmation-screen','external-screen']
+                .forEach(s => document.getElementById(s).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        // ── State ─────────────────────────────────────────────────────────────
         const menuData = [
-            { id: 1, name: "Chicken Sekuwa (500 gm)", price: 815, category: "Sekuwa" },
-            { id: 2, name: "Pork Sekuwa (500 gm)", price: 815, category: "Sekuwa" },
-            { id: 3, name: "Mutton Sekuwa (250 gm)", price: 880, category: "Sekuwa" },
-            { id: 4, name: "Chicken Sekuwa Set", price: 530, category: "Sets" },
-            { id: 5, name: "Buff Momo (Steam)", price: 225, category: "Momo" },
-            { id: 6, name: "Mustang Aloo", price: 300, category: "Sides" }
+            { id:1, name:'Chicken Sekuwa (500 gm)', price:815,  category:'Sekuwa' },
+            { id:2, name:'Pork Sekuwa (500 gm)',    price:815,  category:'Sekuwa' },
+            { id:3, name:'Mutton Sekuwa (250 gm)',  price:880,  category:'Sekuwa' },
+            { id:4, name:'Chicken Sekuwa Set',       price:530,  category:'Sets'   },
+            { id:5, name:'Buff Momo (Steam)',         price:225,  category:'Momo'   },
+            { id:6, name:'Mustang Aloo',              price:300,  category:'Sides'  }
         ];
 
-        let cart = [];
-        let selectedTable = null;
-        let myLatestOrder = null;
+        let cart              = [];
+        let selectedTable     = null;
+        // Each entry: { originalKey, data, unsubscribe }
+        // data tracks status via order_status/<originalKey>
+        let sessionOrders     = [];
+        let activeFilter      = 'All';
+        let tableCount        = 6;
+        let waiterCooldownUntil = 0;
+        let sliderConfirmed   = false;
 
-        window.proceedToTableSelect = function() {
-            document.getElementById('welcome-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            generateGameTokens();
+        // ── Table count from Firebase ─────────────────────────────────────────
+        async function fetchTableCount() {
+            try {
+                const snap = await get(ref(db, 'config/tableCount'));
+                if (snap.exists() && typeof snap.val() === 'number' && snap.val() > 0) {
+                    tableCount = snap.val();
+                }
+            } catch (_) { /* fallback: keep 6 */ }
+        }
+
+        // ── Category filters ──────────────────────────────────────────────────
+        function buildFilterPills() {
+            const cats = ['All', ...new Set(menuData.map(m => m.category))];
+            document.getElementById('filter-row').innerHTML = cats.map(cat => `
+                <button data-cat="${esc(cat)}" onclick="setFilter('${esc(cat)}')"
+                        class="filter-pill ${cat === 'All'
+                            ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
+                            : 'bg-slate-900/50 border-slate-700 text-slate-400'}
+                               text-[11px] font-semibold px-3.5 py-1.5 rounded-full border">
+                    ${esc(cat)}
+                </button>`).join('');
+        }
+
+        window.setFilter = function(cat) {
+            activeFilter = cat;
+            document.querySelectorAll('#filter-row .filter-pill').forEach(btn => {
+                const active = btn.dataset.cat === cat;
+                btn.className = `filter-pill ${active
+                    ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
+                    : 'bg-slate-900/50 border-slate-700 text-slate-400'}
+                    text-[11px] font-semibold px-3.5 py-1.5 rounded-full border transition-all`;
+            });
+            renderMenu();
         };
 
-        function generateGameTokens() {
-            const tables = [1, 2, 3, 4, 5, 6];
-            let html = tables.map(num => `
-                <button onclick="selectTable(${num})" class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg group hover:border-amber-500/50 transition-all cursor-pointer">
-                    <div class="w-14 h-14 rounded-2xl bg-slate-950 text-amber-500 font-extrabold flex items-center justify-center text-base mb-4 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all shadow-inner">${num}</div>
-                    <span class="text-[10px] font-medium text-slate-500 group-hover:text-slate-400">Table</span>
-                    <span class="text-xs font-bold text-slate-300 group-hover:text-amber-400">No. ${num}</span>
-                </button>
-            `).join('');
-            updateDOM('token-container', 'tokens', html);
+        // ── Screens ───────────────────────────────────────────────────────────
+        window.proceedToTableSelect = function() {
+            showScreen('game-screen');
+            generateTableButtons();
+        };
+
+        function generateTableButtons() {
+            document.getElementById('token-container').innerHTML =
+                Array.from({ length: tableCount }, (_, i) => i + 1).map(n => `
+                    <button onclick="selectTable(${n})"
+                            class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col
+                                   items-center justify-center gap-3 group hover:border-amber-500/50
+                                   transition-all cursor-pointer">
+                        <div class="w-12 h-12 rounded-xl bg-slate-950 text-amber-500 font-extrabold
+                                    flex items-center justify-center text-lg group-hover:bg-amber-500
+                                    group-hover:text-slate-950 transition-all">${n}</div>
+                        <span class="text-xs font-semibold text-slate-400 group-hover:text-amber-400
+                                     transition-colors">Table ${n}</span>
+                    </button>`).join('');
         }
 
         window.selectTable = function(num) {
             selectedTable = num;
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('menu-screen').classList.remove('hidden');
+            sessionStorage.setItem('sbk_table', num);
+
             document.getElementById('nav-table-tag').classList.remove('hidden');
+            document.getElementById('nav-table-tag').classList.add('flex');
             document.getElementById('call-waiter-btn').classList.remove('hidden');
-            document.getElementById('nav-table-num').textContent = escapeHTML(num);
+            document.getElementById('call-waiter-btn').classList.add('flex');
+            document.getElementById('nav-table-num').textContent = num;
+
+            showScreen('menu-screen');
+            buildFilterPills();
             renderMenu();
         };
 
+        // ── Waiter call ───────────────────────────────────────────────────────
         window.callWaiter = function() {
-            const callObj = {
-                table: selectedTable,
-                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-                date: new Date().toISOString().split('T')[0],
-                status: 'Pending'
-            };
-            
-            push(ref(db, 'waiter_calls'), callObj).then(() => {
-                alert(`Request successfully sent from Table No. ${selectedTable}.`);
-            }).catch(() => alert("Connection error."));
-        };
-
-        function getQuantity(id) {
-            const item = cart.find(c => c.id === id);
-            return item ? item.quantity : 0;
-        }
-
-        function renderMenu() {
-            let html = menuData.map(item => {
-                const isAdded = getQuantity(item.id) > 0;
-                return `
-                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md flex flex-col justify-between">
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-md">${escapeHTML(item.category)}</span>
-                            <h4 class="text-base sm:text-md font-extrabold text-white mt-4 mb-2 leading-snug tracking-tight">${escapeHTML(item.name)}</h4>
-                            <p class="text-lg sm:text-xl font-black text-amber-500 mt-2">Rs. ${item.price.toLocaleString()}</p>
-                            <span class="text-[10px] text-green-500 font-medium"><i class="fa-solid fa-bolt mr-1 text-[8px]"></i> 9 mins</span>
-                        </div>
-                        <div class="mt-6 flex justify-end">
-                            <div id="control-wrapper-${item.id}">
-                                ${!isAdded ? `
-                                    <button onclick="initiallyAddItem(${item.id})" class="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-black text-xs py-2.5 px-6 rounded-xl hover:bg-amber-500 hover:text-slate-950 transition-all cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Add</button>
-                                ` : `
-                                    <div class="flex items-center justify-between bg-slate-950 p-1 rounded-full border border-slate-800/60 shadow-inner animated-pills w-28">
-                                        <button onclick="decrementMenuQuantity(${item.id})" class="bg-slate-900 hover:bg-red-500/20 text-red-400 text-xs font-black cursor-pointer w-7 h-7 flex items-center justify-center rounded-full transition-all">-</button>
-                                        <span class="text-xs font-black text-slate-300 px-2" id="menu-item-qty-${item.id}">${getQuantity(item.id)}</span>
-                                        <button onclick="incrementMenuQuantity(${item.id})" class="bg-slate-900 hover:bg-amber-500/20 text-amber-400 text-xs font-black cursor-pointer w-7 h-7 flex items-center justify-center rounded-full transition-all">+</button>
-                                    </div>
-                                `}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            updateDOM('menu-items', 'menu', html);
-        }
-
-        window.initiallyAddItem = function(id) { addToCart(id); renderMenu(); };
-        window.incrementMenuQuantity = function(id) { addToCart(id); renderMenu(); };
-        window.decrementMenuQuantity = function(id) {
-            const itemInCart = cart.find(c => c.id === id);
-            if (itemInCart) {
-                if (itemInCart.quantity > 1) itemInCart.quantity -= 1;
-                else cart = cart.filter(c => c.id !== id);
-            }
-            updateCartUI();
-            renderMenu();
-        };
-
-        function addToCart(id) {
-            const item = menuData.find(m => m.id === id);
-            const existing = cart.find(c => c.id === id);
-            if (existing) existing.quantity += 1;
-            else cart.push({ ...item, quantity: 1 });
-            updateCartUI();
-        }
-
-        window.removeFromCart = function(id) {
-            cart = cart.filter(item => item.id !== id);
-            updateCartUI();
-            renderMenu();
-        };
-
-        function updateCartUI() {
-            const subtotalElement = document.getElementById('cart-subtotal');
-            const totalElement = document.getElementById('cart-total');
-
-            if (cart.length === 0) {
-                updateDOM('cart-items', 'cart', `<div class="text-center py-16 text-slate-600"><i class="fa-solid fa-basket-shopping text-2xl mb-2"></i><p class="text-xs font-medium">Your basket is empty</p></div>`);
-                subtotalElement.textContent = "Rs. 0";
-                totalElement.textContent = "Rs. 0";
+            const now = Date.now();
+            if (now < waiterCooldownUntil) {
+                const secs = Math.ceil((waiterCooldownUntil - now) / 1000);
+                showToast(`⏳ Please wait ${secs}s before calling again.`);
                 return;
             }
+            waiterCooldownUntil = now + 60_000;
+            const { time, date } = nowStamp();
+            push(ref(db, 'waiter_calls'), { table: selectedTable, time, date, status: 'Pending' })
+                .then(() => showToast(`🔔 Waiter request sent for Table ${selectedTable}.`))
+                .catch(() => showToast('❌ Connection error. Please try again.'));
+        };
 
-            let subtotal = 0;
-            let html = cart.map(item => {
-                let itemTotal = item.price * item.quantity;
-                subtotal += itemTotal;
+        // ── Menu render ───────────────────────────────────────────────────────
+        function getQty(id) { return (cart.find(c => c.id === id) || {}).quantity || 0; }
+
+        function renderMenu() {
+            const items = activeFilter === 'All'
+                ? menuData : menuData.filter(m => m.category === activeFilter);
+
+            document.getElementById('menu-items').innerHTML = items.map(item => {
+                const qty = getQty(item.id);
                 return `
-                <div class="flex items-center justify-between bg-slate-950 p-3 rounded-lg border border-slate-800">
-                    <div class="w-3/5">
-                        <h5 class="text-[11px] font-bold text-slate-300 truncate">${escapeHTML(item.name)}</h5>
-                        <p class="text-[9px] text-slate-500 mt-0.5">${escapeHTML(item.quantity)} × Rs. ${item.price.toLocaleString()}</p>
+                <div class="menu-card bg-slate-900/90 border border-slate-800 rounded-xl p-5
+                            flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400
+                                     bg-amber-500/10 px-2 py-0.5 rounded-md">${esc(item.category)}</span>
+                        <h4 class="text-sm font-extrabold text-white mt-3 mb-1 leading-snug">
+                            ${esc(item.name)}</h4>
+                        <p class="text-base font-black text-amber-500">${fmt(item.price)}</p>
+                        <p class="text-[10px] text-green-500 mt-1 flex items-center gap-1">
+                            <i class="fa-solid fa-bolt text-[8px]"></i> ~9 mins
+                        </p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs font-extrabold text-amber-500">Rs. ${itemTotal.toLocaleString()}</span>
-                        <button onclick="removeFromCart(${item.id})" class="text-slate-600 hover:text-red-500 p-1 cursor-pointer transition-colors"><i class="fa-solid fa-trash text-[9px]"></i></button>
+                    <div class="mt-5 flex justify-end" id="ctrl-${item.id}">
+                        ${qty === 0
+                            ? `<button onclick="addItem(${item.id})"
+                                       class="bg-amber-500/10 border border-amber-500/30 text-amber-400
+                                              font-bold text-xs py-2 px-5 rounded-xl hover:bg-amber-500
+                                              hover:text-slate-950 transition-all cursor-pointer">
+                                   <i class="fa-solid fa-plus mr-1 text-[10px]"></i> Add
+                               </button>`
+                            : `<div class="qty-pill flex items-center bg-slate-950 border border-slate-800
+                                          rounded-full p-0.5 w-28 justify-between">
+                                   <button onclick="decItem(${item.id})"
+                                           class="w-8 h-8 flex items-center justify-center rounded-full
+                                                  hover:bg-red-500/20 text-red-400 text-sm font-bold
+                                                  cursor-pointer transition-colors">−</button>
+                                   <span class="text-xs font-black text-slate-300">${qty}</span>
+                                   <button onclick="incItem(${item.id})"
+                                           class="w-8 h-8 flex items-center justify-center rounded-full
+                                                  hover:bg-amber-500/20 text-amber-400 text-sm font-bold
+                                                  cursor-pointer transition-colors">+</button>
+                               </div>`}
                     </div>
-                </div>
-                `;
+                </div>`;
             }).join('');
-
-            updateDOM('cart-items', 'cart', html);
-            subtotalElement.textContent = "Rs. " + subtotal.toLocaleString();
-            totalElement.textContent = "Rs. " + subtotal.toLocaleString();
         }
 
-        window.placeOrder = function() {
-            if (cart.length === 0) return alert("Select at least one item from the menu to proceed.");
-            document.getElementById('confirm-table').textContent = escapeHTML(selectedTable);
-            let total = 0;
-            document.getElementById('confirm-items').innerHTML = cart.map(i => {
-                total += i.price * i.quantity;
-                return `<li class="flex justify-between text-slate-400"><span>${escapeHTML(i.name)} × <b class="text-amber-500">${escapeHTML(i.quantity)}</b></span><span class="font-bold text-slate-200">Rs. ${(i.price * i.quantity).toLocaleString()}</span></li>`;
+        // ── Cart operations ───────────────────────────────────────────────────
+        window.addItem = function(id) {
+            const existing = cart.find(c => c.id === id);
+            if (existing) existing.quantity += 1;
+            else cart.push({ ...menuData.find(m => m.id === id), quantity: 1 });
+            renderMenu(); updateCartUI();
+        };
+        window.incItem = window.addItem;
+
+        window.decItem = function(id) {
+            const e = cart.find(c => c.id === id);
+            if (!e) return;
+            if (e.quantity > 1) e.quantity -= 1; else cart = cart.filter(c => c.id !== id);
+            renderMenu(); updateCartUI();
+        };
+
+        window.removeFromCart = function(id) {
+            cart = cart.filter(c => c.id !== id);
+            renderMenu(); updateCartUI();
+        };
+
+        function calcTotal() { return cart.reduce((s, i) => s + i.price * i.quantity, 0); }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-600" id="empty-cart">
+                        <i class="fa-solid fa-basket-shopping text-xl mb-2 block"></i>
+                        <p class="text-xs font-medium">Your basket is empty</p>
+                    </div>`;
+                document.getElementById('cart-subtotal').textContent = fmt(0);
+                document.getElementById('cart-total').textContent    = fmt(0);
+                return;
+            }
+            container.innerHTML = cart.map(item => {
+                const line = item.price * item.quantity;
+                return `
+                <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <div class="min-w-0 flex-1 mr-2">
+                        <p class="text-[11px] font-semibold text-slate-300 truncate">${esc(item.name)}</p>
+                        <p class="text-[10px] text-slate-600 mt-0.5">${item.quantity} × ${fmt(item.price)}</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-xs font-bold text-amber-400">${fmt(line)}</span>
+                        <button onclick="removeFromCart(${item.id})"
+                                class="text-slate-600 hover:text-red-500 p-1 cursor-pointer transition-colors">
+                            <i class="fa-solid fa-trash text-[9px]"></i>
+                        </button>
+                    </div>
+                </div>`;
             }).join('');
-            document.getElementById('confirm-total').textContent = "Rs. " + total.toLocaleString();
-            document.getElementById('menu-screen').classList.add('hidden');
-            document.getElementById('confirmation-screen').classList.remove('hidden');
+            const total = calcTotal();
+            document.getElementById('cart-subtotal').textContent = fmt(total);
+            document.getElementById('cart-total').textContent    = fmt(total);
+        }
+
+        // ── Order flow ────────────────────────────────────────────────────────
+        window.placeOrder = function() {
+            if (cart.length === 0) {
+                const btn = document.getElementById('order-now-btn');
+                btn.classList.remove('shake');
+                void btn.offsetWidth;
+                btn.classList.add('shake');
+                showToast('🛒 Add at least one item first.');
+                return;
+            }
+            const notes = document.getElementById('special-notes').value.trim();
+            const total = calcTotal();
+
+            document.getElementById('confirm-table').textContent = selectedTable;
+            document.getElementById('confirm-items').innerHTML = cart.map(i => `
+                <li class="flex justify-between text-slate-400">
+                    <span>${esc(i.name)} × <b class="text-amber-500">${i.quantity}</b></span>
+                    <span class="font-bold text-slate-200">${fmt(i.price * i.quantity)}</span>
+                </li>`).join('');
+            document.getElementById('confirm-total').textContent = fmt(total);
+
+            const notesRow = document.getElementById('confirm-notes-row');
+            if (notes) {
+                document.getElementById('confirm-notes-text').textContent = notes;
+                notesRow.classList.remove('hidden');
+            } else {
+                notesRow.classList.add('hidden');
+            }
+
+            showScreen('confirmation-screen');
+            resetSlider();
         };
 
         window.confirmFinalOrder = function() {
-            if (cart.length === 0) return alert("Basket is empty.");
-            
-            const orderPayload = {
-                table: selectedTable,
-                items: [...cart],
-                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-                date: new Date().toISOString().split('T')[0],
-                status: 'Pending'
+            if (cart.length === 0) { showToast('Basket is empty.'); return; }
+
+            const notes        = document.getElementById('special-notes').value.trim();
+            const cartSnapshot = [...cart];
+            const { time, date, createdAt } = nowStamp();
+
+            const payload = {
+                table:     selectedTable,
+                items:     cartSnapshot,
+                notes:     notes || null,
+                time, date, createdAt,
+                status:    'Pending'
             };
 
-            push(ref(db, 'kitchen_orders'), orderPayload).then(() => {
-                myLatestOrder = orderPayload; 
-                cart = [];
-                updateCartUI();
-                renderMenu();
-                openExternalPage();
-            }).catch(() => alert("Connection error. Order failed."));
+            push(ref(db, 'kitchen_orders'), payload)
+                .then((orderRef) => {
+                    const originalKey = orderRef.key;
+
+                    // Listen on order_status/<originalKey> — station writes here on every status change.
+                    // This key never changes even when order moves from kitchen → prep → history.
+                    const statusRef = ref(db, `order_status/${originalKey}`);
+                    const entry = {
+                        originalKey,
+                        data: { ...payload },
+                        unsubscribe: null
+                    };
+
+                    const unsubStatus = onValue(statusRef, (snap) => {
+                        const live = snap.val();
+                        if (!live) return;
+                        const prevStatus = entry.data.status;
+                        // Merge live fields (status, etc.) into entry data
+                        entry.data = { ...entry.data, ...live };
+
+                        // Re-render status screen if visible
+                        if (!document.getElementById('external-screen').classList.contains('hidden')) {
+                            renderStatusScreen();
+                        }
+
+                        // Status-change toasts
+                        if (live.status && live.status !== prevStatus) {
+                            if (live.status === 'Preparing') showToast('👨‍🍳 Kitchen is preparing your order!', 4000);
+                            else if (live.status === 'Ready') showToast('✅ Your order is ready! Please collect.', 6000);
+                            else if (live.status === 'Paid')  showToast('💜 Payment confirmed — thank you!', 6000);
+                        }
+                    });
+
+                    entry.unsubscribe = unsubStatus;
+                    sessionOrders.push(entry);
+
+                    cart = [];
+                    document.getElementById('special-notes').value = '';
+                    updateCartUI();
+                    renderMenu();
+                    openOrderStatus();
+                })
+                .catch(() => {
+                    showToast('❌ Connection error. Order failed. Try again.');
+                    resetSlider();
+                    showScreen('confirmation-screen');
+                });
         };
 
-        window.editOrder = function() {
-            document.getElementById('confirmation-screen').classList.add('hidden');
-            document.getElementById('menu-screen').classList.remove('hidden');
+        window.editOrder = function() { showScreen('menu-screen'); };
+
+        // ── Status screen ─────────────────────────────────────────────────────
+        function statusBadge(status, rush) {
+            const map = {
+                Pending:   ['s-pending',   'fa-clock',        'Pending'],
+                Preparing: ['s-preparing', 'fa-fire',         'Preparing'],
+                Ready:     ['s-ready',     'fa-check-circle', 'Ready to Collect'],
+                Paid:      ['s-paid',      'fa-check-double', 'Paid'],
+            };
+            const [cls, icon, label] = map[status] || ['s-pending', 'fa-clock', status];
+            const rushBadge = rush
+                ? `<span class="s-badge s-rush ml-1"><i class="fa-solid fa-bolt"></i> Rush</span>` : '';
+            return `<span class="s-badge ${cls}"><i class="fa-solid ${icon}"></i> ${label}</span>${rushBadge}`;
+        }
+
+        /**
+         * FIX: Progress bar now correctly advances through all four stages.
+         * stages[] indices match status strings exactly.
+         * Each dot is "done" if its index < curIdx, "active" if equal, "pending" if greater.
+         * Connector between i and i+1 is "done" if i < curIdx.
+         */
+        function statusSteps(status) {
+            const stages = ['Pending', 'Preparing', 'Ready', 'Paid'];
+            const labels = ['Received', 'Preparing', 'Ready', 'Paid'];
+            const icons  = ['fa-clock', 'fa-fire', 'fa-check-circle', 'fa-check-double'];
+            const curIdx = stages.indexOf(status);
+            const safeIdx = curIdx < 0 ? 0 : curIdx;
+
+            const dotsHtml = stages.map((_, i) => {
+                let dotClass = 'pending';
+                if (i < safeIdx) dotClass = 'done';
+                else if (i === safeIdx) dotClass = 'active';
+
+                const innerHtml = dotClass === 'done'
+                    ? '<i class="fa-solid fa-check" style="font-size:9px"></i>'
+                    : (i + 1).toString();
+
+                const connector = i < stages.length - 1
+                    ? `<div class="step-connector ${i < safeIdx ? 'done' : ''}"></div>`
+                    : '';
+
+                return `
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                        <div class="step-dot ${dotClass}">${innerHtml}</div>
+                        <span style="font-size:8px;color:${i <= safeIdx ? '#94a3b8' : '#334155'};white-space:nowrap">${labels[i]}</span>
+                    </div>
+                    ${connector}`;
+            }).join('');
+
+            return `<div style="display:flex;align-items:flex-start;width:100%;padding:4px 0">${dotsHtml}</div>`;
+        }
+
+        function renderStatusScreen() {
+            const list     = document.getElementById('status-orders-list');
+            const headline = document.getElementById('status-headline');
+            const subline  = document.getElementById('status-subline');
+
+            if (sessionOrders.length === 0) {
+                headline.textContent = 'No Orders Yet';
+                subline.textContent  = 'Browse the menu and place an order first.';
+                list.innerHTML = `
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center
+                                text-slate-500 text-xs">
+                        <i class="fa-solid fa-basket-shopping text-2xl mb-3 block opacity-50"></i>
+                        No orders placed this session.
+                    </div>`;
+                return;
+            }
+
+            const allPaid = sessionOrders.every(o => o.data.status === 'Paid');
+            if (allPaid) {
+                headline.textContent = 'All Settled — Thank You! 🙏';
+                subline.textContent  = 'We hope you enjoyed your meal.';
+            } else {
+                headline.textContent = 'Your Orders';
+                subline.textContent  = 'Live updates from the kitchen.';
+            }
+
+            list.innerHTML = sessionOrders.map((entry, idx) => {
+                const d         = entry.data;
+                const items     = d.items || [];
+                const total     = items.reduce((s, i) => s + i.price * i.quantity, 0);
+                const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+                const status    = d.status || 'Pending';
+
+                let waitLabel = '';
+                if (status === 'Pending' || status === 'Preparing') {
+                    if (d.createdAt) {
+                        const elapsedMin = Math.floor((Date.now() - new Date(d.createdAt)) / 60000);
+                        const remaining  = Math.max(1, 15 + itemCount * 2 - elapsedMin);
+                        waitLabel = `~${remaining} min${remaining !== 1 ? 's' : ''}`;
+                    } else {
+                        waitLabel = '~15 mins';
+                    }
+                }
+
+                const statusColor = { Ready:'text-green-400', Paid:'text-purple-400' }[status] || 'text-amber-400';
+                const statusLine  = status === 'Ready' ? '✅ Collect now!'
+                                  : status === 'Paid'  ? '💜 Paid — all settled'
+                                  : waitLabel;
+
+                const isReady = status === 'Ready';
+
+                return `
+                <div class="bg-slate-900 border ${isReady ? 'border-green-500/30 pulse-ready' : 'border-slate-800'}
+                            p-5 rounded-2xl text-left space-y-3 transition-all">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <span class="text-xs font-bold text-slate-400">
+                            Order ${idx + 1} &middot; Table ${esc(d.table)}
+                        </span>
+                        <div class="flex flex-wrap gap-1">${statusBadge(status, d.rush)}</div>
+                    </div>
+                    ${statusSteps(status)}
+                    <ul class="text-xs text-slate-400 space-y-1.5 mt-1">
+                        ${items.map(i => `
+                            <li class="flex justify-between">
+                                <span>${esc(i.name)} × ${i.quantity}</span>
+                                <span class="text-amber-400 font-semibold">${fmt(i.price * i.quantity)}</span>
+                            </li>`).join('')}
+                    </ul>
+                    ${d.notes ? `
+                        <p class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-2">
+                            📝 ${esc(d.notes)}</p>` : ''}
+                    <div class="flex justify-between text-xs border-t border-slate-800 pt-2">
+                        <span class="text-slate-500">
+                            ${(status === 'Pending' || status === 'Preparing') ? 'Est. wait' : 'Status'}
+                        </span>
+                        <span class="font-bold ${statusColor}">${statusLine}</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-500">Total</span>
+                        <span class="font-bold text-amber-400">${fmt(total)}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.openOrderStatus = function() {
+            renderStatusScreen();
+            showScreen('external-screen');
         };
 
-        window.openExternalPage = function() {
-            if (!myLatestOrder) return alert("No active orders placed by this device yet.");
-            
-            document.getElementById('external-summary-items').innerHTML = myLatestOrder.items.map(i => `
-                <li class="flex justify-between"><span>${escapeHTML(i.name)} × ${escapeHTML(i.quantity)}</span><span class="text-amber-400">Rs. ${(i.price * i.quantity).toLocaleString()}</span></li>
-            `).join('');
+        window.backToMenuScreen = function() { showScreen('menu-screen'); };
 
-            let totalItemCount = myLatestOrder.items.reduce((acc, item) => acc + Number(item.quantity), 0);
-            document.getElementById('approx-time').textContent = `${15 + (totalItemCount * 3)} Mins`;
+        // ── Slide-to-confirm ──────────────────────────────────────────────────
+        function initSlider() {
+            const track = document.getElementById('slide-track');
+            const thumb = document.getElementById('slide-thumb');
+            const fill  = document.getElementById('slide-fill');
+            const label = document.getElementById('slide-label');
 
-            document.getElementById('menu-screen').classList.add('hidden');
-            document.getElementById('confirmation-screen').classList.add('hidden');
-            document.getElementById('external-screen').classList.remove('hidden');
-        };
+            let dragging = false, startX = 0, currentX = 0;
 
-        window.backToMenuScreen = function() {
-            document.getElementById('external-screen').classList.add('hidden');
-            document.getElementById('menu-screen').classList.remove('hidden');
-        };
+            const maxLeft = () => track.offsetWidth - 56;
 
-        renderMenu();
-        updateCartUI();
+            function setPosition(x) {
+                const c = Math.max(0, Math.min(x, maxLeft()));
+                currentX = c;
+                thumb.style.left  = (4 + c) + 'px';
+                fill.style.width  = (56 + c) + 'px';
+                label.style.opacity = Math.max(0, 1 - (c / maxLeft()) * 1.6);
+            }
+
+            function onStart(e) {
+                if (sliderConfirmed) return;
+                dragging = true;
+                startX   = (e.touches ? e.touches[0].clientX : e.clientX) - currentX;
+                thumb.style.transition = fill.style.transition = 'none';
+                e.preventDefault();
+            }
+            function onMove(e) {
+                if (!dragging) return;
+                setPosition((e.touches ? e.touches[0].clientX : e.clientX) - startX);
+                e.preventDefault();
+            }
+            function onEnd() {
+                if (!dragging) return;
+                dragging = false;
+                thumb.style.transition = fill.style.transition = '';
+                if (currentX >= maxLeft() * 0.85) {
+                    sliderConfirmed = true;
+                    track.classList.add('confirmed');
+                    thumb.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    label.style.opacity = 0;
+                    setTimeout(confirmFinalOrder, 420);
+                } else {
+                    setPosition(0);
+                    label.style.opacity = 1;
+                }
+            }
+
+            thumb.addEventListener('mousedown',   onStart, { passive: false });
+            thumb.addEventListener('touchstart',   onStart, { passive: false });
+            document.addEventListener('mousemove', onMove,  { passive: false });
+            document.addEventListener('touchmove', onMove,  { passive: false });
+            document.addEventListener('mouseup',   onEnd);
+            document.addEventListener('touchend',  onEnd);
+        }
+
+        function resetSlider() {
+            sliderConfirmed = false;
+            const track = document.getElementById('slide-track');
+            const thumb = document.getElementById('slide-thumb');
+            const fill  = document.getElementById('slide-fill');
+            const label = document.getElementById('slide-label');
+            if (!track) return;
+            track.classList.remove('confirmed');
+            thumb.innerHTML     = '<i class="fa-solid fa-chevron-right"></i>';
+            thumb.style.left    = '4px';
+            fill.style.width    = '56px';
+            label.style.opacity = 1;
+        }
+
+        // ── Init — always show welcome screen first ────────────────────────────
+        async function init() {
+            await fetchTableCount();
+            updateCartUI();
+            initSlider();
+            // Always start at welcome screen regardless of session storage.
+            // sessionStorage is used only to remember the table number during the
+            // same browser tab session so the table select can be skipped if the
+            // page refreshes mid-session — but we never skip the welcome screen.
+            showScreen('welcome-screen');
+        }
+
+        init();
     </script>
 </body>
 </html>
