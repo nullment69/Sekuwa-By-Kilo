@@ -7,7 +7,6 @@
     <link rel="icon" type="image/jpeg" href="logo.jpg" onerror="this.href='data:image/x-icon;base64,'">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- EmailJS SDK — sends bill emails client-side, no backend required -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -183,7 +182,6 @@
 </head>
 <body class="branch-bg text-slate-100 min-h-screen flex flex-col justify-between">
 
-<!-- ── NAV ── -->
 <nav class="bg-slate-950/75 backdrop-blur-md border-b border-slate-900 sticky top-0 z-30 shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
@@ -203,7 +201,6 @@
                 Table <span id="nav-table-num">0</span>
             </span>
 
-            <!-- Account avatar (shown once table is selected) -->
             <div class="relative" id="account-nav-wrap" style="display:none">
                 <button class="user-avatar" id="nav-avatar" onclick="toggleAccountPanel()" title="My Account">
                     <span id="nav-avatar-initials">?</span>
@@ -246,11 +243,9 @@
     </div>
 </nav>
 
-<!-- ── AUTH MODAL ── -->
 <div class="auth-overlay hidden" id="auth-overlay" onclick="handleOverlayClick(event)">
     <div class="auth-box animate-fade-in" id="auth-box">
 
-        <!-- Sign-in / first-time view -->
         <div id="auth-signin-view">
             <div class="flex items-center gap-3 mb-5">
                 <div class="w-10 h-10 bg-amber-500/15 border border-amber-500/20 rounded-xl
@@ -288,7 +283,6 @@
             </button>
         </div>
 
-        <!-- Edit profile view -->
         <div id="auth-edit-view" class="hidden">
             <div class="flex items-center justify-between mb-5">
                 <h3 class="text-sm font-extrabold text-white">Edit Profile</h3>
@@ -316,7 +310,6 @@
     </div>
 </div>
 
-<!-- ── WELCOME SCREEN ── -->
 <div id="welcome-screen"
      class="fixed inset-0 z-20 flex flex-col items-center justify-end p-6"
      style="background:rgba(0,0,0,0.7); backdrop-filter:blur(5px);">
@@ -349,7 +342,6 @@
     </div>
 </div>
 
-<!-- ── TABLE SELECT SCREEN ── -->
 <div id="game-screen" class="hidden fixed inset-0 z-10 bg-slate-950 flex flex-col items-center justify-center p-6">
     <div class="max-w-sm w-full text-center space-y-8">
         <div>
@@ -364,7 +356,6 @@
     </div>
 </div>
 
-<!-- ── MENU SCREEN ── -->
 <main id="menu-screen"
       class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow
              grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
@@ -401,7 +392,6 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="menu-items"></div>
     </div>
 
-    <!-- Cart sidebar -->
     <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl
                 sticky top-20 flex flex-col max-h-[85vh]">
         <div class="border-b border-slate-800 pb-3 mb-4 flex justify-between items-center">
@@ -447,7 +437,6 @@
     </div>
 </main>
 
-<!-- ── CONFIRMATION SCREEN ── -->
 <div id="confirmation-screen"
      class="hidden fixed inset-0 z-20 bg-slate-950/95 flex flex-col items-center justify-center p-6">
     <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-5">
@@ -476,7 +465,6 @@
             </div>
         </div>
 
-        <!-- Email row shown after slider capture -->
         <div id="confirm-email-row" class="hidden email-banner">
             <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5 min-w-0">
@@ -510,7 +498,24 @@
     </div>
 </div>
 
-<!-- ── ORDER STATUS SCREEN ── -->
+<div class="auth-overlay hidden" id="email-info-overlay" onclick="if(event.target === this) closeEmailInfoModal()">
+    <div class="auth-box animate-fade-in text-center" style="padding: 32px 24px;">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 text-2xl mb-4">
+            <i class="fa-solid fa-paper-plane"></i>
+        </div>
+        <h3 class="text-xl font-black text-white mb-2 tracking-tight">Order Sent!</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-6 px-2">
+            Your itemised bill will be sent to <br>
+            <b class="text-amber-400" id="info-modal-email"></b><br>
+            as soon as your payment is completed.
+        </p>
+        <button onclick="closeEmailInfoModal()"
+                class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-3.5 rounded-xl shadow-md transition-all cursor-pointer">
+            Awesome, thanks!
+        </button>
+    </div>
+</div>
+
 <div id="external-screen"
      class="hidden fixed inset-0 z-25 bg-slate-950/95 flex flex-col items-center justify-start p-6 overflow-y-auto">
     <div class="max-w-md w-full space-y-4 py-8">
@@ -520,7 +525,6 @@
             <p class="text-xs text-slate-500" id="status-subline">Live updates from the kitchen.</p>
         </div>
 
-        <!-- Email confirmed banner -->
         <div id="status-email-set" class="email-banner hidden">
             <div class="flex items-center gap-2.5">
                 <i class="fa-solid fa-circle-check text-amber-400 text-base flex-shrink-0"></i>
@@ -541,7 +545,6 @@
     </div>
 </div>
 
-<!-- ── Bill sent confirmation toast ── -->
 <div id="bill-toast" class="hidden">
     <div class="bg-green-950 border border-green-500/40 text-green-300
                 px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
@@ -555,7 +558,6 @@
     </div>
 </div>
 
-<!-- Toast -->
 <div id="toast"
      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700
             text-white text-xs font-semibold px-5 py-3 rounded-full shadow-2xl opacity-0 whitespace-nowrap">
@@ -573,20 +575,6 @@
     /* ═══════════════════════════════════════════════════════════════════════
        EMAILJS SETUP — required to send bill emails
        ─────────────────────────────────────────────────────────────────────
-       1. Sign up free at https://www.emailjs.com (200 emails/month free)
-       2. Add an Email Service (Gmail recommended) → copy the Service ID
-       3. Create an Email Template. Use these exact variable names:
-           {{to_name}}          customer's name
-           {{to_email}}         send-to address  ← set as "To Email" in template
-           {{table_number}}     table number
-           {{order_items}}      line-by-line item list (plain text, newline-separated)
-           {{order_total}}      total e.g. "Rs. 1,630"
-           {{order_date}}       date string
-           {{order_time}}       time string
-           {{order_notes}}      special notes (may be "—")
-           {{restaurant_name}}  always "Sekuwa by Kilo — Lazimpat"
-       4. Copy your Public Key from Account → API Keys
-       5. Replace the three placeholders below.
     ═══════════════════════════════════════════════════════════════════════ */
     const EMAILJS_PUBLIC_KEY  = 'B7TxLhcukvBJeNDLu';   // ← replace
     const EMAILJS_SERVICE_ID  = 'service_py2n2bm';   // ← replace
@@ -724,41 +712,43 @@
         if (!name)              { document.getElementById('auth-name').focus();  showToast('Please enter your name.'); return; }
         if (!isValidEmail(email)) { document.getElementById('auth-email').focus(); showToast('Please enter a valid email.'); return; }
         persistAccount(name, email);
+        
         // Log to Firebase for restaurant records (name + email + table, no sensitive data)
         if (selectedTable) {
             push(ref(db, 'customer_emails'), { name, email, table: selectedTable, date: nowStamp().date }).catch(()=>{});
         }
+        
         closeAuthModal();
         refreshAccountUI();
         showToast(`✅ Got it, ${name}! Bill will go to ${email}`);
-        // If slider was waiting for email, now fire the order
-        if (_pendingOrderAfterAuth) {
-            _pendingOrderAfterAuth = false;
-            sliderConfirmed = true;
-            const track = document.getElementById('slide-track');
-            const thumb = document.getElementById('slide-thumb');
-            const label = document.getElementById('slide-label');
-            track.classList.add('confirmed');
-            thumb.innerHTML = '<i class="fa-solid fa-check"></i>';
-            label.style.opacity = 0;
-            setTimeout(confirmFinalOrder, 420);
+
+        // If they just placed an order (meaning sessionOrders has items)
+        if (sessionOrders.length > 0) {
+            const latestOrder = sessionOrders[sessionOrders.length - 1];
+            
+            // Update the kitchen order in Firebase with the newly provided email
+            update(ref(db, `kitchen_orders/${latestOrder.originalKey}`), {
+                customerEmail: account.email,
+                customerName: account.name
+            }).catch(()=>{});
+
+            // Update the local entry data so the email function has the correct email
+            latestOrder.data.customerEmail = account.email;
+            latestOrder.data.customerName = account.name;
+
+            // Show the "Awesome, Order Sent!" modal
+            openEmailInfoModal();
+
+            // FORCE EMAIL IMMEDIATELY FOR TESTING
+            sendBillEmail(latestOrder);
         }
     };
+
     window.skipAuth = function() {
         closeAuthModal();
-        // If slider was waiting, proceed without email
-        if (_pendingOrderAfterAuth) {
-            _pendingOrderAfterAuth = false;
-            sliderConfirmed = true;
-            const track = document.getElementById('slide-track');
-            const thumb = document.getElementById('slide-thumb');
-            const label = document.getElementById('slide-label');
-            track.classList.add('confirmed');
-            thumb.innerHTML = '<i class="fa-solid fa-check"></i>';
-            label.style.opacity = 0;
-            setTimeout(confirmFinalOrder, 420);
-        }
+        showToast('Order received! You can track its status here.');
     };
+
     window.saveEditAccount = function() {
         const name  = document.getElementById('edit-name').value.trim();
         const email = document.getElementById('edit-email').value.trim();
@@ -769,6 +759,7 @@
         refreshAccountUI();
         showToast('✅ Profile updated!');
     };
+    
     window.signOut = function() {
         if (!confirm('Remove your saved email from this device?')) return;
         account = { name:'', email:'' };
@@ -791,6 +782,15 @@
         const wrap = document.getElementById('account-nav-wrap');
         if (wrap && !wrap.contains(e.target)) closeAccountPanel();
     });
+
+    /* ─── Email Info Modal ─── */
+    window.openEmailInfoModal = function() {
+        document.getElementById('info-modal-email').textContent = account.email;
+        document.getElementById('email-info-overlay').classList.remove('hidden');
+    };
+    window.closeEmailInfoModal = function() {
+        document.getElementById('email-info-overlay').classList.add('hidden');
+    };
 
     /* ─── Email billing ─────────────────────────────────────────────────── */
     const billedKeys = new Set(); // guard against double-sending
@@ -855,7 +855,6 @@
     let tableCount          = 6;
     let waiterCooldownUntil = 0;
     let sliderConfirmed     = false;
-    let _pendingOrderAfterAuth = false; // set true when slider fires but email not yet captured
 
     async function fetchTableCount() {
         try {
@@ -1064,7 +1063,7 @@
                         else if (live.status==='Ready') showToast('✅ Your order is ready! Please collect.',6000);
                         else if (live.status==='Paid')  {
                             showToast('💜 Payment confirmed — thank you!',6000);
-                            sendBillEmail(entry);
+                            // Real app: sendBillEmail(entry) goes here.
                         }
                     }
                 }
@@ -1083,6 +1082,15 @@
                 sessionOrders.push(entry);
                 cart=[]; document.getElementById('special-notes').value='';
                 updateCartUI(); renderMenu(); openOrderStatus();
+                
+                // --- NEW FLOW: Ask for email AFTER order is successfully sent to DB ---
+                if (!hasAccount()) {
+                    openAuthModal('signin');
+                } else {
+                    openEmailInfoModal();
+                    // FORCE EMAIL IMMEDIATELY FOR TESTING
+                    sendBillEmail(entry); 
+                }
             })
             .catch(() => {
                 showToast('❌ Connection error. Order failed. Try again.');
@@ -1225,16 +1233,10 @@
             if(!dragging) return; dragging=false;
             thumb.style.transition=fill.style.transition='';
             if(currentX>=maxLeft()*0.85) {
-                // If no email yet, pause and ask before confirming
-                if (!hasAccount()) {
-                    setPos(0); label.style.opacity=1; // reset thumb
-                    _pendingOrderAfterAuth = true;
-                    openAuthModal('signin');
-                } else {
-                    sliderConfirmed=true; track.classList.add('confirmed');
-                    thumb.innerHTML='<i class="fa-solid fa-check"></i>'; label.style.opacity=0;
-                    setTimeout(confirmFinalOrder,420);
-                }
+                // IMMEDIATELY confirm and send the order
+                sliderConfirmed=true; track.classList.add('confirmed');
+                thumb.innerHTML='<i class="fa-solid fa-check"></i>'; label.style.opacity=0;
+                setTimeout(confirmFinalOrder,420);
             } else { setPos(0); label.style.opacity=1; }
         }
         thumb.addEventListener('mousedown', onStart,{passive:false});
