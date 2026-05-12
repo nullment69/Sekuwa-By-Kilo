@@ -7,6 +7,8 @@
     <link rel="icon" type="image/jpeg" href="logo.jpg" onerror="this.href='data:image/x-icon;base64,'">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- EmailJS SDK — sends bill emails client-side, no backend required -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         * { box-sizing: border-box; }
@@ -17,6 +19,12 @@
             to   { transform: translateY(0);    opacity: 1; }
         }
         .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in { animation: fadeIn 0.25s ease forwards; }
 
         @keyframes shake {
             0%,100% { transform: translateX(0); }
@@ -89,7 +97,6 @@
             color: #fbbf24 !important;
         }
 
-        /* Status badges */
         .s-badge {
             display: inline-flex; align-items: center; gap: 3px;
             font-size: 10px; font-weight: 700; padding: 2px 9px;
@@ -101,7 +108,6 @@
         .s-paid      { background:rgba(168,85,247,0.15);  color:#c084fc; border:1px solid rgba(168,85,247,0.3); }
         .s-rush      { background:rgba(239,68,68,0.15);   color:#f87171; border:1px solid rgba(239,68,68,0.3); }
 
-        /* Status progress steps */
         .step-dot {
             width: 22px; height: 22px; border-radius: 50%; border: 2px solid;
             display: flex; align-items: center; justify-content: center; font-size: 9px;
@@ -112,6 +118,59 @@
         .step-dot.pending { background: transparent; border-color: #334155; color: #334155; }
         .step-connector   { flex: 1; height: 2px; background: #1e293b; border-radius: 2px; margin: 0 3px; transition: background 0.4s ease; }
         .step-connector.done { background: rgba(34,197,94,0.45); }
+
+        /* ── Auth overlay ── */
+        .auth-overlay {
+            position: fixed; inset: 0; z-index: 60;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .auth-overlay.hidden { display: none; }
+        .auth-box {
+            background: #0f172a; border: 1px solid #1e293b;
+            border-radius: 24px; padding: 28px; width: 100%; max-width: 380px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+        }
+
+        /* ── Account panel dropdown ── */
+        .account-panel {
+            position: absolute; top: calc(100% + 10px); right: 0; z-index: 55;
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 16px;
+            padding: 14px; width: 230px; box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+            display: none;
+        }
+        .account-panel.open { display: block; }
+
+        .auth-input {
+            width: 100%; background: #1e293b; border: 1px solid #334155;
+            border-radius: 12px; padding: 10px 14px; font-size: 13px; color: #e2e8f0;
+            outline: none; transition: border-color 0.15s; min-height: unset !important;
+        }
+        .auth-input:focus { border-color: rgba(245,158,11,0.5); }
+        .auth-input::placeholder { color: #475569; }
+
+        .email-banner {
+            background: linear-gradient(135deg, rgba(245,158,11,0.07), rgba(234,179,8,0.03));
+            border: 1px solid rgba(245,158,11,0.2); border-radius: 14px; padding: 12px 14px;
+        }
+
+        /* ── User avatar ── */
+        .user-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 800; color: white; cursor: pointer;
+            border: 2px solid rgba(245,158,11,0.4); flex-shrink: 0;
+            transition: border-color 0.15s, transform 0.15s;
+        }
+        .user-avatar:hover { border-color: rgba(245,158,11,0.7); transform: scale(1.05); }
+
+        /* ── Bill sent toast ── */
+        #bill-toast {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            z-index: 55; transition: opacity 0.4s; max-width: 320px; width: calc(100% - 32px);
+        }
+        #bill-toast.hidden { opacity: 0; pointer-events: none; }
 
         #toast { transition: opacity 0.3s; pointer-events: none; }
 
@@ -124,827 +183,1085 @@
 </head>
 <body class="branch-bg text-slate-100 min-h-screen flex flex-col justify-between">
 
-    <!-- ── NAV ── -->
-    <nav class="bg-slate-950/75 backdrop-blur-md border-b border-slate-900 sticky top-0 z-30 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <img src="logo.jpg" alt="Sekuwa by Kilo logo"
-                     class="h-9 w-auto object-contain rounded-lg border border-amber-500/20"
-                     onerror="this.style.display='none'">
-                <div class="hidden sm:block">
-                    <p class="text-xs font-semibold text-white leading-none">Sekuwa by Kilo</p>
-                    <p class="text-[10px] text-slate-500 mt-0.5">Lazimpat Branch</p>
-                </div>
+<!-- ── NAV ── -->
+<nav class="bg-slate-950/75 backdrop-blur-md border-b border-slate-900 sticky top-0 z-30 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <img src="logo.jpg" alt="Sekuwa by Kilo logo"
+                 class="h-9 w-auto object-contain rounded-lg border border-amber-500/20"
+                 onerror="this.style.display='none'">
+            <div class="hidden sm:block">
+                <p class="text-xs font-semibold text-white leading-none">Sekuwa by Kilo</p>
+                <p class="text-[10px] text-slate-500 mt-0.5">Lazimpat Branch</p>
             </div>
-            <div class="flex items-center gap-2.5">
-                <span id="nav-table-tag"
-                      class="hidden text-[11px] bg-amber-500/10 border border-amber-500/30 text-amber-400
-                             font-semibold px-3 py-1.5 rounded-full items-center gap-1.5">
-                    <i class="fa-solid fa-utensils text-[10px]"></i>
-                    Table <span id="nav-table-num">0</span>
-                </span>
-                <button id="call-waiter-btn"
-                        class="hidden bg-red-600 hover:bg-red-500 text-white text-[10px] font-bold
-                               px-3 py-2 rounded-full shadow-lg transition-all cursor-pointer items-center gap-1.5"
-                        onclick="callWaiter()">
-                    <i class="fa-solid fa-bell fa-shake"></i> Call Waiter
+        </div>
+        <div class="flex items-center gap-2.5">
+            <span id="nav-table-tag"
+                  class="hidden text-[11px] bg-amber-500/10 border border-amber-500/30 text-amber-400
+                         font-semibold px-3 py-1.5 rounded-full items-center gap-1.5">
+                <i class="fa-solid fa-utensils text-[10px]"></i>
+                Table <span id="nav-table-num">0</span>
+            </span>
+
+            <!-- Account avatar (shown once table is selected) -->
+            <div class="relative" id="account-nav-wrap" style="display:none">
+                <button class="user-avatar" id="nav-avatar" onclick="toggleAccountPanel()" title="My Account">
+                    <span id="nav-avatar-initials">?</span>
                 </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- ── WELCOME SCREEN ── -->
-    <div id="welcome-screen"
-         class="fixed inset-0 z-20 flex flex-col items-center justify-end p-6"
-         style="background:rgba(0,0,0,0.7); backdrop-filter:blur(5px);">
-        <div class="modal-content-bg border-2 border-amber-400/70 max-w-2xl w-full p-6 rounded-3xl
-                    shadow-2xl animate-slide-up text-slate-100 flex flex-col md:flex-row
-                    items-center justify-between gap-6 relative mb-10">
-            <div class="flex flex-col items-center md:items-start text-center md:text-left">
-                <img src="logo.jpg" alt="Sekuwa by Kilo"
-                     class="h-12 w-auto object-contain mb-3 rounded-xl" onerror="this.style.display='none'">
-                <span class="text-[9px] font-bold tracking-widest text-amber-300 uppercase mb-3
-                             bg-amber-500/10 px-3 py-0.5 rounded-md">Lazimpat Branch</span>
-                <p class="text-xs text-slate-300 max-w-xs leading-relaxed">
-                    Start your table dining experience and explore freshly prepared charcoal-grilled recipes.
-                </p>
-            </div>
-            <div class="flex flex-col items-center gap-2 shrink-0">
-                <button onclick="proceedToTableSelect()"
-                        class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400
-                               hover:to-orange-400 text-white font-bold text-xs px-10 py-4 rounded-2xl
-                               shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center
-                               gap-3 tracking-wide cursor-pointer">
-                    GET STARTED <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── TABLE SELECT SCREEN ── -->
-    <div id="game-screen" class="hidden fixed inset-0 z-10 bg-slate-950 flex flex-col items-center justify-center p-6">
-        <div class="max-w-sm w-full text-center space-y-8">
-            <div>
-                <span class="bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full text-[10px]
-                             font-bold uppercase tracking-wider">
-                    <i class="fa-solid fa-circle-dot mr-1"></i> Step 1
-                </span>
-                <h2 class="text-2xl font-extrabold text-white mt-4 tracking-tight">Select Your Table</h2>
-                <p class="text-slate-500 text-xs mt-2">Tap your table number to begin.</p>
-            </div>
-            <div class="grid grid-cols-3 gap-4" id="token-container"></div>
-        </div>
-    </div>
-
-    <!-- ── MENU SCREEN ── -->
-    <main id="menu-screen"
-          class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow
-                 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
-
-        <!-- Left: Menu -->
-        <div class="lg:col-span-2 space-y-5">
-            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl flex items-start gap-4">
-                <div class="w-10 h-10 bg-amber-500/15 text-amber-400 rounded-xl flex items-center
-                            justify-center text-base flex-shrink-0">
-                    <i class="fa-solid fa-book-open"></i>
-                </div>
-                <div>
-                    <p class="text-[11px] font-bold text-amber-400 mb-1 tracking-widest uppercase">How to order</p>
-                    <p class="text-xs text-slate-400 leading-relaxed">
-                        Tap <b class="text-slate-200">Add</b> on any item, adjust quantities with
-                        <b class="text-slate-200">+</b> / <b class="text-slate-200">−</b>, then hit
-                        <b class="text-slate-200">Order Now</b>.
+                <div class="account-panel" id="account-panel">
+                    <div class="flex items-center gap-3 mb-3 pb-3 border-b border-slate-800">
+                        <div class="user-avatar" style="pointer-events:none">
+                            <span id="panel-initials">?</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-bold text-white truncate" id="panel-name">Guest</p>
+                            <p class="text-[10px] text-slate-500 truncate" id="panel-email">No email set</p>
+                        </div>
+                    </div>
+                    <button onclick="openAuthModal('edit'); closeAccountPanel()"
+                            class="w-full text-left text-[11px] text-slate-400 hover:text-amber-400
+                                   py-2 px-2 rounded-lg hover:bg-slate-800/60 transition-all
+                                   flex items-center gap-2 cursor-pointer" style="min-height:unset">
+                        <i class="fa-solid fa-pen text-[10px] w-4 text-center"></i> Edit Profile
+                    </button>
+                    <button onclick="signOut(); closeAccountPanel()"
+                            class="w-full text-left text-[11px] text-red-500 hover:text-red-400
+                                   py-2 px-2 rounded-lg hover:bg-red-950/30 transition-all
+                                   flex items-center gap-2 cursor-pointer" style="min-height:unset">
+                        <i class="fa-solid fa-right-from-bracket text-[10px] w-4 text-center"></i> Sign Out
+                    </button>
+                    <p class="text-[9px] text-slate-600 mt-3 pt-3 border-t border-slate-800 leading-relaxed">
+                        Your itemised bill will be emailed when your order is marked paid.
                     </p>
-                    <span class="mt-2 inline-flex items-center gap-1.5 text-[10px] bg-slate-800
-                                 text-slate-500 px-3 py-1 rounded-full">
-                        <i class="fa-solid fa-bolt text-amber-500 text-[9px]"></i> No service charge
-                    </span>
                 </div>
             </div>
 
-            <div class="flex items-end justify-between">
-                <div>
-                    <h2 class="text-xl font-black text-white tracking-tight">Charcoal &amp; BBQ</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Pick from our freshly prepared categories</p>
+            <button id="call-waiter-btn"
+                    class="hidden bg-red-600 hover:bg-red-500 text-white text-[10px] font-bold
+                           px-3 py-2 rounded-full shadow-lg transition-all cursor-pointer items-center gap-1.5"
+                    onclick="callWaiter()">
+                <i class="fa-solid fa-bell fa-shake"></i> Call Waiter
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- ── AUTH MODAL ── -->
+<div class="auth-overlay hidden" id="auth-overlay" onclick="handleOverlayClick(event)">
+    <div class="auth-box animate-fade-in" id="auth-box">
+
+        <!-- Sign-in / first-time view -->
+        <div id="auth-signin-view">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 bg-amber-500/15 border border-amber-500/20 rounded-xl
+                            flex items-center justify-center text-amber-400 text-sm flex-shrink-0">
+                    <i class="fa-solid fa-envelope"></i>
                 </div>
-                <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20
-                             px-2.5 py-1 rounded-lg font-semibold hidden sm:block">
-                    <i class="fa-solid fa-fire mr-1"></i> Live grill
+                <div>
+                    <h3 class="text-sm font-extrabold text-white">Receive your bill by email</h3>
+                    <p class="text-[10px] text-slate-500 mt-0.5">Completely optional · takes 10 seconds</p>
+                </div>
+            </div>
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Your Name</label>
+                    <input id="auth-name"  type="text"  class="auth-input" placeholder="e.g. Aarav Sharma"  autocomplete="name"  maxlength="60">
+                </div>
+                <div>
+                    <label class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Email Address</label>
+                    <input id="auth-email" type="email" class="auth-input" placeholder="you@example.com" autocomplete="email" maxlength="100">
+                    <p class="text-[10px] text-slate-600 mt-1.5 leading-relaxed">
+                        We'll send an itemised bill the moment your order is marked paid. No account, no password.
+                    </p>
+                </div>
+            </div>
+            <button onclick="saveAccount()"
+                    class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold
+                           py-3 rounded-xl text-sm transition-all cursor-pointer flex items-center
+                           justify-center gap-2 mb-3">
+                <i class="fa-solid fa-check text-[12px]"></i> Save &amp; Continue
+            </button>
+            <button onclick="skipAuth()"
+                    class="w-full bg-slate-800/50 hover:bg-slate-700 border border-slate-600 text-slate-200 hover:text-white text-xs font-semibold
+                           py-3 rounded-xl transition-all cursor-pointer mt-2 shadow-sm">
+                Skip — I don't need an email bill
+            </button>
+        </div>
+
+        <!-- Edit profile view -->
+        <div id="auth-edit-view" class="hidden">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-sm font-extrabold text-white">Edit Profile</h3>
+                <button onclick="closeAuthModal()" class="text-slate-500 hover:text-white cursor-pointer"
+                        style="min-height:unset;background:none;border:none;padding:4px 8px">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Name</label>
+                    <input id="edit-name"  type="text"  class="auth-input" placeholder="Your name"        maxlength="60">
+                </div>
+                <div>
+                    <label class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Email</label>
+                    <input id="edit-email" type="email" class="auth-input" placeholder="you@example.com"  maxlength="100">
+                </div>
+            </div>
+            <button onclick="saveEditAccount()"
+                    class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold
+                           py-3 rounded-xl text-sm transition-all cursor-pointer">
+                Save Changes
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── WELCOME SCREEN ── -->
+<div id="welcome-screen"
+     class="fixed inset-0 z-20 flex flex-col items-center justify-end p-6"
+     style="background:rgba(0,0,0,0.7); backdrop-filter:blur(5px);">
+    <div class="modal-content-bg border-2 border-amber-400/70 max-w-2xl w-full p-6 rounded-3xl
+                shadow-2xl animate-slide-up text-slate-100 flex flex-col md:flex-row
+                items-center justify-between gap-6 relative mb-10">
+        <div class="flex flex-col items-center md:items-start text-center md:text-left">
+            <img src="logo.jpg" alt="Sekuwa by Kilo"
+                 class="h-12 w-auto object-contain mb-3 rounded-xl" onerror="this.style.display='none'">
+            <span class="text-[9px] font-bold tracking-widest text-amber-300 uppercase mb-3
+                         bg-amber-500/10 px-3 py-0.5 rounded-md">Lazimpat Branch</span>
+            <p class="text-xs text-slate-300 max-w-xs leading-relaxed">
+                Start your table dining experience and explore freshly prepared charcoal-grilled recipes.
+            </p>
+            <div class="mt-3 flex items-center gap-2 text-[10px] text-amber-400/80
+                        border border-amber-500/20 bg-amber-500/6 px-3 py-1.5 rounded-lg">
+                <i class="fa-solid fa-envelope text-[9px]"></i>
+                Get your itemised bill by email after dining
+            </div>
+        </div>
+        <div class="flex flex-col items-center gap-2 shrink-0">
+            <button onclick="proceedToTableSelect()"
+                    class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400
+                           hover:to-orange-400 text-white font-bold text-xs px-10 py-4 rounded-2xl
+                           shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center
+                           gap-3 tracking-wide cursor-pointer">
+                GET STARTED <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── TABLE SELECT SCREEN ── -->
+<div id="game-screen" class="hidden fixed inset-0 z-10 bg-slate-950 flex flex-col items-center justify-center p-6">
+    <div class="max-w-sm w-full text-center space-y-8">
+        <div>
+            <span class="bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full text-[10px]
+                         font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-circle-dot mr-1"></i> Step 1
+            </span>
+            <h2 class="text-2xl font-extrabold text-white mt-4 tracking-tight">Select Your Table</h2>
+            <p class="text-slate-500 text-xs mt-2">Tap your table number to begin.</p>
+        </div>
+        <div class="grid grid-cols-3 gap-4" id="token-container"></div>
+    </div>
+</div>
+
+<!-- ── MENU SCREEN ── -->
+<main id="menu-screen"
+      class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow
+             grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
+
+    <div class="lg:col-span-2 space-y-5">
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl flex items-start gap-4">
+            <div class="w-10 h-10 bg-amber-500/15 text-amber-400 rounded-xl flex items-center
+                        justify-center text-base flex-shrink-0">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
+            <div>
+                <p class="text-[11px] font-bold text-amber-400 mb-1 tracking-widest uppercase">How to order</p>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Tap <b class="text-slate-200">Add</b> on any item, adjust with <b class="text-slate-200">+/−</b>, then hit <b class="text-slate-200">Order Now</b>.
+                </p>
+                <span class="mt-2 inline-flex items-center gap-1.5 text-[10px] bg-slate-800 text-slate-500 px-3 py-1 rounded-full">
+                    <i class="fa-solid fa-bolt text-amber-500 text-[9px]"></i> No service charge
                 </span>
             </div>
-
-            <div class="flex gap-2 flex-wrap" id="filter-row"></div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="menu-items"></div>
         </div>
 
-        <!-- Right: Cart sidebar -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl
-                    sticky top-20 flex flex-col max-h-[85vh]">
-            <div class="border-b border-slate-800 pb-3 mb-4 flex justify-between items-center">
-                <h3 class="text-sm font-bold text-slate-100">Order Summary</h3>
-                <span class="text-[10px] font-bold tracking-wider text-amber-500 uppercase">Session</span>
+        <div class="flex items-end justify-between">
+            <div>
+                <h2 class="text-xl font-black text-white tracking-tight">Charcoal &amp; BBQ</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Pick from our freshly prepared categories</p>
             </div>
+            <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20
+                         px-2.5 py-1 rounded-lg font-semibold hidden sm:block">
+                <i class="fa-solid fa-fire mr-1"></i> Live grill
+            </span>
+        </div>
 
-            <div class="flex-grow overflow-y-auto space-y-2.5 styled-scroll pr-1" id="cart-items">
-                <div class="text-center py-12 text-slate-600" id="empty-cart">
-                    <i class="fa-solid fa-basket-shopping text-xl mb-2 block"></i>
-                    <p class="text-xs font-medium">Your basket is empty</p>
-                </div>
-            </div>
+        <div class="flex gap-2 flex-wrap" id="filter-row"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="menu-items"></div>
+    </div>
 
-            <div class="mt-3">
-                <textarea id="special-notes"
-                          class="special-notes w-full bg-slate-950/70 border border-slate-800 rounded-xl
-                                 text-slate-400 text-xs p-3 resize-none placeholder-slate-600"
-                          rows="2"
-                          placeholder="Special requests or allergies…"></textarea>
-            </div>
+    <!-- Cart sidebar -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl
+                sticky top-20 flex flex-col max-h-[85vh]">
+        <div class="border-b border-slate-800 pb-3 mb-4 flex justify-between items-center">
+            <h3 class="text-sm font-bold text-slate-100">Order Summary</h3>
+            <span class="text-[10px] font-bold tracking-wider text-amber-500 uppercase">Session</span>
+        </div>
 
-            <div class="border-t border-slate-800 pt-3 mt-3 space-y-2">
-                <div class="flex justify-between text-xs text-slate-500">
-                    <span>Subtotal</span>
-                    <span id="cart-subtotal" class="font-semibold text-slate-300">Rs. 0</span>
-                </div>
-                <div class="flex justify-between items-center border-t border-slate-800 pt-2.5">
-                    <span class="text-xs font-bold text-slate-200">Total</span>
-                    <span id="cart-total" class="text-xl font-black text-amber-500">Rs. 0</span>
-                </div>
-                <button id="order-now-btn" onclick="placeOrder()"
-                        class="w-full mt-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold
-                               py-3.5 px-6 rounded-xl shadow-md transition-all cursor-pointer text-sm">
-                    ORDER NOW
-                </button>
-                <button onclick="openOrderStatus()"
-                        class="w-full bg-slate-950/60 text-amber-400 border border-amber-500/20 text-xs
-                               font-semibold py-3 px-6 rounded-xl hover:bg-amber-500/10 transition-all
-                               cursor-pointer flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-circle-info"></i> Check Order Status
-                </button>
+        <div class="flex-grow overflow-y-auto space-y-2.5 styled-scroll pr-1" id="cart-items">
+            <div class="text-center py-12 text-slate-600" id="empty-cart">
+                <i class="fa-solid fa-basket-shopping text-xl mb-2 block"></i>
+                <p class="text-xs font-medium">Your basket is empty</p>
             </div>
         </div>
-    </main>
 
-    <!-- ── CONFIRMATION SCREEN ── -->
-    <div id="confirmation-screen"
-         class="hidden fixed inset-0 z-20 bg-slate-950/95 flex flex-col items-center justify-center p-6">
-        <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6">
-            <div class="text-center">
-                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl
-                            bg-green-500/10 border border-green-500/20 text-green-400 text-xl mb-4">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-                <h2 class="text-xl font-extrabold text-white tracking-tight">Review Your Order</h2>
-                <p class="text-xs text-slate-500 mt-1">Confirm before sending to the kitchen.</p>
-            </div>
+        <div class="mt-3">
+            <textarea id="special-notes"
+                      class="special-notes w-full bg-slate-950/70 border border-slate-800 rounded-xl
+                             text-slate-400 text-xs p-3 resize-none placeholder-slate-600"
+                      rows="2" placeholder="Special requests or allergies…"></textarea>
+        </div>
 
-            <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 text-left">
-                <div class="flex justify-between text-xs pb-3 border-b border-slate-800 mb-3">
-                    <span class="text-slate-500">Table</span>
-                    <span id="confirm-table" class="font-bold text-amber-400">0</span>
-                </div>
-                <ul class="space-y-2 text-xs" id="confirm-items"></ul>
-                <div id="confirm-notes-row" class="hidden mt-3 pt-3 border-t border-slate-800">
-                    <p class="text-slate-500 text-xs">Notes:</p>
-                    <p id="confirm-notes-text" class="text-slate-400 text-xs mt-1 italic"></p>
-                </div>
-                <div class="flex justify-between text-sm border-t border-slate-800 pt-3 mt-3">
-                    <span class="text-slate-500">Grand Total</span>
-                    <span id="confirm-total" class="font-bold text-amber-400">Rs. 0</span>
-                </div>
+        <div class="border-t border-slate-800 pt-3 mt-3 space-y-2">
+            <div class="flex justify-between text-xs text-slate-500">
+                <span>Subtotal</span>
+                <span id="cart-subtotal" class="font-semibold text-slate-300">Rs. 0</span>
             </div>
-
-            <div class="slide-track" id="slide-track">
-                <div class="slide-fill"  id="slide-fill"></div>
-                <div class="slide-label" id="slide-label">
-                    <span>SLIDE TO SEND &nbsp;›››</span>
-                </div>
-                <div class="slide-thumb" id="slide-thumb">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
+            <div class="flex justify-between items-center border-t border-slate-800 pt-2.5">
+                <span class="text-xs font-bold text-slate-200">Total</span>
+                <span id="cart-total" class="text-xl font-black text-amber-500">Rs. 0</span>
             </div>
-            <button onclick="editOrder()"
-                    class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold
-                           py-3.5 px-6 rounded-xl border border-slate-800 transition-all cursor-pointer text-xs">
-                <i class="fa-solid fa-pen-to-square mr-2"></i> Edit Order
+            <button id="order-now-btn" onclick="placeOrder()"
+                    class="w-full mt-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold
+                           py-3.5 px-6 rounded-xl shadow-md transition-all cursor-pointer text-sm">
+                ORDER NOW
+            </button>
+            <button onclick="openOrderStatus()"
+                    class="w-full bg-slate-950/60 text-amber-400 border border-amber-500/20 text-xs
+                           font-semibold py-3 px-6 rounded-xl hover:bg-amber-500/10 transition-all
+                           cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-info"></i> Check Order Status
             </button>
         </div>
     </div>
+</main>
 
-    <!-- ── ORDER STATUS SCREEN ── -->
-    <div id="external-screen"
-         class="hidden fixed inset-0 z-25 bg-slate-950/95 flex flex-col items-center justify-start p-6 overflow-y-auto">
-        <div class="max-w-md w-full space-y-4 py-8">
-            <div class="text-center">
-                <i class="fa-solid fa-fire-burner text-4xl text-amber-500 animate-pulse block mb-3"></i>
-                <h3 class="text-xl font-extrabold text-white mb-1" id="status-headline">Your Orders</h3>
-                <p class="text-xs text-slate-500" id="status-subline">Live updates from the kitchen.</p>
+<!-- ── CONFIRMATION SCREEN ── -->
+<div id="confirmation-screen"
+     class="hidden fixed inset-0 z-20 bg-slate-950/95 flex flex-col items-center justify-center p-6">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-5">
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl
+                        bg-green-500/10 border border-green-500/20 text-green-400 text-xl mb-4">
+                <i class="fa-solid fa-circle-check"></i>
             </div>
+            <h2 class="text-xl font-extrabold text-white tracking-tight">Review Your Order</h2>
+            <p class="text-xs text-slate-500 mt-1">Confirm before sending to the kitchen.</p>
+        </div>
 
-            <div id="status-orders-list" class="space-y-3"></div>
+        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 text-left">
+            <div class="flex justify-between text-xs pb-3 border-b border-slate-800 mb-3">
+                <span class="text-slate-500">Table</span>
+                <span id="confirm-table" class="font-bold text-amber-400">0</span>
+            </div>
+            <ul class="space-y-2 text-xs" id="confirm-items"></ul>
+            <div id="confirm-notes-row" class="hidden mt-3 pt-3 border-t border-slate-800">
+                <p class="text-slate-500 text-xs">Notes:</p>
+                <p id="confirm-notes-text" class="text-slate-400 text-xs mt-1 italic"></p>
+            </div>
+            <div class="flex justify-between text-sm border-t border-slate-800 pt-3 mt-3">
+                <span class="text-slate-500">Grand Total</span>
+                <span id="confirm-total" class="font-bold text-amber-400">Rs. 0</span>
+            </div>
+        </div>
 
-            <button onclick="backToMenuScreen()"
-                    class="w-full bg-slate-900 text-amber-400 border border-slate-800 text-xs
-                           font-bold py-3.5 px-6 rounded-xl hover:bg-amber-500/10 transition-all cursor-pointer">
-                <i class="fa-solid fa-arrow-left mr-2"></i> Place Another Order
-            </button>
+        <!-- Email row shown after slider capture -->
+        <div id="confirm-email-row" class="hidden email-banner">
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-7 h-7 bg-amber-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-envelope text-amber-400 text-[10px]"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] font-semibold text-amber-400">Bill will be emailed to</p>
+                        <p class="text-[11px] text-slate-300 font-bold truncate" id="confirm-email-display">—</p>
+                    </div>
+                </div>
+                <button onclick="openAuthModal('edit')" style="min-height:unset"
+                        class="text-[9px] text-slate-500 hover:text-amber-400 cursor-pointer transition
+                               px-2 py-1 rounded border border-slate-700 hover:border-amber-500/30">
+                    Edit
+                </button>
+            </div>
+        </div>
+
+        <div class="slide-track" id="slide-track">
+            <div class="slide-fill"  id="slide-fill"></div>
+            <div class="slide-label" id="slide-label"><span>SLIDE TO SEND &nbsp;›››</span></div>
+            <div class="slide-thumb" id="slide-thumb"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
+        <button onclick="editOrder()"
+                class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold
+                       py-3.5 px-6 rounded-xl border border-slate-800 transition-all cursor-pointer text-xs">
+            <i class="fa-solid fa-pen-to-square mr-2"></i> Edit Order
+        </button>
+    </div>
+</div>
+
+<!-- ── ORDER STATUS SCREEN ── -->
+<div id="external-screen"
+     class="hidden fixed inset-0 z-25 bg-slate-950/95 flex flex-col items-center justify-start p-6 overflow-y-auto">
+    <div class="max-w-md w-full space-y-4 py-8">
+        <div class="text-center">
+            <i class="fa-solid fa-fire-burner text-4xl text-amber-500 animate-pulse block mb-3"></i>
+            <h3 class="text-xl font-extrabold text-white mb-1" id="status-headline">Your Orders</h3>
+            <p class="text-xs text-slate-500" id="status-subline">Live updates from the kitchen.</p>
+        </div>
+
+        <!-- Email confirmed banner -->
+        <div id="status-email-set" class="email-banner hidden">
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-circle-check text-amber-400 text-base flex-shrink-0"></i>
+                <div>
+                    <p class="text-[10px] font-semibold text-amber-400">Bill email confirmed</p>
+                    <p class="text-[11px] text-slate-300 font-bold" id="status-email-display">—</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="status-orders-list" class="space-y-3"></div>
+
+        <button onclick="backToMenuScreen()"
+                class="w-full bg-slate-900 text-amber-400 border border-slate-800 text-xs
+                       font-bold py-3.5 px-6 rounded-xl hover:bg-amber-500/10 transition-all cursor-pointer">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Place Another Order
+        </button>
+    </div>
+</div>
+
+<!-- ── Bill sent confirmation toast ── -->
+<div id="bill-toast" class="hidden">
+    <div class="bg-green-950 border border-green-500/40 text-green-300
+                px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
+        <div class="w-9 h-9 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-envelope-circle-check text-green-400 text-base"></i>
+        </div>
+        <div>
+            <p class="font-extrabold text-green-300 text-xs">Bill sent!</p>
+            <p class="text-green-500 text-[10px] mt-0.5" id="bill-toast-email">Check your inbox.</p>
         </div>
     </div>
+</div>
 
-    <!-- Toast notification -->
-    <div id="toast"
-         class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700
-                text-white text-xs font-semibold px-5 py-3 rounded-full shadow-2xl opacity-0
-                whitespace-nowrap">
-    </div>
+<!-- Toast -->
+<div id="toast"
+     class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700
+            text-white text-xs font-semibold px-5 py-3 rounded-full shadow-2xl opacity-0 whitespace-nowrap">
+</div>
 
-    <footer class="bg-slate-900/80 border-t border-slate-800 py-5 text-center text-[10px] text-slate-700">
-        &copy; 2026 Sekuwa by Kilo &mdash; Lazimpat Branch
-    </footer>
+<footer class="bg-slate-900/80 border-t border-slate-800 py-5 text-center text-[10px] text-slate-700">
+    &copy; 2026 Sekuwa by Kilo &mdash; Lazimpat Branch
+</footer>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, get, update, off }
-            from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, get, update }
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAdQtFwyOHoixp2rALMKBllaeqg2jvCl5w",
-            authDomain: "sekuwa-by-kilo.firebaseapp.com",
-            databaseURL: "https://sekuwa-by-kilo-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "sekuwa-by-kilo",
-            storageBucket: "sekuwa-by-kilo.firebasestorage.app",
-            messagingSenderId: "524646744577",
-            appId: "1:524646744577:web:5b8f1a500b8f09cea43600"
+    /* ═══════════════════════════════════════════════════════════════════════
+       EMAILJS SETUP — required to send bill emails
+       ─────────────────────────────────────────────────────────────────────
+       1. Sign up free at https://www.emailjs.com (200 emails/month free)
+       2. Add an Email Service (Gmail recommended) → copy the Service ID
+       3. Create an Email Template. Use these exact variable names:
+           {{to_name}}          customer's name
+           {{to_email}}         send-to address  ← set as "To Email" in template
+           {{table_number}}     table number
+           {{order_items}}      line-by-line item list (plain text, newline-separated)
+           {{order_total}}      total e.g. "Rs. 1,630"
+           {{order_date}}       date string
+           {{order_time}}       time string
+           {{order_notes}}      special notes (may be "—")
+           {{restaurant_name}}  always "Sekuwa by Kilo — Lazimpat"
+       4. Copy your Public Key from Account → API Keys
+       5. Replace the three placeholders below.
+    ═══════════════════════════════════════════════════════════════════════ */
+    const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // ← replace
+    const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // ← replace
+    const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // ← replace
+
+    const EMAIL_CONFIGURED = ![EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID]
+        .some(v => v.startsWith('YOUR_'));
+
+    if (EMAIL_CONFIGURED) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+    /* ─── Firebase ──────────────────────────────────────────────────────── */
+    const firebaseConfig = {
+        apiKey: "AIzaSyAdQtFwyOHoixp2rALMKBllaeqg2jvCl5w",
+        authDomain: "sekuwa-by-kilo.firebaseapp.com",
+        databaseURL: "https://sekuwa-by-kilo-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "sekuwa-by-kilo",
+        storageBucket: "sekuwa-by-kilo.firebasestorage.app",
+        messagingSenderId: "524646744577",
+        appId: "1:524646744577:web:5b8f1a500b8f09cea43600"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+
+    /* ─── Helpers ───────────────────────────────────────────────────────── */
+    function esc(s) {
+        if (!s && s !== 0) return '';
+        return String(s).replace(/[&<>'"]/g,
+            c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c]);
+    }
+    function fmt(n) { return 'Rs.\u00a0' + Number(n).toLocaleString(); }
+    function nowStamp() {
+        return {
+            time:      new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false }),
+            date:      new Date().toISOString().split('T')[0],
+            createdAt: new Date().toISOString()
+        };
+    }
+    function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e).trim()); }
+
+    let _toastTimer;
+    function showToast(msg, dur = 3500) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.style.opacity = '1';
+        clearTimeout(_toastTimer);
+        _toastTimer = setTimeout(() => { t.style.opacity = '0'; }, dur);
+    }
+    function showScreen(id) {
+        ['welcome-screen','game-screen','menu-screen','confirmation-screen','external-screen']
+            .forEach(s => document.getElementById(s).classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    /* ─── Account state (persisted in localStorage) ─────────────────────── */
+    let account = {
+        name:  localStorage.getItem('sbk_name')  || '',
+        email: localStorage.getItem('sbk_email') || ''
+    };
+
+    function persistAccount(name, email) {
+        account.name  = name.trim();
+        account.email = email.trim().toLowerCase();
+        localStorage.setItem('sbk_name',  account.name);
+        localStorage.setItem('sbk_email', account.email);
+    }
+    function hasAccount() { return !!(account.email && isValidEmail(account.email)); }
+    function initials(name) {
+        if (!name) return '?';
+        return name.trim().split(/\s+/).map(w => w[0].toUpperCase()).slice(0,2).join('');
+    }
+
+    function refreshAccountUI() {
+        const wrap  = document.getElementById('account-nav-wrap');
+        const avEl  = document.getElementById('nav-avatar-initials');
+        const piEl  = document.getElementById('panel-initials');
+        const pnEl  = document.getElementById('panel-name');
+        const peEl  = document.getElementById('panel-email');
+
+        // Show avatar whenever table is selected
+        if (selectedTable) wrap.style.display = 'block';
+
+        if (hasAccount()) {
+            const ini = initials(account.name || account.email);
+            avEl.textContent = ini;
+            piEl.textContent = ini;
+            pnEl.textContent = account.name  || 'Guest';
+            peEl.textContent = account.email;
+        } else {
+            avEl.textContent = '?';
+            piEl.textContent = '?';
+            pnEl.textContent = 'Guest';
+            peEl.textContent = 'No email set';
+        }
+
+        // Confirmation screen — only show email row if account set
+        const cer = document.getElementById('confirm-email-row');
+        if (cer) {
+            cer.classList.toggle('hidden', !hasAccount());
+            if (hasAccount()) document.getElementById('confirm-email-display').textContent = account.email;
+        }
+
+        // Status screen banners
+        const ses = document.getElementById('status-email-set');
+        const sed = document.getElementById('status-email-display');
+        if (ses) {
+            ses.classList.toggle('hidden', !hasAccount());
+            if (hasAccount() && sed) sed.textContent = account.email;
+        }
+    }
+
+    /* ─── Auth modal ────────────────────────────────────────────────────── */
+    window.openAuthModal = function(mode = 'signin') {
+        document.getElementById('auth-overlay').classList.remove('hidden');
+        document.getElementById('auth-signin-view').classList.toggle('hidden', mode !== 'signin');
+        document.getElementById('auth-edit-view').classList.toggle('hidden',   mode !== 'edit');
+        if (mode === 'signin') {
+            document.getElementById('auth-name').value  = account.name  || '';
+            document.getElementById('auth-email').value = account.email || '';
+            setTimeout(() => document.getElementById('auth-name').focus(), 50);
+        } else {
+            document.getElementById('edit-name').value  = account.name  || '';
+            document.getElementById('edit-email').value = account.email || '';
+            setTimeout(() => document.getElementById('edit-name').focus(), 50);
+        }
+    };
+    window.closeAuthModal = function() {
+        document.getElementById('auth-overlay').classList.add('hidden');
+    };
+    window.handleOverlayClick = function(e) {
+        if (e.target === document.getElementById('auth-overlay')) closeAuthModal();
+    };
+
+    window.saveAccount = function() {
+        const name  = document.getElementById('auth-name').value.trim();
+        const email = document.getElementById('auth-email').value.trim();
+        if (!name)              { document.getElementById('auth-name').focus();  showToast('Please enter your name.'); return; }
+        if (!isValidEmail(email)) { document.getElementById('auth-email').focus(); showToast('Please enter a valid email.'); return; }
+        persistAccount(name, email);
+        // Log to Firebase for restaurant records (name + email + table, no sensitive data)
+        if (selectedTable) {
+            push(ref(db, 'customer_emails'), { name, email, table: selectedTable, date: nowStamp().date }).catch(()=>{});
+        }
+        closeAuthModal();
+        refreshAccountUI();
+        showToast(`✅ Got it, ${name}! Bill will go to ${email}`);
+        // If slider was waiting for email, now fire the order
+        if (_pendingOrderAfterAuth) {
+            _pendingOrderAfterAuth = false;
+            sliderConfirmed = true;
+            const track = document.getElementById('slide-track');
+            const thumb = document.getElementById('slide-thumb');
+            const label = document.getElementById('slide-label');
+            track.classList.add('confirmed');
+            thumb.innerHTML = '<i class="fa-solid fa-check"></i>';
+            label.style.opacity = 0;
+            setTimeout(confirmFinalOrder, 420);
+        }
+    };
+    window.skipAuth = function() {
+        closeAuthModal();
+        // If slider was waiting, proceed without email
+        if (_pendingOrderAfterAuth) {
+            _pendingOrderAfterAuth = false;
+            sliderConfirmed = true;
+            const track = document.getElementById('slide-track');
+            const thumb = document.getElementById('slide-thumb');
+            const label = document.getElementById('slide-label');
+            track.classList.add('confirmed');
+            thumb.innerHTML = '<i class="fa-solid fa-check"></i>';
+            label.style.opacity = 0;
+            setTimeout(confirmFinalOrder, 420);
+        }
+    };
+    window.saveEditAccount = function() {
+        const name  = document.getElementById('edit-name').value.trim();
+        const email = document.getElementById('edit-email').value.trim();
+        if (!name)              { document.getElementById('edit-name').focus();  showToast('Please enter your name.'); return; }
+        if (!isValidEmail(email)) { document.getElementById('edit-email').focus(); showToast('Please enter a valid email.'); return; }
+        persistAccount(name, email);
+        closeAuthModal();
+        refreshAccountUI();
+        showToast('✅ Profile updated!');
+    };
+    window.signOut = function() {
+        if (!confirm('Remove your saved email from this device?')) return;
+        account = { name:'', email:'' };
+        localStorage.removeItem('sbk_name');
+        localStorage.removeItem('sbk_email');
+        refreshAccountUI();
+        showToast('Signed out. No bill will be emailed.');
+    };
+
+    let _panelOpen = false;
+    window.toggleAccountPanel = function() {
+        _panelOpen = !_panelOpen;
+        document.getElementById('account-panel').classList.toggle('open', _panelOpen);
+    };
+    window.closeAccountPanel = function() {
+        _panelOpen = false;
+        document.getElementById('account-panel').classList.remove('open');
+    };
+    document.addEventListener('click', e => {
+        const wrap = document.getElementById('account-nav-wrap');
+        if (wrap && !wrap.contains(e.target)) closeAccountPanel();
+    });
+
+    /* ─── Email billing ─────────────────────────────────────────────────── */
+    const billedKeys = new Set(); // guard against double-sending
+
+    function sendBillEmail(entry) {
+        if (!hasAccount()) return;
+        if (billedKeys.has(entry.originalKey)) return;
+        billedKeys.add(entry.originalKey);
+
+        const d     = entry.data;
+        const items = (d.items || []).map(i =>
+            `${i.name} × ${i.quantity}  —  ${fmt(i.price * i.quantity)}`
+        ).join('\n');
+        const total = (d.items || []).reduce((s,i) => s + i.price * i.quantity, 0);
+
+        const params = {
+            to_name:         account.name  || 'Valued Customer',
+            to_email:        account.email,
+            table_number:    String(d.table || selectedTable || '—'),
+            order_items:     items || '—',
+            order_total:     fmt(total),
+            order_date:      d.date || nowStamp().date,
+            order_time:      d.time || nowStamp().time,
+            order_notes:     d.notes || '—',
+            restaurant_name: 'Sekuwa by Kilo — Lazimpat'
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db  = getDatabase(app);
-
-        // ── Helpers ──────────────────────────────────────────────────────────
-        function esc(str) {
-            if (!str && str !== 0) return '';
-            return String(str).replace(/[&<>'"]/g,
-                m => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' })[m]);
+        if (!EMAIL_CONFIGURED) {
+            console.log('[EmailJS not configured] Would send bill to:', account.email, '\nParams:', params);
+            showToast('ℹ️ EmailJS not configured — see console for details.');
+            return;
         }
 
-        function fmt(n) { return 'Rs.\u00a0' + Number(n).toLocaleString(); }
-
-        function nowStamp() {
-            return {
-                time:      new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false }),
-                date:      new Date().toISOString().split('T')[0],
-                createdAt: new Date().toISOString()
-            };
-        }
-
-        let _toastTimer;
-        function showToast(msg, duration = 3500) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.style.opacity = '1';
-            clearTimeout(_toastTimer);
-            _toastTimer = setTimeout(() => { t.style.opacity = '0'; }, duration);
-        }
-
-        function showScreen(id) {
-            ['welcome-screen','game-screen','menu-screen','confirmation-screen','external-screen']
-                .forEach(s => document.getElementById(s).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        // ── State ─────────────────────────────────────────────────────────────
-        const menuData = [
-            { id:1, name:'Chicken Sekuwa (500 gm)', price:815,  category:'Sekuwa' },
-            { id:2, name:'Pork Sekuwa (500 gm)',    price:815,  category:'Sekuwa' },
-            { id:3, name:'Mutton Sekuwa (250 gm)',  price:880,  category:'Sekuwa' },
-            { id:4, name:'Chicken Sekuwa Set',       price:530,  category:'Sets'   },
-            { id:5, name:'Buff Momo (Steam)',         price:225,  category:'Momo'   },
-            { id:6, name:'Mustang Aloo',              price:300,  category:'Sides'  }
-        ];
-
-        let cart              = [];
-        let selectedTable     = null;
-        // Each entry: { originalKey, data, unsubscribe }
-        // data tracks status via order_status/<originalKey>
-        let sessionOrders     = [];
-        let activeFilter      = 'All';
-        let tableCount        = 6;
-        let waiterCooldownUntil = 0;
-        let sliderConfirmed   = false;
-
-        // ── Table count from Firebase ─────────────────────────────────────────
-        async function fetchTableCount() {
-            try {
-                const snap = await get(ref(db, 'config/tableCount'));
-                if (snap.exists() && typeof snap.val() === 'number' && snap.val() > 0) {
-                    tableCount = snap.val();
-                }
-            } catch (_) { /* fallback: keep 6 */ }
-        }
-
-        // ── Category filters ──────────────────────────────────────────────────
-        function buildFilterPills() {
-            const cats = ['All', ...new Set(menuData.map(m => m.category))];
-            document.getElementById('filter-row').innerHTML = cats.map(cat => `
-                <button data-cat="${esc(cat)}" onclick="setFilter('${esc(cat)}')"
-                        class="filter-pill ${cat === 'All'
-                            ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
-                            : 'bg-slate-900/50 border-slate-700 text-slate-400'}
-                               text-[11px] font-semibold px-3.5 py-1.5 rounded-full border">
-                    ${esc(cat)}
-                </button>`).join('');
-        }
-
-        window.setFilter = function(cat) {
-            activeFilter = cat;
-            document.querySelectorAll('#filter-row .filter-pill').forEach(btn => {
-                const active = btn.dataset.cat === cat;
-                btn.className = `filter-pill ${active
-                    ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
-                    : 'bg-slate-900/50 border-slate-700 text-slate-400'}
-                    text-[11px] font-semibold px-3.5 py-1.5 rounded-full border transition-all`;
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+            .then(() => {
+                // Show big celebratory toast
+                document.getElementById('bill-toast-email').textContent = `Sent to ${account.email}`;
+                const bt = document.getElementById('bill-toast');
+                bt.classList.remove('hidden');
+                setTimeout(() => bt.classList.add('hidden'), 7000);
+            })
+            .catch(err => {
+                console.error('EmailJS send error:', err);
+                showToast('⚠️ Bill email failed. Please ask for a printed receipt.', 5000);
             });
-            renderMenu();
-        };
+    }
 
-        // ── Screens ───────────────────────────────────────────────────────────
-        window.proceedToTableSelect = function() {
-            showScreen('game-screen');
-            generateTableButtons();
-        };
+    /* ─── App state ─────────────────────────────────────────────────────── */
+    const menuData = [
+        { id:1, name:'Chicken Sekuwa (500 gm)', price:815,  category:'Sekuwa' },
+        { id:2, name:'Pork Sekuwa (500 gm)',    price:815,  category:'Sekuwa' },
+        { id:3, name:'Mutton Sekuwa (250 gm)',  price:880,  category:'Sekuwa' },
+        { id:4, name:'Chicken Sekuwa Set',       price:530,  category:'Sets'   },
+        { id:5, name:'Buff Momo (Steam)',         price:225,  category:'Momo'   },
+        { id:6, name:'Mustang Aloo',              price:300,  category:'Sides'  }
+    ];
 
-        function generateTableButtons() {
-            document.getElementById('token-container').innerHTML =
-                Array.from({ length: tableCount }, (_, i) => i + 1).map(n => `
-                    <button onclick="selectTable(${n})"
-                            class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col
-                                   items-center justify-center gap-3 group hover:border-amber-500/50
-                                   transition-all cursor-pointer">
-                        <div class="w-12 h-12 rounded-xl bg-slate-950 text-amber-500 font-extrabold
-                                    flex items-center justify-center text-lg group-hover:bg-amber-500
-                                    group-hover:text-slate-950 transition-all">${n}</div>
-                        <span class="text-xs font-semibold text-slate-400 group-hover:text-amber-400
-                                     transition-colors">Table ${n}</span>
-                    </button>`).join('');
+    let cart                = [];
+    let selectedTable       = null;
+    let sessionOrders       = []; // { originalKey, data, unsubscribe }
+    let activeFilter        = 'All';
+    let tableCount          = 6;
+    let waiterCooldownUntil = 0;
+    let sliderConfirmed     = false;
+    let _pendingOrderAfterAuth = false; // set true when slider fires but email not yet captured
+
+    async function fetchTableCount() {
+        try {
+            const snap = await get(ref(db, 'config/tableCount'));
+            if (snap.exists() && typeof snap.val() === 'number' && snap.val() > 0)
+                tableCount = snap.val();
+        } catch(_) {}
+    }
+
+    /* ─── Category filters ──────────────────────────────────────────────── */
+    function buildFilterPills() {
+        const cats = ['All', ...new Set(menuData.map(m => m.category))];
+        document.getElementById('filter-row').innerHTML = cats.map(cat => `
+            <button data-cat="${esc(cat)}" onclick="setFilter('${esc(cat)}')"
+                    class="filter-pill ${cat === 'All'
+                        ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
+                        : 'bg-slate-900/50 border-slate-700 text-slate-400'}
+                           text-[11px] font-semibold px-3.5 py-1.5 rounded-full border">
+                ${esc(cat)}
+            </button>`).join('');
+    }
+
+    window.setFilter = function(cat) {
+        activeFilter = cat;
+        document.querySelectorAll('#filter-row .filter-pill').forEach(btn => {
+            const a = btn.dataset.cat === cat;
+            btn.className = `filter-pill ${a
+                ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
+                : 'bg-slate-900/50 border-slate-700 text-slate-400'}
+                text-[11px] font-semibold px-3.5 py-1.5 rounded-full border transition-all`;
+        });
+        renderMenu();
+    };
+
+    /* ─── Screens ───────────────────────────────────────────────────────── */
+    window.proceedToTableSelect = function() {
+        showScreen('game-screen'); generateTableButtons();
+    };
+
+    function generateTableButtons() {
+        document.getElementById('token-container').innerHTML =
+            Array.from({ length: tableCount }, (_,i) => i+1).map(n => `
+                <button onclick="selectTable(${n})"
+                        class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col
+                               items-center justify-center gap-3 group hover:border-amber-500/50
+                               transition-all cursor-pointer">
+                    <div class="w-12 h-12 rounded-xl bg-slate-950 text-amber-500 font-extrabold
+                                flex items-center justify-center text-lg group-hover:bg-amber-500
+                                group-hover:text-slate-950 transition-all">${n}</div>
+                    <span class="text-xs font-semibold text-slate-400 group-hover:text-amber-400
+                                 transition-colors">Table ${n}</span>
+                </button>`).join('');
+    }
+
+    window.selectTable = function(num) {
+        selectedTable = num;
+        sessionStorage.setItem('sbk_table', num);
+        document.getElementById('nav-table-tag').classList.remove('hidden');
+        document.getElementById('nav-table-tag').classList.add('flex');
+        document.getElementById('call-waiter-btn').classList.remove('hidden');
+        document.getElementById('call-waiter-btn').classList.add('flex');
+        document.getElementById('nav-table-num').textContent = num;
+        document.getElementById('account-nav-wrap').style.display = 'block';
+        showScreen('menu-screen');
+        buildFilterPills(); renderMenu(); refreshAccountUI();
+    };
+
+    window.callWaiter = function() {
+        const now = Date.now();
+        if (now < waiterCooldownUntil) {
+            showToast(`⏳ Please wait ${Math.ceil((waiterCooldownUntil-now)/1000)}s before calling again.`); return;
         }
+        waiterCooldownUntil = now + 60_000;
+        const { time, date } = nowStamp();
+        push(ref(db,'waiter_calls'), { table:selectedTable, time, date, status:'Pending' })
+            .then(() => showToast(`🔔 Waiter request sent for Table ${selectedTable}.`))
+            .catch(() => showToast('❌ Connection error. Please try again.'));
+    };
 
-        window.selectTable = function(num) {
-            selectedTable = num;
-            sessionStorage.setItem('sbk_table', num);
+    /* ─── Menu render ───────────────────────────────────────────────────── */
+    function getQty(id) { return (cart.find(c => c.id===id)||{}).quantity||0; }
 
-            document.getElementById('nav-table-tag').classList.remove('hidden');
-            document.getElementById('nav-table-tag').classList.add('flex');
-            document.getElementById('call-waiter-btn').classList.remove('hidden');
-            document.getElementById('call-waiter-btn').classList.add('flex');
-            document.getElementById('nav-table-num').textContent = num;
+    function renderMenu() {
+        const items = activeFilter==='All' ? menuData : menuData.filter(m=>m.category===activeFilter);
+        document.getElementById('menu-items').innerHTML = items.map(item => {
+            const qty = getQty(item.id);
+            return `
+            <div class="menu-card bg-slate-900/90 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md">${esc(item.category)}</span>
+                    <h4 class="text-sm font-extrabold text-white mt-3 mb-1 leading-snug">${esc(item.name)}</h4>
+                    <p class="text-base font-black text-amber-500">${fmt(item.price)}</p>
+                    <p class="text-[10px] text-green-500 mt-1 flex items-center gap-1"><i class="fa-solid fa-bolt text-[8px]"></i> ~9 mins</p>
+                </div>
+                <div class="mt-5 flex justify-end">
+                    ${qty===0
+                        ? `<button onclick="addItem(${item.id})"
+                                   class="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold
+                                          text-xs py-2 px-5 rounded-xl hover:bg-amber-500 hover:text-slate-950
+                                          transition-all cursor-pointer">
+                               <i class="fa-solid fa-plus mr-1 text-[10px]"></i> Add
+                           </button>`
+                        : `<div class="qty-pill flex items-center bg-slate-950 border border-slate-800 rounded-full p-0.5 w-28 justify-between">
+                               <button onclick="decItem(${item.id})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/20 text-red-400 text-sm font-bold cursor-pointer transition-colors">−</button>
+                               <span class="text-xs font-black text-slate-300">${qty}</span>
+                               <button onclick="incItem(${item.id})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-amber-500/20 text-amber-400 text-sm font-bold cursor-pointer transition-colors">+</button>
+                           </div>`}
+                </div>
+            </div>`;
+        }).join('');
+    }
 
-            showScreen('menu-screen');
-            buildFilterPills();
-            renderMenu();
-        };
+    /* ─── Cart ──────────────────────────────────────────────────────────── */
+    window.addItem = function(id) {
+        const e = cart.find(c=>c.id===id);
+        if (e) e.quantity++; else cart.push({ ...menuData.find(m=>m.id===id), quantity:1 });
+        renderMenu(); updateCartUI();
+    };
+    window.incItem = window.addItem;
+    window.decItem = function(id) {
+        const e = cart.find(c=>c.id===id); if (!e) return;
+        if (e.quantity>1) e.quantity--; else cart=cart.filter(c=>c.id!==id);
+        renderMenu(); updateCartUI();
+    };
+    window.removeFromCart = function(id) {
+        cart=cart.filter(c=>c.id!==id); renderMenu(); updateCartUI();
+    };
+    function calcTotal() { return cart.reduce((s,i)=>s+i.price*i.quantity,0); }
 
-        // ── Waiter call ───────────────────────────────────────────────────────
-        window.callWaiter = function() {
-            const now = Date.now();
-            if (now < waiterCooldownUntil) {
-                const secs = Math.ceil((waiterCooldownUntil - now) / 1000);
-                showToast(`⏳ Please wait ${secs}s before calling again.`);
-                return;
-            }
-            waiterCooldownUntil = now + 60_000;
-            const { time, date } = nowStamp();
-            push(ref(db, 'waiter_calls'), { table: selectedTable, time, date, status: 'Pending' })
-                .then(() => showToast(`🔔 Waiter request sent for Table ${selectedTable}.`))
-                .catch(() => showToast('❌ Connection error. Please try again.'));
-        };
-
-        // ── Menu render ───────────────────────────────────────────────────────
-        function getQty(id) { return (cart.find(c => c.id === id) || {}).quantity || 0; }
-
-        function renderMenu() {
-            const items = activeFilter === 'All'
-                ? menuData : menuData.filter(m => m.category === activeFilter);
-
-            document.getElementById('menu-items').innerHTML = items.map(item => {
-                const qty = getQty(item.id);
-                return `
-                <div class="menu-card bg-slate-900/90 border border-slate-800 rounded-xl p-5
-                            flex flex-col justify-between">
-                    <div>
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400
-                                     bg-amber-500/10 px-2 py-0.5 rounded-md">${esc(item.category)}</span>
-                        <h4 class="text-sm font-extrabold text-white mt-3 mb-1 leading-snug">
-                            ${esc(item.name)}</h4>
-                        <p class="text-base font-black text-amber-500">${fmt(item.price)}</p>
-                        <p class="text-[10px] text-green-500 mt-1 flex items-center gap-1">
-                            <i class="fa-solid fa-bolt text-[8px]"></i> ~9 mins
-                        </p>
-                    </div>
-                    <div class="mt-5 flex justify-end" id="ctrl-${item.id}">
-                        ${qty === 0
-                            ? `<button onclick="addItem(${item.id})"
-                                       class="bg-amber-500/10 border border-amber-500/30 text-amber-400
-                                              font-bold text-xs py-2 px-5 rounded-xl hover:bg-amber-500
-                                              hover:text-slate-950 transition-all cursor-pointer">
-                                   <i class="fa-solid fa-plus mr-1 text-[10px]"></i> Add
-                               </button>`
-                            : `<div class="qty-pill flex items-center bg-slate-950 border border-slate-800
-                                          rounded-full p-0.5 w-28 justify-between">
-                                   <button onclick="decItem(${item.id})"
-                                           class="w-8 h-8 flex items-center justify-center rounded-full
-                                                  hover:bg-red-500/20 text-red-400 text-sm font-bold
-                                                  cursor-pointer transition-colors">−</button>
-                                   <span class="text-xs font-black text-slate-300">${qty}</span>
-                                   <button onclick="incItem(${item.id})"
-                                           class="w-8 h-8 flex items-center justify-center rounded-full
-                                                  hover:bg-amber-500/20 text-amber-400 text-sm font-bold
-                                                  cursor-pointer transition-colors">+</button>
-                               </div>`}
-                    </div>
-                </div>`;
-            }).join('');
+    function updateCartUI() {
+        const con = document.getElementById('cart-items');
+        if (cart.length===0) {
+            con.innerHTML = `<div class="text-center py-12 text-slate-600"><i class="fa-solid fa-basket-shopping text-xl mb-2 block"></i><p class="text-xs font-medium">Your basket is empty</p></div>`;
+            document.getElementById('cart-subtotal').textContent = fmt(0);
+            document.getElementById('cart-total').textContent    = fmt(0);
+            return;
         }
+        con.innerHTML = cart.map(item => {
+            const line = item.price*item.quantity;
+            return `
+            <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800">
+                <div class="min-w-0 flex-1 mr-2">
+                    <p class="text-[11px] font-semibold text-slate-300 truncate">${esc(item.name)}</p>
+                    <p class="text-[10px] text-slate-600 mt-0.5">${item.quantity} × ${fmt(item.price)}</p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-xs font-bold text-amber-400">${fmt(line)}</span>
+                    <button onclick="removeFromCart(${item.id})" class="text-slate-600 hover:text-red-500 p-1 cursor-pointer transition-colors">
+                        <i class="fa-solid fa-trash text-[9px]"></i>
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+        const total = calcTotal();
+        document.getElementById('cart-subtotal').textContent = fmt(total);
+        document.getElementById('cart-total').textContent    = fmt(total);
+    }
 
-        // ── Cart operations ───────────────────────────────────────────────────
-        window.addItem = function(id) {
-            const existing = cart.find(c => c.id === id);
-            if (existing) existing.quantity += 1;
-            else cart.push({ ...menuData.find(m => m.id === id), quantity: 1 });
-            renderMenu(); updateCartUI();
-        };
-        window.incItem = window.addItem;
-
-        window.decItem = function(id) {
-            const e = cart.find(c => c.id === id);
-            if (!e) return;
-            if (e.quantity > 1) e.quantity -= 1; else cart = cart.filter(c => c.id !== id);
-            renderMenu(); updateCartUI();
-        };
-
-        window.removeFromCart = function(id) {
-            cart = cart.filter(c => c.id !== id);
-            renderMenu(); updateCartUI();
-        };
-
-        function calcTotal() { return cart.reduce((s, i) => s + i.price * i.quantity, 0); }
-
-        function updateCartUI() {
-            const container = document.getElementById('cart-items');
-            if (cart.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-slate-600" id="empty-cart">
-                        <i class="fa-solid fa-basket-shopping text-xl mb-2 block"></i>
-                        <p class="text-xs font-medium">Your basket is empty</p>
-                    </div>`;
-                document.getElementById('cart-subtotal').textContent = fmt(0);
-                document.getElementById('cart-total').textContent    = fmt(0);
-                return;
-            }
-            container.innerHTML = cart.map(item => {
-                const line = item.price * item.quantity;
-                return `
-                <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <div class="min-w-0 flex-1 mr-2">
-                        <p class="text-[11px] font-semibold text-slate-300 truncate">${esc(item.name)}</p>
-                        <p class="text-[10px] text-slate-600 mt-0.5">${item.quantity} × ${fmt(item.price)}</p>
-                    </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <span class="text-xs font-bold text-amber-400">${fmt(line)}</span>
-                        <button onclick="removeFromCart(${item.id})"
-                                class="text-slate-600 hover:text-red-500 p-1 cursor-pointer transition-colors">
-                            <i class="fa-solid fa-trash text-[9px]"></i>
-                        </button>
-                    </div>
-                </div>`;
-            }).join('');
-            const total = calcTotal();
-            document.getElementById('cart-subtotal').textContent = fmt(total);
-            document.getElementById('cart-total').textContent    = fmt(total);
+    /* ─── Order flow ────────────────────────────────────────────────────── */
+    window.placeOrder = function() {
+        if (cart.length===0) {
+            const btn = document.getElementById('order-now-btn');
+            btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake');
+            showToast('🛒 Add at least one item first.'); return;
         }
+        const notes = document.getElementById('special-notes').value.trim();
+        document.getElementById('confirm-table').textContent = selectedTable;
+        document.getElementById('confirm-items').innerHTML = cart.map(i=>`
+            <li class="flex justify-between text-slate-400">
+                <span>${esc(i.name)} × <b class="text-amber-500">${i.quantity}</b></span>
+                <span class="font-bold text-slate-200">${fmt(i.price*i.quantity)}</span>
+            </li>`).join('');
+        document.getElementById('confirm-total').textContent = fmt(calcTotal());
+        const nr = document.getElementById('confirm-notes-row');
+        if (notes) { document.getElementById('confirm-notes-text').textContent=notes; nr.classList.remove('hidden'); }
+        else nr.classList.add('hidden');
+        refreshAccountUI(); // update email row on confirmation screen
+        showScreen('confirmation-screen'); resetSlider();
+    };
 
-        // ── Order flow ────────────────────────────────────────────────────────
-        window.placeOrder = function() {
-            if (cart.length === 0) {
-                const btn = document.getElementById('order-now-btn');
-                btn.classList.remove('shake');
-                void btn.offsetWidth;
-                btn.classList.add('shake');
-                showToast('🛒 Add at least one item first.');
-                return;
-            }
-            const notes = document.getElementById('special-notes').value.trim();
-            const total = calcTotal();
-
-            document.getElementById('confirm-table').textContent = selectedTable;
-            document.getElementById('confirm-items').innerHTML = cart.map(i => `
-                <li class="flex justify-between text-slate-400">
-                    <span>${esc(i.name)} × <b class="text-amber-500">${i.quantity}</b></span>
-                    <span class="font-bold text-slate-200">${fmt(i.price * i.quantity)}</span>
-                </li>`).join('');
-            document.getElementById('confirm-total').textContent = fmt(total);
-
-            const notesRow = document.getElementById('confirm-notes-row');
-            if (notes) {
-                document.getElementById('confirm-notes-text').textContent = notes;
-                notesRow.classList.remove('hidden');
-            } else {
-                notesRow.classList.add('hidden');
-            }
-
-            showScreen('confirmation-screen');
-            resetSlider();
+    window.confirmFinalOrder = function() {
+        if (cart.length===0) { showToast('Basket is empty.'); return; }
+        const notes = document.getElementById('special-notes').value.trim();
+        const snap  = [...cart];
+        const { time, date, createdAt } = nowStamp();
+        const payload = {
+            table: selectedTable, items: snap,
+            notes: notes||null, time, date, createdAt, status:'Pending',
+            customerEmail: account.email||null,
+            customerName:  account.name||null
         };
 
-        window.confirmFinalOrder = function() {
-            if (cart.length === 0) { showToast('Basket is empty.'); return; }
+        push(ref(db,'kitchen_orders'), payload)
+            .then(orderRef => {
+                const originalKey = orderRef.key;
+                const entry = { originalKey, data:{ ...payload }, unsubscribe:null };
 
-            const notes        = document.getElementById('special-notes').value.trim();
-            const cartSnapshot = [...cart];
-            const { time, date, createdAt } = nowStamp();
-
-            const payload = {
-                table:     selectedTable,
-                items:     cartSnapshot,
-                notes:     notes || null,
-                time, date, createdAt,
-                status:    'Pending'
-            };
-
-            push(ref(db, 'kitchen_orders'), payload)
-                .then((orderRef) => {
-                    const originalKey = orderRef.key;
-
-                    // Listen on order_status/<originalKey> — station writes here on every status change.
-                    // This key never changes even when order moves from kitchen → prep → history.
-                    const statusRef = ref(db, `order_status/${originalKey}`);
-                    const entry = {
-                        originalKey,
-                        data: { ...payload },
-                        unsubscribe: null
-                    };
-
-                    const unsubStatus = onValue(statusRef, (snap) => {
-                        const live = snap.val();
-                        if (!live) return;
-                        const prevStatus = entry.data.status;
-                        // Merge live fields (status, etc.) into entry data
-                        entry.data = { ...entry.data, ...live };
-
-                        // Re-render status screen if visible
-                        if (!document.getElementById('external-screen').classList.contains('hidden')) {
-                            renderStatusScreen();
+                function handleStatusUpdate(live) {
+                    if (!live) return;
+                    const prev = entry.data.status;
+                    entry.data = { ...entry.data, ...live };
+                    if (!document.getElementById('external-screen').classList.contains('hidden'))
+                        renderStatusScreen();
+                    if (live.status && live.status !== prev) {
+                        if (live.status==='Preparing') showToast('👨‍🍳 Kitchen is preparing your order!',4000);
+                        else if (live.status==='Ready') showToast('✅ Your order is ready! Please collect.',6000);
+                        else if (live.status==='Paid')  {
+                            showToast('💜 Payment confirmed — thank you!',6000);
+                            sendBillEmail(entry);
                         }
-
-                        // Status-change toasts
-                        if (live.status && live.status !== prevStatus) {
-                            if (live.status === 'Preparing') showToast('👨‍🍳 Kitchen is preparing your order!', 4000);
-                            else if (live.status === 'Ready') showToast('✅ Your order is ready! Please collect.', 6000);
-                            else if (live.status === 'Paid')  showToast('💜 Payment confirmed — thank you!', 6000);
-                        }
-                    });
-
-                    entry.unsubscribe = unsubStatus;
-                    sessionOrders.push(entry);
-
-                    cart = [];
-                    document.getElementById('special-notes').value = '';
-                    updateCartUI();
-                    renderMenu();
-                    openOrderStatus();
-                })
-                .catch(() => {
-                    showToast('❌ Connection error. Order failed. Try again.');
-                    resetSlider();
-                    showScreen('confirmation-screen');
-                });
-        };
-
-        window.editOrder = function() { showScreen('menu-screen'); };
-
-        // ── Status screen ─────────────────────────────────────────────────────
-        function statusBadge(status, rush) {
-            const map = {
-                Pending:   ['s-pending',   'fa-clock',        'Pending'],
-                Preparing: ['s-preparing', 'fa-fire',         'Preparing'],
-                Ready:     ['s-ready',     'fa-check-circle', 'Ready to Collect'],
-                Paid:      ['s-paid',      'fa-check-double', 'Paid'],
-            };
-            const [cls, icon, label] = map[status] || ['s-pending', 'fa-clock', status];
-            const rushBadge = rush
-                ? `<span class="s-badge s-rush ml-1"><i class="fa-solid fa-bolt"></i> Rush</span>` : '';
-            return `<span class="s-badge ${cls}"><i class="fa-solid ${icon}"></i> ${label}</span>${rushBadge}`;
-        }
-
-        /**
-         * FIX: Progress bar now correctly advances through all four stages.
-         * stages[] indices match status strings exactly.
-         * Each dot is "done" if its index < curIdx, "active" if equal, "pending" if greater.
-         * Connector between i and i+1 is "done" if i < curIdx.
-         */
-        function statusSteps(status) {
-            const stages = ['Pending', 'Preparing', 'Ready', 'Paid'];
-            const labels = ['Received', 'Preparing', 'Ready', 'Paid'];
-            const icons  = ['fa-clock', 'fa-fire', 'fa-check-circle', 'fa-check-double'];
-            const curIdx = stages.indexOf(status);
-            const safeIdx = curIdx < 0 ? 0 : curIdx;
-
-            const dotsHtml = stages.map((_, i) => {
-                let dotClass = 'pending';
-                if (i < safeIdx) dotClass = 'done';
-                else if (i === safeIdx) dotClass = 'active';
-
-                const innerHtml = dotClass === 'done'
-                    ? '<i class="fa-solid fa-check" style="font-size:9px"></i>'
-                    : (i + 1).toString();
-
-                const connector = i < stages.length - 1
-                    ? `<div class="step-connector ${i < safeIdx ? 'done' : ''}"></div>`
-                    : '';
-
-                return `
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-                        <div class="step-dot ${dotClass}">${innerHtml}</div>
-                        <span style="font-size:8px;color:${i <= safeIdx ? '#94a3b8' : '#334155'};white-space:nowrap">${labels[i]}</span>
-                    </div>
-                    ${connector}`;
-            }).join('');
-
-            return `<div style="display:flex;align-items:flex-start;width:100%;padding:4px 0">${dotsHtml}</div>`;
-        }
-
-        function renderStatusScreen() {
-            const list     = document.getElementById('status-orders-list');
-            const headline = document.getElementById('status-headline');
-            const subline  = document.getElementById('status-subline');
-
-            if (sessionOrders.length === 0) {
-                headline.textContent = 'No Orders Yet';
-                subline.textContent  = 'Browse the menu and place an order first.';
-                list.innerHTML = `
-                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center
-                                text-slate-500 text-xs">
-                        <i class="fa-solid fa-basket-shopping text-2xl mb-3 block opacity-50"></i>
-                        No orders placed this session.
-                    </div>`;
-                return;
-            }
-
-            const allPaid = sessionOrders.every(o => o.data.status === 'Paid');
-            if (allPaid) {
-                headline.textContent = 'All Settled — Thank You! 🙏';
-                subline.textContent  = 'We hope you enjoyed your meal.';
-            } else {
-                headline.textContent = 'Your Orders';
-                subline.textContent  = 'Live updates from the kitchen.';
-            }
-
-            list.innerHTML = sessionOrders.map((entry, idx) => {
-                const d         = entry.data;
-                const items     = d.items || [];
-                const total     = items.reduce((s, i) => s + i.price * i.quantity, 0);
-                const itemCount = items.reduce((s, i) => s + i.quantity, 0);
-                const status    = d.status || 'Pending';
-
-                let waitLabel = '';
-                if (status === 'Pending' || status === 'Preparing') {
-                    if (d.createdAt) {
-                        const elapsedMin = Math.floor((Date.now() - new Date(d.createdAt)) / 60000);
-                        const remaining  = Math.max(1, 15 + itemCount * 2 - elapsedMin);
-                        waitLabel = `~${remaining} min${remaining !== 1 ? 's' : ''}`;
-                    } else {
-                        waitLabel = '~15 mins';
                     }
                 }
 
-                const statusColor = { Ready:'text-green-400', Paid:'text-purple-400' }[status] || 'text-amber-400';
-                const statusLine  = status === 'Ready' ? '✅ Collect now!'
-                                  : status === 'Paid'  ? '💜 Paid — all settled'
-                                  : waitLabel;
+                // Listen on order_status mirror (station app may write here)
+                const unsubStatus = onValue(ref(db,`order_status/${originalKey}`), snap2 => {
+                    handleStatusUpdate(snap2.val());
+                });
 
-                const isReady = status === 'Ready';
+                // Also listen directly on the kitchen_orders record for status changes
+                const unsubKitchen = onValue(ref(db,`kitchen_orders/${originalKey}`), snap2 => {
+                    handleStatusUpdate(snap2.val());
+                });
 
-                return `
-                <div class="bg-slate-900 border ${isReady ? 'border-green-500/30 pulse-ready' : 'border-slate-800'}
-                            p-5 rounded-2xl text-left space-y-3 transition-all">
-                    <div class="flex items-center justify-between flex-wrap gap-2">
-                        <span class="text-xs font-bold text-slate-400">
-                            Order ${idx + 1} &middot; Table ${esc(d.table)}
-                        </span>
-                        <div class="flex flex-wrap gap-1">${statusBadge(status, d.rush)}</div>
-                    </div>
-                    ${statusSteps(status)}
-                    <ul class="text-xs text-slate-400 space-y-1.5 mt-1">
-                        ${items.map(i => `
-                            <li class="flex justify-between">
-                                <span>${esc(i.name)} × ${i.quantity}</span>
-                                <span class="text-amber-400 font-semibold">${fmt(i.price * i.quantity)}</span>
-                            </li>`).join('')}
-                    </ul>
-                    ${d.notes ? `
-                        <p class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-2">
-                            📝 ${esc(d.notes)}</p>` : ''}
-                    <div class="flex justify-between text-xs border-t border-slate-800 pt-2">
-                        <span class="text-slate-500">
-                            ${(status === 'Pending' || status === 'Preparing') ? 'Est. wait' : 'Status'}
-                        </span>
-                        <span class="font-bold ${statusColor}">${statusLine}</span>
-                    </div>
-                    <div class="flex justify-between text-xs">
-                        <span class="text-slate-500">Total</span>
-                        <span class="font-bold text-amber-400">${fmt(total)}</span>
-                    </div>
-                </div>`;
-            }).join('');
-        }
+                entry.unsubscribe = () => { unsubStatus(); unsubKitchen(); };
+                sessionOrders.push(entry);
+                cart=[]; document.getElementById('special-notes').value='';
+                updateCartUI(); renderMenu(); openOrderStatus();
+            })
+            .catch(() => {
+                showToast('❌ Connection error. Order failed. Try again.');
+                resetSlider(); showScreen('confirmation-screen');
+            });
+    };
 
-        window.openOrderStatus = function() {
-            renderStatusScreen();
-            showScreen('external-screen');
+    window.editOrder = function() { showScreen('menu-screen'); };
+
+    /* ─── Status screen ─────────────────────────────────────────────────── */
+    function statusBadge(status, rush) {
+        const map = {
+            Pending:   ['s-pending',   'fa-clock',        'Pending'],
+            Preparing: ['s-preparing', 'fa-fire',         'Preparing'],
+            Ready:     ['s-ready',     'fa-check-circle', 'Ready to Collect'],
+            Paid:      ['s-paid',      'fa-check-double', 'Paid'],
         };
+        const [cls,icon,label] = map[status]||['s-pending','fa-clock',status];
+        const rushBadge = rush ? `<span class="s-badge s-rush ml-1"><i class="fa-solid fa-bolt"></i> Rush</span>` : '';
+        return `<span class="s-badge ${cls}"><i class="fa-solid ${icon}"></i> ${label}</span>${rushBadge}`;
+    }
 
-        window.backToMenuScreen = function() { showScreen('menu-screen'); };
+    function statusSteps(status) {
+        const stages=['Pending','Preparing','Ready','Paid'];
+        const labels=['Received','Preparing','Ready','Paid'];
+        const curIdx=stages.indexOf(status); const safeIdx=curIdx<0?0:curIdx;
+        const html=stages.map((_,i)=>{
+            let dc='pending';
+            if(i<safeIdx) dc='done'; else if(i===safeIdx) dc='active';
+            const inner = dc==='done'
+                ? '<i class="fa-solid fa-check" style="font-size:9px"></i>' : String(i+1);
+            const conn  = i<stages.length-1
+                ? `<div class="step-connector ${i<safeIdx?'done':''}"></div>` : '';
+            return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                        <div class="step-dot ${dc}">${inner}</div>
+                        <span style="font-size:8px;color:${i<=safeIdx?'#94a3b8':'#334155'};white-space:nowrap">${labels[i]}</span>
+                    </div>${conn}`;
+        }).join('');
+        return `<div style="display:flex;align-items:flex-start;width:100%;padding:4px 0">${html}</div>`;
+    }
 
-        // ── Slide-to-confirm ──────────────────────────────────────────────────
-        function initSlider() {
-            const track = document.getElementById('slide-track');
-            const thumb = document.getElementById('slide-thumb');
-            const fill  = document.getElementById('slide-fill');
-            const label = document.getElementById('slide-label');
+    function renderStatusScreen() {
+        const list=document.getElementById('status-orders-list');
+        const hl=document.getElementById('status-headline');
+        const sl=document.getElementById('status-subline');
+        refreshAccountUI();
 
-            let dragging = false, startX = 0, currentX = 0;
+        if (sessionOrders.length===0) {
+            hl.textContent='No Orders Yet'; sl.textContent='Browse the menu and place an order first.';
+            list.innerHTML=`<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs"><i class="fa-solid fa-basket-shopping text-2xl mb-3 block opacity-50"></i>No orders placed this session.</div>`;
+            return;
+        }
 
-            const maxLeft = () => track.offsetWidth - 56;
+        const allPaid = sessionOrders.every(o=>o.data.status==='Paid');
+        hl.textContent = allPaid ? 'All Settled — Thank You! 🙏' : 'Your Orders';
+        sl.textContent = allPaid
+            ? (hasAccount() ? `Bill emailed to ${account.email}` : 'We hope you enjoyed your meal.')
+            : 'Live updates from the kitchen.';
 
-            function setPosition(x) {
-                const c = Math.max(0, Math.min(x, maxLeft()));
-                currentX = c;
-                thumb.style.left  = (4 + c) + 'px';
-                fill.style.width  = (56 + c) + 'px';
-                label.style.opacity = Math.max(0, 1 - (c / maxLeft()) * 1.6);
+        list.innerHTML = sessionOrders.map((entry,idx) => {
+            const d=entry.data; const items=d.items||[];
+            const total=items.reduce((s,i)=>s+i.price*i.quantity,0);
+            const itemCount=items.reduce((s,i)=>s+i.quantity,0);
+            const status=d.status||'Pending';
+
+            let waitLabel='';
+            if (status==='Pending'||status==='Preparing') {
+                if (d.createdAt) {
+                    const elapsed=Math.floor((Date.now()-new Date(d.createdAt))/60000);
+                    const rem=Math.max(1,15+itemCount*2-elapsed);
+                    waitLabel=`~${rem} min${rem!==1?'s':''}`;
+                } else waitLabel='~15 mins';
             }
 
-            function onStart(e) {
-                if (sliderConfirmed) return;
-                dragging = true;
-                startX   = (e.touches ? e.touches[0].clientX : e.clientX) - currentX;
-                thumb.style.transition = fill.style.transition = 'none';
-                e.preventDefault();
-            }
-            function onMove(e) {
-                if (!dragging) return;
-                setPosition((e.touches ? e.touches[0].clientX : e.clientX) - startX);
-                e.preventDefault();
-            }
-            function onEnd() {
-                if (!dragging) return;
-                dragging = false;
-                thumb.style.transition = fill.style.transition = '';
-                if (currentX >= maxLeft() * 0.85) {
-                    sliderConfirmed = true;
-                    track.classList.add('confirmed');
-                    thumb.innerHTML = '<i class="fa-solid fa-check"></i>';
-                    label.style.opacity = 0;
-                    setTimeout(confirmFinalOrder, 420);
+            const sColor={Ready:'text-green-400',Paid:'text-purple-400'}[status]||'text-amber-400';
+            const sLine = status==='Ready'?'✅ Collect now!'
+                        : status==='Paid' ?'💜 Paid'
+                        : waitLabel;
+
+            return `
+            <div class="bg-slate-900 border ${status==='Ready'?'border-green-500/30 pulse-ready':'border-slate-800'}
+                        p-5 rounded-2xl text-left space-y-3 transition-all">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <span class="text-xs font-bold text-slate-400">Order ${idx+1} &middot; Table ${esc(d.table)}</span>
+                    <div class="flex flex-wrap gap-1">${statusBadge(status,d.rush)}</div>
+                </div>
+                ${statusSteps(status)}
+                <ul class="text-xs text-slate-400 space-y-1.5 mt-1">
+                    ${items.map(i=>`
+                        <li class="flex justify-between">
+                            <span>${esc(i.name)} × ${i.quantity}</span>
+                            <span class="text-amber-400 font-semibold">${fmt(i.price*i.quantity)}</span>
+                        </li>`).join('')}
+                </ul>
+                ${d.notes?`<p class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-2">📝 ${esc(d.notes)}</p>`:''}
+                <div class="flex justify-between text-xs border-t border-slate-800 pt-2">
+                    <span class="text-slate-500">${(status==='Pending'||status==='Preparing')?'Est. wait':'Status'}</span>
+                    <span class="font-bold ${sColor}">${sLine}</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                    <span class="text-slate-500">Total</span>
+                    <span class="font-bold text-amber-400">${fmt(total)}</span>
+                </div>
+                ${status==='Paid'&&hasAccount()?`
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-800">
+                    <i class="fa-solid fa-envelope-circle-check text-[10px] text-green-500 flex-shrink-0"></i>
+                    <span class="text-[10px] text-slate-500">Bill emailed to <b class="text-slate-400">${esc(account.email)}</b></span>
+                </div>`:''}
+            </div>`;
+        }).join('');
+    }
+
+    window.openOrderStatus = function() { renderStatusScreen(); showScreen('external-screen'); };
+    window.backToMenuScreen = function() { showScreen('menu-screen'); };
+
+    /* ─── Slide-to-confirm ──────────────────────────────────────────────── */
+    function initSlider() {
+        const track=document.getElementById('slide-track');
+        const thumb=document.getElementById('slide-thumb');
+        const fill =document.getElementById('slide-fill');
+        const label=document.getElementById('slide-label');
+        let dragging=false,startX=0,currentX=0;
+        const maxLeft=()=>track.offsetWidth-56;
+
+        function setPos(x) {
+            const c=Math.max(0,Math.min(x,maxLeft())); currentX=c;
+            thumb.style.left=(4+c)+'px'; fill.style.width=(56+c)+'px';
+            label.style.opacity=Math.max(0,1-(c/maxLeft())*1.6);
+        }
+        function onStart(e) {
+            if(sliderConfirmed) return; dragging=true;
+            startX=(e.touches?e.touches[0].clientX:e.clientX)-currentX;
+            thumb.style.transition=fill.style.transition='none'; e.preventDefault();
+        }
+        function onMove(e) {
+            if(!dragging) return;
+            setPos((e.touches?e.touches[0].clientX:e.clientX)-startX); e.preventDefault();
+        }
+        function onEnd() {
+            if(!dragging) return; dragging=false;
+            thumb.style.transition=fill.style.transition='';
+            if(currentX>=maxLeft()*0.85) {
+                // If no email yet, pause and ask before confirming
+                if (!hasAccount()) {
+                    setPos(0); label.style.opacity=1; // reset thumb
+                    _pendingOrderAfterAuth = true;
+                    openAuthModal('signin');
                 } else {
-                    setPosition(0);
-                    label.style.opacity = 1;
+                    sliderConfirmed=true; track.classList.add('confirmed');
+                    thumb.innerHTML='<i class="fa-solid fa-check"></i>'; label.style.opacity=0;
+                    setTimeout(confirmFinalOrder,420);
                 }
-            }
-
-            thumb.addEventListener('mousedown',   onStart, { passive: false });
-            thumb.addEventListener('touchstart',   onStart, { passive: false });
-            document.addEventListener('mousemove', onMove,  { passive: false });
-            document.addEventListener('touchmove', onMove,  { passive: false });
-            document.addEventListener('mouseup',   onEnd);
-            document.addEventListener('touchend',  onEnd);
+            } else { setPos(0); label.style.opacity=1; }
         }
+        thumb.addEventListener('mousedown', onStart,{passive:false});
+        thumb.addEventListener('touchstart',onStart,{passive:false});
+        document.addEventListener('mousemove',onMove,{passive:false});
+        document.addEventListener('touchmove',onMove,{passive:false});
+        document.addEventListener('mouseup',  onEnd);
+        document.addEventListener('touchend', onEnd);
+    }
 
-        function resetSlider() {
-            sliderConfirmed = false;
-            const track = document.getElementById('slide-track');
-            const thumb = document.getElementById('slide-thumb');
-            const fill  = document.getElementById('slide-fill');
-            const label = document.getElementById('slide-label');
-            if (!track) return;
-            track.classList.remove('confirmed');
-            thumb.innerHTML     = '<i class="fa-solid fa-chevron-right"></i>';
-            thumb.style.left    = '4px';
-            fill.style.width    = '56px';
-            label.style.opacity = 1;
-        }
+    function resetSlider() {
+        sliderConfirmed=false;
+        const track=document.getElementById('slide-track'),thumb=document.getElementById('slide-thumb'),
+              fill=document.getElementById('slide-fill'),label=document.getElementById('slide-label');
+        if(!track) return;
+        track.classList.remove('confirmed');
+        thumb.innerHTML='<i class="fa-solid fa-chevron-right"></i>';
+        thumb.style.left='4px'; fill.style.width='56px'; label.style.opacity=1;
+    }
 
-        // ── Init — always show welcome screen first ────────────────────────────
-        async function init() {
-            await fetchTableCount();
-            updateCartUI();
-            initSlider();
-            // Always start at welcome screen regardless of session storage.
-            // sessionStorage is used only to remember the table number during the
-            // same browser tab session so the table select can be skipped if the
-            // page refreshes mid-session — but we never skip the welcome screen.
-            showScreen('welcome-screen');
-        }
-
-        init();
-    </script>
+    /* ─── Init ──────────────────────────────────────────────────────────── */
+    async function init() {
+        await fetchTableCount();
+        updateCartUI(); initSlider(); refreshAccountUI();
+        showScreen('welcome-screen');
+    }
+    init();
+</script>
 </body>
 </html>
