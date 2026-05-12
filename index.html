@@ -34,6 +34,67 @@
         }
         .shake { animation: shake 0.42s ease; }
 
+        /* ── Menu card animations ── */
+        @keyframes menuCardIn {
+            from { opacity: 0; transform: translateY(18px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0)    scale(1); }
+        }
+        @keyframes menuCardOut {
+            from { opacity: 1; transform: translateY(0)    scale(1); }
+            to   { opacity: 0; transform: translateY(-10px) scale(0.97); }
+        }
+        @keyframes gridFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .menu-grid-enter {
+            animation: gridFadeIn 0.22s ease forwards;
+        }
+        .menu-card-anim {
+            opacity: 0;
+            animation: menuCardIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* ── Search highlight pulse ── */
+        @keyframes searchPulse {
+            0%   { border-color: rgba(245,158,11,0.2); }
+            50%  { border-color: rgba(245,158,11,0.6); }
+            100% { border-color: rgba(245,158,11,0.2); }
+        }
+        .search-active { animation: searchPulse 1.5s ease infinite; }
+
+        /* ── Search result highlight on card ── */
+        @keyframes cardHighlight {
+            0%   { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+            40%  { box-shadow: 0 0 0 3px rgba(245,158,11,0.35); }
+            100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+        }
+        .search-hit { animation: cardHighlight 0.7s ease; }
+
+        /* ── Filter pill active transition ── */
+        @keyframes pillPop {
+            0%   { transform: scale(1); }
+            40%  { transform: scale(0.93); }
+            100% { transform: scale(1); }
+        }
+        .filter-pill-pop { animation: pillPop 0.22s ease; }
+
+        /* ── No results bounce ── */
+        @keyframes noResultsBounce {
+            0%,100% { transform: translateY(0); }
+            40%     { transform: translateY(-6px); }
+            70%     { transform: translateY(-2px); }
+        }
+        .no-results-icon { animation: noResultsBounce 1.6s ease-in-out infinite; }
+
+        /* ── Search bar clear button ── */
+        @keyframes clearBtnIn {
+            from { opacity: 0; transform: scale(0.6) rotate(-90deg); }
+            to   { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .clear-btn-in { animation: clearBtnIn 0.2s ease forwards; }
+
         .branch-bg {
             background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('lazimpat.jpg');
             background-size: cover; background-position: center; background-attachment: fixed;
@@ -83,8 +144,8 @@
         .slide-track.confirmed .slide-label { opacity: 0; }
         .slide-track.confirmed .slide-thumb { left: calc(100% - 52px) !important; background: #15803d; cursor: default; }
 
-        .menu-card { transition: border-color 0.15s, transform 0.15s; }
-        .menu-card:hover { border-color: rgba(245,158,11,0.3) !important; transform: translateY(-1px); }
+        .menu-card { transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s; }
+        .menu-card:hover { border-color: rgba(245,158,11,0.3) !important; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
 
         .special-notes { transition: border-color 0.15s; }
         .special-notes:focus { outline: none; border-color: rgba(245,158,11,0.4) !important; }
@@ -94,6 +155,61 @@
             background: rgba(245,158,11,0.15) !important;
             border-color: rgba(245,158,11,0.4) !important;
             color: #fbbf24 !important;
+        }
+
+        /* ── Search input ── */
+        .search-input-wrap {
+            position: relative; width: 100%;
+        }
+        .search-input {
+            width: 100%;
+            background: rgba(15,23,42,0.85);
+            border: 1px solid rgba(51,65,85,0.8);
+            border-radius: 14px;
+            padding: 10px 40px 10px 38px;
+            font-size: 13px;
+            color: #e2e8f0;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            min-height: unset !important;
+        }
+        .search-input:focus {
+            border-color: rgba(245,158,11,0.45);
+            background: rgba(15,23,42,0.95);
+            box-shadow: 0 0 0 3px rgba(245,158,11,0.08);
+        }
+        .search-input::placeholder { color: #475569; }
+        .search-icon {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: #64748b; font-size: 13px; pointer-events: none;
+            transition: color 0.2s;
+        }
+        .search-input-wrap:focus-within .search-icon { color: #f59e0b; }
+        .search-clear {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            background: rgba(71,85,105,0.5); border: none; border-radius: 50%;
+            width: 20px; height: 20px !important; min-height: unset !important;
+            display: flex; align-items: center; justify-content: center;
+            color: #94a3b8; cursor: pointer; font-size: 9px;
+            transition: background 0.15s, color 0.15s;
+        }
+        .search-clear:hover { background: rgba(239,68,68,0.25); color: #f87171; }
+
+        /* ── Search results count badge ── */
+        .search-count-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700; color: #f59e0b;
+            background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+            padding: 3px 10px; border-radius: 100px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        /* ── Match highlight in item name ── */
+        .search-match-highlight {
+            background: rgba(245,158,11,0.22);
+            color: #fbbf24;
+            border-radius: 3px;
+            padding: 0 2px;
         }
 
         .s-badge {
@@ -178,6 +294,31 @@
             50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0.15); }
         }
         .pulse-ready { animation: pulseReady 1.8s ease-in-out infinite; }
+
+        /* ── Category transition overlay ── */
+        @keyframes categorySlideRight {
+            from { opacity: 0; transform: translateX(-20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes categorySlideLeft {
+            from { opacity: 0; transform: translateX(20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .cat-slide-right { animation: categorySlideRight 0.26s cubic-bezier(0.22,1,0.36,1) forwards; }
+        .cat-slide-left  { animation: categorySlideLeft  0.26s cubic-bezier(0.22,1,0.36,1) forwards; }
+
+        /* ── Stagger delays for cards ── */
+        .menu-card-anim:nth-child(1)  { animation-delay: 0ms;  }
+        .menu-card-anim:nth-child(2)  { animation-delay: 30ms; }
+        .menu-card-anim:nth-child(3)  { animation-delay: 55ms; }
+        .menu-card-anim:nth-child(4)  { animation-delay: 75ms; }
+        .menu-card-anim:nth-child(5)  { animation-delay: 95ms; }
+        .menu-card-anim:nth-child(6)  { animation-delay:110ms; }
+        .menu-card-anim:nth-child(7)  { animation-delay:125ms; }
+        .menu-card-anim:nth-child(8)  { animation-delay:138ms; }
+        .menu-card-anim:nth-child(9)  { animation-delay:150ms; }
+        .menu-card-anim:nth-child(10) { animation-delay:160ms; }
+        .menu-card-anim:nth-child(n+11) { animation-delay:168ms; }
     </style>
 </head>
 <body class="branch-bg text-slate-100 min-h-screen flex flex-col justify-between">
@@ -388,8 +529,38 @@
             </span>
         </div>
 
+        <!-- ── Search Bar ── -->
+        <div class="search-input-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input
+                id="search-input"
+                type="text"
+                class="search-input"
+                placeholder="Search dishes… e.g. pork sekuwa, fish, paneer"
+                autocomplete="off"
+                maxlength="80"
+                oninput="handleSearch(this.value)"
+            >
+            <button id="search-clear" class="search-clear hidden clear-btn-in" onclick="clearSearch()" title="Clear search">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- ── Search results info bar ── -->
+        <div id="search-info-bar" class="hidden flex items-center justify-between flex-wrap gap-2">
+            <span id="search-count-el" class="search-count-badge">
+                <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
+                <span id="search-count-text">0 results</span>
+            </span>
+            <button onclick="clearSearch()"
+                    class="text-[10px] text-slate-500 hover:text-amber-400 transition-colors cursor-pointer"
+                    style="min-height:unset;background:none;border:none;padding:4px 8px">
+                Clear search
+            </button>
+        </div>
+
         <div class="flex gap-2 flex-wrap" id="filter-row"></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="menu-items"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 menu-grid-enter" id="menu-items"></div>
     </div>
 
     <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl
@@ -572,20 +743,15 @@
     import { getDatabase, ref, push, onValue, get, update }
         from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-    /* ═══════════════════════════════════════════════════════════════════════
-       EMAILJS SETUP — required to send bill emails
-       ─────────────────────────────────────────────────────────────────────
-    ═══════════════════════════════════════════════════════════════════════ */
-    const EMAILJS_PUBLIC_KEY  = 'B7TxLhcukvBJeNDLu';   // ← replace
-    const EMAILJS_SERVICE_ID  = 'service_py2n2bm';   // ← replace
-    const EMAILJS_TEMPLATE_ID = 'template_ruuryg5';  // ← replace
+    const EMAILJS_PUBLIC_KEY  = 'B7TxLhcukvBJeNDLu';
+    const EMAILJS_SERVICE_ID  = 'service_py2n2bm';
+    const EMAILJS_TEMPLATE_ID = 'template_ruuryg5';
 
     const EMAIL_CONFIGURED = ![EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID]
         .some(v => v.startsWith('YOUR_'));
 
     if (EMAIL_CONFIGURED) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
-    /* ─── Firebase ──────────────────────────────────────────────────────── */
     const firebaseConfig = {
         apiKey: "AIzaSyAdQtFwyOHoixp2rALMKBllaeqg2jvCl5w",
         authDomain: "sekuwa-by-kilo.firebaseapp.com",
@@ -598,7 +764,6 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    /* ─── Helpers ───────────────────────────────────────────────────────── */
     function esc(s) {
         if (!s && s !== 0) return '';
         return String(s).replace(/[&<>'"]/g,
@@ -627,7 +792,7 @@
         document.getElementById(id).classList.remove('hidden');
     }
 
-    /* ─── Account state (persisted in localStorage) ─────────────────────── */
+    /* ─── Account state ─────────────────────────────────────────────────── */
     let account = {
         name:  localStorage.getItem('sbk_name')  || '',
         email: localStorage.getItem('sbk_email') || ''
@@ -652,7 +817,6 @@
         const pnEl  = document.getElementById('panel-name');
         const peEl  = document.getElementById('panel-email');
 
-        // Show avatar whenever table is selected
         if (selectedTable) wrap.style.display = 'block';
 
         if (hasAccount()) {
@@ -668,14 +832,12 @@
             peEl.textContent = 'No email set';
         }
 
-        // Confirmation screen — only show email row if account set
         const cer = document.getElementById('confirm-email-row');
         if (cer) {
             cer.classList.toggle('hidden', !hasAccount());
             if (hasAccount()) document.getElementById('confirm-email-display').textContent = account.email;
         }
 
-        // Status screen banners
         const ses = document.getElementById('status-email-set');
         const sed = document.getElementById('status-email-display');
         if (ses) {
@@ -713,7 +875,6 @@
         if (!isValidEmail(email)) { document.getElementById('auth-email').focus(); showToast('Please enter a valid email.'); return; }
         persistAccount(name, email);
         
-        // Log to Firebase for restaurant records (name + email + table, no sensitive data)
         if (selectedTable) {
             push(ref(db, 'customer_emails'), { name, email, table: selectedTable, date: nowStamp().date }).catch(()=>{});
         }
@@ -722,24 +883,15 @@
         refreshAccountUI();
         showToast(`✅ Got it, ${name}! Bill will go to ${email}`);
 
-        // If they just placed an order (meaning sessionOrders has items)
         if (sessionOrders.length > 0) {
             const latestOrder = sessionOrders[sessionOrders.length - 1];
-            
-            // Update the kitchen order in Firebase with the newly provided email
             update(ref(db, `kitchen_orders/${latestOrder.originalKey}`), {
                 customerEmail: account.email,
                 customerName: account.name
             }).catch(()=>{});
-
-            // Update the local entry data so the email function has the correct email
             latestOrder.data.customerEmail = account.email;
             latestOrder.data.customerName = account.name;
-
-            // Show the "Awesome, Order Sent!" modal
             openEmailInfoModal();
-
-            // FORCE EMAIL IMMEDIATELY FOR TESTING
             sendBillEmail(latestOrder);
         }
     };
@@ -783,7 +935,6 @@
         if (wrap && !wrap.contains(e.target)) closeAccountPanel();
     });
 
-    /* ─── Email Info Modal ─── */
     window.openEmailInfoModal = function() {
         document.getElementById('info-modal-email').textContent = account.email;
         document.getElementById('email-info-overlay').classList.remove('hidden');
@@ -793,7 +944,7 @@
     };
 
     /* ─── Email billing ─────────────────────────────────────────────────── */
-    const billedKeys = new Set(); // guard against double-sending
+    const billedKeys = new Set();
 
     function sendBillEmail(entry) {
         if (!hasAccount()) return;
@@ -818,15 +969,10 @@
             restaurant_name: 'Sekuwa by Kilo — Lazimpat'
         };
 
-        if (!EMAIL_CONFIGURED) {
-            console.log('[EmailJS not configured] Would send bill to:', account.email, '\nParams:', params);
-            showToast('ℹ️ EmailJS not configured — see console for details.');
-            return;
-        }
+        if (!EMAIL_CONFIGURED) return;
 
         emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
             .then(() => {
-                // Show big celebratory toast
                 document.getElementById('bill-toast-email').textContent = `Sent to ${account.email}`;
                 const bt = document.getElementById('bill-toast');
                 bt.classList.remove('hidden');
@@ -838,23 +984,99 @@
             });
     }
 
-    /* ─── App state ─────────────────────────────────────────────────────── */
+    /* ─── Menu Data ─────────────────────────────────────────────────────── */
     const menuData = [
-        { id:1, name:'Chicken Sekuwa (500 gm)', price:815,  category:'Sekuwa' },
-        { id:2, name:'Pork Sekuwa (500 gm)',    price:815,  category:'Sekuwa' },
-        { id:3, name:'Mutton Sekuwa (250 gm)',  price:880,  category:'Sekuwa' },
-        { id:4, name:'Chicken Sekuwa Set',       price:530,  category:'Sets'   },
-        { id:5, name:'Buff Momo (Steam)',         price:225,  category:'Momo'   },
-        { id:6, name:'Mustang Aloo',              price:300,  category:'Sides'  }
+        { id: 1,  name: 'Chicken Butter Masala',             price: 469,  category: 'Curry' },
+        { id: 2,  name: 'Paneer Butter Masala',              price: 489,  category: 'Curry' },
+        { id: 3,  name: 'Mutter Paneer',                     price: 374,  category: 'Curry' },
+        { id: 4,  name: 'Mutter Mushroom',                   price: 294,  category: 'Curry' },
+        { id: 5,  name: 'Mushroom Paneer',                   price: 399,  category: 'Curry' },
+        { id: 6,  name: 'Trout Fish Curry',                  price: 629,  category: 'Curry' },
+        { id: 7,  name: 'Fish Curry',                        price: 389,  category: 'Curry' },
+        { id: 8,  name: 'Local Chicken Curry',               price: 409,  category: 'Curry' },
+        { id: 9,  name: 'Pork Curry',                        price: 364,  category: 'Curry' },
+        { id: 10, name: 'Mutton Curry',                      price: 499,  category: 'Curry' },
+        { id: 11, name: 'Mixed Veg Curry',                   price: 299,  category: 'Curry' },
+        { id: 12, name: 'Daal Fry',                          price: 149,  category: 'Curry' },
+        { id: 13, name: 'Dharane Sekuwa Combo Platter Set',  price: 2699, category: 'Special' },
+        { id: 14, name: 'Pork Sekuwa (1 Plate)',             price: 299,  category: 'Sekuwa' },
+        { id: 15, name: 'Pork Sekuwa (½ kg)',                price: 589,  category: 'Sekuwa' },
+        { id: 16, name: 'Pork Sekuwa (1 kg)',                price: 1149, category: 'Sekuwa' },
+        { id: 17, name: 'Chicken Sekuwa (1 Plate)',          price: 279,  category: 'Sekuwa' },
+        { id: 18, name: 'Chicken Sekuwa (½ kg)',             price: 529,  category: 'Sekuwa' },
+        { id: 19, name: 'Chicken Sekuwa (1 kg)',             price: 1049, category: 'Sekuwa' },
+        { id: 20, name: 'Wings Sekuwa & Fry (1 Plate)',      price: 279,  category: 'Sekuwa' },
+        { id: 21, name: 'Wings Sekuwa & Fry (½ kg)',         price: 529,  category: 'Sekuwa' },
+        { id: 22, name: 'Wings Sekuwa & Fry (1 kg)',         price: 1049, category: 'Sekuwa' },
+        { id: 23, name: 'Mutton Sekuwa (1 Plate)',           price: 489,  category: 'Sekuwa' },
+        { id: 24, name: 'Mutton Sekuwa (½ kg)',              price: 1199, category: 'Sekuwa' },
+        { id: 25, name: 'Mutton Sekuwa (1 kg)',              price: 2399, category: 'Sekuwa' },
+        { id: 26, name: 'Chicken Sausage',                   price: 269,  category: 'Sausages' },
+        { id: 27, name: 'Buff Sausage',                      price: 269,  category: 'Sausages' },
+        { id: 28, name: 'Pork Kasaudi Khaja Set',            price: 424,  category: 'Khaja Set' },
+        { id: 29, name: 'Local Chicken Kasaudi Khaja Set',   price: 449,  category: 'Khaja Set' },
+        { id: 30, name: 'Mutton Kasaudi Khaja Set',          price: 489,  category: 'Khaja Set' },
+        { id: 31, name: 'Veg Kasaudi Khaja Set',             price: 254,  category: 'Khaja Set' },
+        { id: 32, name: 'Pork Kasaudi Dry',                  price: 364,  category: 'Kasaudi Dry' },
+        { id: 33, name: 'Local Chicken Kasaudi Dry',         price: 409,  category: 'Kasaudi Dry' },
+        { id: 34, name: 'Mutton Kasaudi Dry',                price: 444,  category: 'Kasaudi Dry' },
+        { id: 35, name: 'Chicken Fried (Full Dose)',         price: 1619, category: 'Chicken Snacks' },
+        { id: 36, name: 'Chicken Fried (Half Dose)',         price: 819,  category: 'Chicken Snacks' },
+        { id: 37, name: 'Chicken Fried 2 pcs',              price: 414,  category: 'Chicken Snacks' },
+        { id: 38, name: 'Potato wrapped Chicken',            price: 599,  category: 'Chicken Snacks' },
+        { id: 39, name: 'Pan Fried Chicken with Veg',        price: 569,  category: 'Chicken Snacks' },
+        { id: 40, name: 'Cashewnut Chicken',                 price: 679,  category: 'Chicken Snacks' },
+        { id: 41, name: 'Chicken Drumstick',                 price: 549,  category: 'Chicken Snacks' },
+        { id: 42, name: 'Chicken Meatball',                  price: 489,  category: 'Chicken Snacks' },
+        { id: 43, name: 'Chicken Roast',                     price: 559,  category: 'Chicken Snacks' },
+        { id: 44, name: 'Chicken Parma with Cheese',         price: 649,  category: 'Chicken Snacks' },
+        { id: 45, name: 'Timoor Chicken',                    price: 569,  category: 'Chicken Snacks' },
+        { id: 46, name: 'Chicken Fajita',                    price: 629,  category: 'Chicken Snacks' },
+        { id: 47, name: 'Diamond Chicken',                   price: 569,  category: 'Chicken Snacks' },
+        { id: 48, name: 'Beijing Chicken',                   price: 644,  category: 'Chicken Snacks' },
+        { id: 49, name: 'Chicken Boil',                      price: 349,  category: 'Chicken Snacks' },
+        { id: 50, name: 'Pangra Fry',                        price: 409,  category: 'Chicken Snacks' },
+        { id: 51, name: 'Battai Fry',                        price: 579,  category: 'Chicken Snacks' },
+        { id: 52, name: 'Grilled Salmon with Veg',           price: 1599, category: 'Seafood Snacks' },
+        { id: 53, name: 'Roasted Whole Baked Fish',          price: 1049, category: 'Seafood Snacks' },
+        { id: 54, name: 'Tiger Prawn with Papaya Salad',     price: 979,  category: 'Seafood Snacks' },
+        { id: 55, name: 'King Prawn Fry',                    price: 719,  category: 'Seafood Snacks' },
+        { id: 56, name: 'Golden Fry Fish',                   price: 499,  category: 'Seafood Snacks' },
+        { id: 57, name: 'Fish & Chips',                      price: 579,  category: 'Seafood Snacks' },
+        { id: 58, name: 'Grilled Fish',                      price: 589,  category: 'Seafood Snacks' },
+        { id: 59, name: 'Fish Ball',                         price: 489,  category: 'Seafood Snacks' },
+        { id: 60, name: 'Fish Finger',                       price: 489,  category: 'Seafood Snacks' },
+        { id: 61, name: 'Thai Prawn',                        price: 799,  category: 'Seafood Snacks' },
+        { id: 62, name: 'Tawa Fried Fish',                   price: 624,  category: 'Seafood Snacks' },
+        { id: 63, name: 'Trout Fish with Hot Spicy Sauce',   price: 689,  category: 'Seafood Snacks' },
+        { id: 64, name: 'Roasted Pork Belly',                price: 559,  category: 'Pork Snacks' },
+        { id: 65, name: 'Peri Peri Pork Chop',               price: 589,  category: 'Pork Snacks' },
+        { id: 66, name: 'Pork Bacon',                        price: 619,  category: 'Pork Snacks' },
+        { id: 67, name: 'Pork Fajita',                       price: 649,  category: 'Pork Snacks' },
+        { id: 68, name: 'Pork Boil',                         price: 349,  category: 'Pork Snacks' },
+        { id: 69, name: 'Badel Dameko',                      price: 739,  category: 'Pork Snacks' },
+        { id: 70, name: 'Mutton Hyakula Fry',                price: 589,  category: 'Mutton Snacks' },
+        { id: 71, name: 'Mutton Tauko Fry',                  price: 399,  category: 'Mutton Snacks' },
+        { id: 72, name: 'Mutton Tauko Boil',                 price: 399,  category: 'Mutton Snacks' },
+        { id: 73, name: 'Mutton Fila Boil',                  price: 599,  category: 'Mutton Snacks' },
+        { id: 74, name: 'Duck Chhoila',                      price: 549,  category: 'Chhoila' },
+        { id: 75, name: 'Battai Chhoila',                    price: 599,  category: 'Chhoila' },
+        { id: 76, name: 'Pork Chhoila',                      price: 414,  category: 'Chhoila' },
+        { id: 77, name: 'Chicken Chhoila',                   price: 414,  category: 'Chhoila' }
     ];
 
     let cart                = [];
     let selectedTable       = null;
-    let sessionOrders       = []; // { originalKey, data, unsubscribe }
+    let sessionOrders       = [];
     let activeFilter        = 'All';
+    let searchQuery         = '';
     let tableCount          = 6;
     let waiterCooldownUntil = 0;
     let sliderConfirmed     = false;
+
+    /* ── Track last filter index for direction detection ── */
+    const categories = ['All', ...new Set(menuData.map(m => m.category))];
+    let lastFilterIdx = 0;
 
     async function fetchTableCount() {
         try {
@@ -864,10 +1086,55 @@
         } catch(_) {}
     }
 
+    /* ─── Search ────────────────────────────────────────────────────────── */
+    window.handleSearch = function(val) {
+        searchQuery = val.trim().toLowerCase();
+        const clearBtn = document.getElementById('search-clear');
+        const infoBar  = document.getElementById('search-info-bar');
+
+        if (searchQuery) {
+            clearBtn.classList.remove('hidden');
+            // When searching, reset to "All" filter so all results are visible
+            if (activeFilter !== 'All') {
+                activeFilter = 'All';
+                lastFilterIdx = 0;
+                updateFilterPillsUI();
+            }
+            infoBar.classList.remove('hidden');
+            infoBar.classList.add('flex');
+        } else {
+            clearBtn.classList.add('hidden');
+            infoBar.classList.add('hidden');
+            infoBar.classList.remove('flex');
+        }
+        renderMenu();
+    };
+
+    window.clearSearch = function() {
+        const inp = document.getElementById('search-input');
+        inp.value = '';
+        searchQuery = '';
+        document.getElementById('search-clear').classList.add('hidden');
+        document.getElementById('search-info-bar').classList.add('hidden');
+        document.getElementById('search-info-bar').classList.remove('flex');
+        inp.focus();
+        renderMenu();
+    };
+
+    /* Highlight matching portion of text */
+    function highlightMatch(text, query) {
+        if (!query) return esc(text);
+        const idx = text.toLowerCase().indexOf(query.toLowerCase());
+        if (idx < 0) return esc(text);
+        const before = esc(text.slice(0, idx));
+        const match  = esc(text.slice(idx, idx + query.length));
+        const after  = esc(text.slice(idx + query.length));
+        return `${before}<span class="search-match-highlight">${match}</span>${after}`;
+    }
+
     /* ─── Category filters ──────────────────────────────────────────────── */
     function buildFilterPills() {
-        const cats = ['All', ...new Set(menuData.map(m => m.category))];
-        document.getElementById('filter-row').innerHTML = cats.map(cat => `
+        document.getElementById('filter-row').innerHTML = categories.map(cat => `
             <button data-cat="${esc(cat)}" onclick="setFilter('${esc(cat)}')"
                     class="filter-pill ${cat === 'All'
                         ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
@@ -877,16 +1144,41 @@
             </button>`).join('');
     }
 
-    window.setFilter = function(cat) {
-        activeFilter = cat;
+    function updateFilterPillsUI() {
         document.querySelectorAll('#filter-row .filter-pill').forEach(btn => {
-            const a = btn.dataset.cat === cat;
+            const a = btn.dataset.cat === activeFilter;
             btn.className = `filter-pill ${a
                 ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
                 : 'bg-slate-900/50 border-slate-700 text-slate-400'}
                 text-[11px] font-semibold px-3.5 py-1.5 rounded-full border transition-all`;
         });
-        renderMenu();
+    }
+
+    window.setFilter = function(cat) {
+        if (cat === activeFilter && !searchQuery) return;
+        const newIdx = categories.indexOf(cat);
+        const direction = newIdx >= lastFilterIdx ? 'left' : 'right';
+        lastFilterIdx = newIdx;
+        activeFilter  = cat;
+
+        // Clear search when switching categories
+        if (searchQuery) {
+            searchQuery = '';
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-clear').classList.add('hidden');
+            document.getElementById('search-info-bar').classList.add('hidden');
+            document.getElementById('search-info-bar').classList.remove('flex');
+        }
+
+        updateFilterPillsUI();
+        renderMenu(direction);
+
+        // Animate the clicked pill
+        const btn = document.querySelector(`#filter-row [data-cat="${CSS.escape(cat)}"]`);
+        if (btn) {
+            btn.classList.add('filter-pill-pop');
+            btn.addEventListener('animationend', () => btn.classList.remove('filter-pill-pop'), { once: true });
+        }
     };
 
     /* ─── Screens ───────────────────────────────────────────────────────── */
@@ -920,6 +1212,9 @@
         document.getElementById('account-nav-wrap').style.display = 'block';
         showScreen('menu-screen');
         buildFilterPills(); renderMenu(); refreshAccountUI();
+
+        // Auto-focus search after a brief delay for smooth UX
+        setTimeout(() => document.getElementById('search-input').focus(), 600);
     };
 
     window.callWaiter = function() {
@@ -934,66 +1229,110 @@
             .catch(() => showToast('❌ Connection error. Please try again.'));
     };
 
-    /* ─── Menu render ───────────────────────────────────────────────────── */
+    /* ─── Menu render (with animation direction) ────────────────────────── */
     function getQty(id) { return (cart.find(c => c.id===id)||{}).quantity||0; }
 
-    function renderMenu() {
-        const items = activeFilter==='All' ? menuData : menuData.filter(m=>m.category===activeFilter);
-        document.getElementById('menu-items').innerHTML = items.map(item => {
-            const qty = getQty(item.id);
-            return `
-            <div class="menu-card bg-slate-900/90 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
-                <div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md">${esc(item.category)}</span>
-                    <h4 class="text-sm font-extrabold text-white mt-3 mb-1 leading-snug">${esc(item.name)}</h4>
-                    <p class="text-base font-black text-amber-500">${fmt(item.price)}</p>
-                    <p class="text-[10px] text-green-500 mt-1 flex items-center gap-1"><i class="fa-solid fa-bolt text-[8px]"></i> ~9 mins</p>
-                </div>
-                <div class="mt-5 flex justify-end">
-                    ${qty===0
-                        ? `<button onclick="addItem(${item.id})"
-                                   class="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold
-                                          text-xs py-2 px-5 rounded-xl hover:bg-amber-500 hover:text-slate-950
-                                          transition-all cursor-pointer">
-                               <i class="fa-solid fa-plus mr-1 text-[10px]"></i> Add
-                           </button>`
-                        : `<div class="qty-pill flex items-center bg-slate-950 border border-slate-800 rounded-full p-0.5 w-28 justify-between">
-                               <button onclick="decItem(${item.id})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/20 text-red-400 text-sm font-bold cursor-pointer transition-colors">−</button>
-                               <span class="text-xs font-black text-slate-300">${qty}</span>
-                               <button onclick="incItem(${item.id})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-amber-500/20 text-amber-400 text-sm font-bold cursor-pointer transition-colors">+</button>
-                           </div>`}
-                </div>
-            </div>`;
-        }).join('');
+    function renderMenu(direction = null) {
+        const grid = document.getElementById('menu-items');
+
+        // Filter items
+        let items = activeFilter === 'All' ? menuData : menuData.filter(m => m.category === activeFilter);
+
+        // Apply search
+        if (searchQuery) {
+            const q = searchQuery;
+            items = menuData.filter(m =>
+                m.name.toLowerCase().includes(q) ||
+                m.category.toLowerCase().includes(q)
+            );
+            // Update search count
+            const countEl = document.getElementById('search-count-text');
+            if (countEl) countEl.textContent = `${items.length} result${items.length !== 1 ? 's' : ''} for "${searchQuery}"`;
+        }
+
+        // Animate out old content
+        grid.style.opacity = '0';
+        grid.style.transform = direction === 'left'  ? 'translateX(16px)'  :
+                               direction === 'right' ? 'translateX(-16px)' : 'translateY(8px)';
+        grid.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+
+        setTimeout(() => {
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-2 text-center py-16 text-slate-500">
+                        <i class="fa-solid fa-bowl-food text-3xl mb-4 block opacity-40 no-results-icon"></i>
+                        <p class="text-sm font-semibold text-slate-400">No items found</p>
+                        <p class="text-xs mt-1 text-slate-600">
+                            ${searchQuery ? `Try a different search term` : 'Nothing in this category yet'}
+                        </p>
+                        ${searchQuery ? `<button onclick="clearSearch()" class="mt-4 text-[11px] text-amber-400 border border-amber-500/20 px-4 py-2 rounded-xl hover:bg-amber-500/10 transition-all cursor-pointer" style="min-height:unset">Clear Search</button>` : ''}
+                    </div>`;
+            } else {
+                grid.innerHTML = items.map(item => {
+                    const qty      = getQty(item.id);
+                    const nameHtml = searchQuery
+                        ? highlightMatch(item.name, searchQuery)
+                        : esc(item.name);
+                    return `
+                    <div class="menu-card menu-card-anim bg-slate-900/90 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md">${esc(item.category)}</span>
+                            <h4 class="text-sm font-extrabold text-white mt-3 mb-1 leading-snug">${nameHtml}</h4>
+                            <p class="text-base font-black text-amber-500">${fmt(item.price)}</p>
+                            <p class="text-[10px] text-green-500 mt-1 flex items-center gap-1"><i class="fa-solid fa-bolt text-[8px]"></i> ~9 mins</p>
+                        </div>
+                        <div class="mt-5 flex justify-end">
+                            ${qty === 0
+                                ? `<button onclick="addItem(${item.id})"
+                                           class="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold
+                                                  text-xs py-2 px-5 rounded-xl hover:bg-amber-500 hover:text-slate-950
+                                                  transition-all cursor-pointer">
+                                       <i class="fa-solid fa-plus mr-1 text-[10px]"></i> Add
+                                   </button>`
+                                : `<div class="qty-pill flex items-center bg-slate-950 border border-slate-800 rounded-full p-0.5 w-28 justify-between">
+                                       <button onclick="decItem(${item.id})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/20 text-red-400 text-sm font-bold cursor-pointer transition-colors">−</button>
+                                       <span class="text-xs font-black text-slate-300">${qty}</span>
+                                       <button onclick="incItem(${item.id})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-amber-500/20 text-amber-400 text-sm font-bold cursor-pointer transition-colors">+</button>
+                                   </div>`}
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            // Animate in
+            grid.style.transition = 'opacity 0.24s ease, transform 0.24s cubic-bezier(0.22,1,0.36,1)';
+            grid.style.opacity    = '1';
+            grid.style.transform  = 'translateX(0) translateY(0)';
+        }, 160);
     }
 
     /* ─── Cart ──────────────────────────────────────────────────────────── */
     window.addItem = function(id) {
-        const e = cart.find(c=>c.id===id);
-        if (e) e.quantity++; else cart.push({ ...menuData.find(m=>m.id===id), quantity:1 });
+        const e = cart.find(c => c.id === id);
+        if (e) e.quantity++; else cart.push({ ...menuData.find(m => m.id === id), quantity: 1 });
         renderMenu(); updateCartUI();
     };
     window.incItem = window.addItem;
     window.decItem = function(id) {
-        const e = cart.find(c=>c.id===id); if (!e) return;
-        if (e.quantity>1) e.quantity--; else cart=cart.filter(c=>c.id!==id);
+        const e = cart.find(c => c.id === id); if (!e) return;
+        if (e.quantity > 1) e.quantity--; else cart = cart.filter(c => c.id !== id);
         renderMenu(); updateCartUI();
     };
     window.removeFromCart = function(id) {
-        cart=cart.filter(c=>c.id!==id); renderMenu(); updateCartUI();
+        cart = cart.filter(c => c.id !== id); renderMenu(); updateCartUI();
     };
-    function calcTotal() { return cart.reduce((s,i)=>s+i.price*i.quantity,0); }
+    function calcTotal() { return cart.reduce((s,i) => s + i.price * i.quantity, 0); }
 
     function updateCartUI() {
         const con = document.getElementById('cart-items');
-        if (cart.length===0) {
+        if (cart.length === 0) {
             con.innerHTML = `<div class="text-center py-12 text-slate-600"><i class="fa-solid fa-basket-shopping text-xl mb-2 block"></i><p class="text-xs font-medium">Your basket is empty</p></div>`;
             document.getElementById('cart-subtotal').textContent = fmt(0);
             document.getElementById('cart-total').textContent    = fmt(0);
             return;
         }
         con.innerHTML = cart.map(item => {
-            const line = item.price*item.quantity;
+            const line = item.price * item.quantity;
             return `
             <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800">
                 <div class="min-w-0 flex-1 mr-2">
@@ -1015,42 +1354,42 @@
 
     /* ─── Order flow ────────────────────────────────────────────────────── */
     window.placeOrder = function() {
-        if (cart.length===0) {
+        if (cart.length === 0) {
             const btn = document.getElementById('order-now-btn');
             btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake');
             showToast('🛒 Add at least one item first.'); return;
         }
         const notes = document.getElementById('special-notes').value.trim();
         document.getElementById('confirm-table').textContent = selectedTable;
-        document.getElementById('confirm-items').innerHTML = cart.map(i=>`
+        document.getElementById('confirm-items').innerHTML = cart.map(i => `
             <li class="flex justify-between text-slate-400">
                 <span>${esc(i.name)} × <b class="text-amber-500">${i.quantity}</b></span>
                 <span class="font-bold text-slate-200">${fmt(i.price*i.quantity)}</span>
             </li>`).join('');
         document.getElementById('confirm-total').textContent = fmt(calcTotal());
         const nr = document.getElementById('confirm-notes-row');
-        if (notes) { document.getElementById('confirm-notes-text').textContent=notes; nr.classList.remove('hidden'); }
+        if (notes) { document.getElementById('confirm-notes-text').textContent = notes; nr.classList.remove('hidden'); }
         else nr.classList.add('hidden');
-        refreshAccountUI(); // update email row on confirmation screen
+        refreshAccountUI();
         showScreen('confirmation-screen'); resetSlider();
     };
 
     window.confirmFinalOrder = function() {
-        if (cart.length===0) { showToast('Basket is empty.'); return; }
+        if (cart.length === 0) { showToast('Basket is empty.'); return; }
         const notes = document.getElementById('special-notes').value.trim();
         const snap  = [...cart];
         const { time, date, createdAt } = nowStamp();
         const payload = {
             table: selectedTable, items: snap,
-            notes: notes||null, time, date, createdAt, status:'Pending',
+            notes: notes||null, time, date, createdAt, status: 'Pending',
             customerEmail: account.email||null,
             customerName:  account.name||null
         };
 
-        push(ref(db,'kitchen_orders'), payload)
+        push(ref(db, 'kitchen_orders'), payload)
             .then(orderRef => {
                 const originalKey = orderRef.key;
-                const entry = { originalKey, data:{ ...payload }, unsubscribe:null };
+                const entry = { originalKey, data: { ...payload }, unsubscribe: null };
 
                 function handleStatusUpdate(live) {
                     if (!live) return;
@@ -1059,37 +1398,25 @@
                     if (!document.getElementById('external-screen').classList.contains('hidden'))
                         renderStatusScreen();
                     if (live.status && live.status !== prev) {
-                        if (live.status==='Preparing') showToast('👨‍🍳 Kitchen is preparing your order!',4000);
-                        else if (live.status==='Ready') showToast('✅ Your order is ready! Please collect.',6000);
-                        else if (live.status==='Paid')  {
-                            showToast('💜 Payment confirmed — thank you!',6000);
-                            // Real app: sendBillEmail(entry) goes here.
-                        }
+                        if (live.status === 'Preparing') showToast('👨‍🍳 Kitchen is preparing your order!', 4000);
+                        else if (live.status === 'Ready') showToast('✅ Your order is ready! Please collect.', 6000);
+                        else if (live.status === 'Paid')  showToast('💜 Payment confirmed — thank you!', 6000);
                     }
                 }
 
-                // Listen on order_status mirror (station app may write here)
-                const unsubStatus = onValue(ref(db,`order_status/${originalKey}`), snap2 => {
-                    handleStatusUpdate(snap2.val());
-                });
-
-                // Also listen directly on the kitchen_orders record for status changes
-                const unsubKitchen = onValue(ref(db,`kitchen_orders/${originalKey}`), snap2 => {
-                    handleStatusUpdate(snap2.val());
-                });
+                const unsubStatus  = onValue(ref(db, `order_status/${originalKey}`),  snap2 => { handleStatusUpdate(snap2.val()); });
+                const unsubKitchen = onValue(ref(db, `kitchen_orders/${originalKey}`), snap2 => { handleStatusUpdate(snap2.val()); });
 
                 entry.unsubscribe = () => { unsubStatus(); unsubKitchen(); };
                 sessionOrders.push(entry);
-                cart=[]; document.getElementById('special-notes').value='';
+                cart = []; document.getElementById('special-notes').value = '';
                 updateCartUI(); renderMenu(); openOrderStatus();
                 
-                // --- NEW FLOW: Ask for email AFTER order is successfully sent to DB ---
                 if (!hasAccount()) {
                     openAuthModal('signin');
                 } else {
                     openEmailInfoModal();
-                    // FORCE EMAIL IMMEDIATELY FOR TESTING
-                    sendBillEmail(entry); 
+                    sendBillEmail(entry);
                 }
             })
             .catch(() => {
@@ -1108,22 +1435,21 @@
             Ready:     ['s-ready',     'fa-check-circle', 'Ready to Collect'],
             Paid:      ['s-paid',      'fa-check-double', 'Paid'],
         };
-        const [cls,icon,label] = map[status]||['s-pending','fa-clock',status];
+        const [cls, icon, label] = map[status] || ['s-pending','fa-clock',status];
         const rushBadge = rush ? `<span class="s-badge s-rush ml-1"><i class="fa-solid fa-bolt"></i> Rush</span>` : '';
         return `<span class="s-badge ${cls}"><i class="fa-solid ${icon}"></i> ${label}</span>${rushBadge}`;
     }
 
     function statusSteps(status) {
-        const stages=['Pending','Preparing','Ready','Paid'];
-        const labels=['Received','Preparing','Ready','Paid'];
-        const curIdx=stages.indexOf(status); const safeIdx=curIdx<0?0:curIdx;
-        const html=stages.map((_,i)=>{
-            let dc='pending';
-            if(i<safeIdx) dc='done'; else if(i===safeIdx) dc='active';
-            const inner = dc==='done'
-                ? '<i class="fa-solid fa-check" style="font-size:9px"></i>' : String(i+1);
-            const conn  = i<stages.length-1
-                ? `<div class="step-connector ${i<safeIdx?'done':''}"></div>` : '';
+        const stages = ['Pending','Preparing','Ready','Paid'];
+        const labels = ['Received','Preparing','Ready','Paid'];
+        const curIdx = stages.indexOf(status); const safeIdx = curIdx < 0 ? 0 : curIdx;
+        const html = stages.map((_,i) => {
+            let dc = 'pending';
+            if (i < safeIdx) dc = 'done'; else if (i === safeIdx) dc = 'active';
+            const inner = dc === 'done' ? '<i class="fa-solid fa-check" style="font-size:9px"></i>' : String(i+1);
+            const conn  = i < stages.length-1
+                ? `<div class="step-connector ${i < safeIdx ? 'done' : ''}"></div>` : '';
             return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
                         <div class="step-dot ${dc}">${inner}</div>
                         <span style="font-size:8px;color:${i<=safeIdx?'#94a3b8':'#334155'};white-space:nowrap">${labels[i]}</span>
@@ -1133,59 +1459,59 @@
     }
 
     function renderStatusScreen() {
-        const list=document.getElementById('status-orders-list');
-        const hl=document.getElementById('status-headline');
-        const sl=document.getElementById('status-subline');
+        const list = document.getElementById('status-orders-list');
+        const hl   = document.getElementById('status-headline');
+        const sl   = document.getElementById('status-subline');
         refreshAccountUI();
 
-        if (sessionOrders.length===0) {
-            hl.textContent='No Orders Yet'; sl.textContent='Browse the menu and place an order first.';
-            list.innerHTML=`<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs"><i class="fa-solid fa-basket-shopping text-2xl mb-3 block opacity-50"></i>No orders placed this session.</div>`;
+        if (sessionOrders.length === 0) {
+            hl.textContent = 'No Orders Yet'; sl.textContent = 'Browse the menu and place an order first.';
+            list.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs"><i class="fa-solid fa-basket-shopping text-2xl mb-3 block opacity-50"></i>No orders placed this session.</div>`;
             return;
         }
 
-        const allPaid = sessionOrders.every(o=>o.data.status==='Paid');
+        const allPaid = sessionOrders.every(o => o.data.status === 'Paid');
         hl.textContent = allPaid ? 'All Settled — Thank You! 🙏' : 'Your Orders';
         sl.textContent = allPaid
             ? (hasAccount() ? `Bill emailed to ${account.email}` : 'We hope you enjoyed your meal.')
             : 'Live updates from the kitchen.';
 
-        list.innerHTML = sessionOrders.map((entry,idx) => {
-            const d=entry.data; const items=d.items||[];
-            const total=items.reduce((s,i)=>s+i.price*i.quantity,0);
-            const itemCount=items.reduce((s,i)=>s+i.quantity,0);
-            const status=d.status||'Pending';
+        list.innerHTML = sessionOrders.map((entry, idx) => {
+            const d = entry.data; const items = d.items || [];
+            const total     = items.reduce((s,i) => s + i.price * i.quantity, 0);
+            const itemCount = items.reduce((s,i) => s + i.quantity, 0);
+            const status    = d.status || 'Pending';
 
-            let waitLabel='';
-            if (status==='Pending'||status==='Preparing') {
+            let waitLabel = '';
+            if (status === 'Pending' || status === 'Preparing') {
                 if (d.createdAt) {
-                    const elapsed=Math.floor((Date.now()-new Date(d.createdAt))/60000);
-                    const rem=Math.max(1,15+itemCount*2-elapsed);
-                    waitLabel=`~${rem} min${rem!==1?'s':''}`;
-                } else waitLabel='~15 mins';
+                    const elapsed = Math.floor((Date.now() - new Date(d.createdAt)) / 60000);
+                    const rem     = Math.max(1, 15 + itemCount * 2 - elapsed);
+                    waitLabel = `~${rem} min${rem !== 1 ? 's' : ''}`;
+                } else waitLabel = '~15 mins';
             }
 
-            const sColor={Ready:'text-green-400',Paid:'text-purple-400'}[status]||'text-amber-400';
-            const sLine = status==='Ready'?'✅ Collect now!'
-                        : status==='Paid' ?'💜 Paid'
-                        : waitLabel;
+            const sColor = {Ready:'text-green-400', Paid:'text-purple-400'}[status] || 'text-amber-400';
+            const sLine  = status === 'Ready' ? '✅ Collect now!'
+                         : status === 'Paid'  ? '💜 Paid'
+                         : waitLabel;
 
             return `
             <div class="bg-slate-900 border ${status==='Ready'?'border-green-500/30 pulse-ready':'border-slate-800'}
                         p-5 rounded-2xl text-left space-y-3 transition-all">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                     <span class="text-xs font-bold text-slate-400">Order ${idx+1} &middot; Table ${esc(d.table)}</span>
-                    <div class="flex flex-wrap gap-1">${statusBadge(status,d.rush)}</div>
+                    <div class="flex flex-wrap gap-1">${statusBadge(status, d.rush)}</div>
                 </div>
                 ${statusSteps(status)}
                 <ul class="text-xs text-slate-400 space-y-1.5 mt-1">
-                    ${items.map(i=>`
+                    ${items.map(i => `
                         <li class="flex justify-between">
                             <span>${esc(i.name)} × ${i.quantity}</span>
                             <span class="text-amber-400 font-semibold">${fmt(i.price*i.quantity)}</span>
                         </li>`).join('')}
                 </ul>
-                ${d.notes?`<p class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-2">📝 ${esc(d.notes)}</p>`:''}
+                ${d.notes ? `<p class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-2">📝 ${esc(d.notes)}</p>` : ''}
                 <div class="flex justify-between text-xs border-t border-slate-800 pt-2">
                     <span class="text-slate-500">${(status==='Pending'||status==='Preparing')?'Est. wait':'Status'}</span>
                     <span class="font-bold ${sColor}">${sLine}</span>
@@ -1194,67 +1520,68 @@
                     <span class="text-slate-500">Total</span>
                     <span class="font-bold text-amber-400">${fmt(total)}</span>
                 </div>
-                ${status==='Paid'&&hasAccount()?`
+                ${status==='Paid'&&hasAccount() ? `
                 <div class="flex items-center gap-2 pt-2 border-t border-slate-800">
                     <i class="fa-solid fa-envelope-circle-check text-[10px] text-green-500 flex-shrink-0"></i>
                     <span class="text-[10px] text-slate-500">Bill emailed to <b class="text-slate-400">${esc(account.email)}</b></span>
-                </div>`:''}
+                </div>` : ''}
             </div>`;
         }).join('');
     }
 
-    window.openOrderStatus = function() { renderStatusScreen(); showScreen('external-screen'); };
+    window.openOrderStatus  = function() { renderStatusScreen(); showScreen('external-screen'); };
     window.backToMenuScreen = function() { showScreen('menu-screen'); };
 
     /* ─── Slide-to-confirm ──────────────────────────────────────────────── */
     function initSlider() {
-        const track=document.getElementById('slide-track');
-        const thumb=document.getElementById('slide-thumb');
-        const fill =document.getElementById('slide-fill');
-        const label=document.getElementById('slide-label');
-        let dragging=false,startX=0,currentX=0;
-        const maxLeft=()=>track.offsetWidth-56;
+        const track = document.getElementById('slide-track');
+        const thumb = document.getElementById('slide-thumb');
+        const fill  = document.getElementById('slide-fill');
+        const label = document.getElementById('slide-label');
+        let dragging = false, startX = 0, currentX = 0;
+        const maxLeft = () => track.offsetWidth - 56;
 
         function setPos(x) {
-            const c=Math.max(0,Math.min(x,maxLeft())); currentX=c;
-            thumb.style.left=(4+c)+'px'; fill.style.width=(56+c)+'px';
-            label.style.opacity=Math.max(0,1-(c/maxLeft())*1.6);
+            const c = Math.max(0, Math.min(x, maxLeft())); currentX = c;
+            thumb.style.left = (4 + c) + 'px'; fill.style.width = (56 + c) + 'px';
+            label.style.opacity = Math.max(0, 1 - (c / maxLeft()) * 1.6);
         }
         function onStart(e) {
-            if(sliderConfirmed) return; dragging=true;
-            startX=(e.touches?e.touches[0].clientX:e.clientX)-currentX;
-            thumb.style.transition=fill.style.transition='none'; e.preventDefault();
+            if (sliderConfirmed) return; dragging = true;
+            startX = (e.touches ? e.touches[0].clientX : e.clientX) - currentX;
+            thumb.style.transition = fill.style.transition = 'none'; e.preventDefault();
         }
         function onMove(e) {
-            if(!dragging) return;
-            setPos((e.touches?e.touches[0].clientX:e.clientX)-startX); e.preventDefault();
+            if (!dragging) return;
+            setPos((e.touches ? e.touches[0].clientX : e.clientX) - startX); e.preventDefault();
         }
         function onEnd() {
-            if(!dragging) return; dragging=false;
-            thumb.style.transition=fill.style.transition='';
-            if(currentX>=maxLeft()*0.85) {
-                // IMMEDIATELY confirm and send the order
-                sliderConfirmed=true; track.classList.add('confirmed');
-                thumb.innerHTML='<i class="fa-solid fa-check"></i>'; label.style.opacity=0;
-                setTimeout(confirmFinalOrder,420);
-            } else { setPos(0); label.style.opacity=1; }
+            if (!dragging) return; dragging = false;
+            thumb.style.transition = fill.style.transition = '';
+            if (currentX >= maxLeft() * 0.85) {
+                sliderConfirmed = true; track.classList.add('confirmed');
+                thumb.innerHTML = '<i class="fa-solid fa-check"></i>'; label.style.opacity = 0;
+                setTimeout(confirmFinalOrder, 420);
+            } else { setPos(0); label.style.opacity = 1; }
         }
-        thumb.addEventListener('mousedown', onStart,{passive:false});
-        thumb.addEventListener('touchstart',onStart,{passive:false});
-        document.addEventListener('mousemove',onMove,{passive:false});
-        document.addEventListener('touchmove',onMove,{passive:false});
+        thumb.addEventListener('mousedown',  onStart, { passive: false });
+        thumb.addEventListener('touchstart', onStart, { passive: false });
+        document.addEventListener('mousemove', onMove, { passive: false });
+        document.addEventListener('touchmove', onMove, { passive: false });
         document.addEventListener('mouseup',  onEnd);
         document.addEventListener('touchend', onEnd);
     }
 
     function resetSlider() {
-        sliderConfirmed=false;
-        const track=document.getElementById('slide-track'),thumb=document.getElementById('slide-thumb'),
-              fill=document.getElementById('slide-fill'),label=document.getElementById('slide-label');
-        if(!track) return;
+        sliderConfirmed = false;
+        const track = document.getElementById('slide-track');
+        const thumb = document.getElementById('slide-thumb');
+        const fill  = document.getElementById('slide-fill');
+        const label = document.getElementById('slide-label');
+        if (!track) return;
         track.classList.remove('confirmed');
-        thumb.innerHTML='<i class="fa-solid fa-chevron-right"></i>';
-        thumb.style.left='4px'; fill.style.width='56px'; label.style.opacity=1;
+        thumb.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+        thumb.style.left = '4px'; fill.style.width = '56px'; label.style.opacity = 1;
     }
 
     /* ─── Init ──────────────────────────────────────────────────────────── */
