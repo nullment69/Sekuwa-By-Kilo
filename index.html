@@ -1,1596 +1,1121 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sekuwa by Kilo - Lazimpat</title>
-    <link rel="icon" type="image/jpeg" href="logo.jpg" onerror="this.href='data:image/x-icon;base64,'">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sekuwa by Kilo — Lazimpat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fbf9f4;
+  --surface:#ffffff;
+  --surface-low:#f5f3ee;
+  --surface-mid:#f0eee9;
+  --surface-high:#eae8e3;
+  --border:#e4e2dd;
+  --border-dark:#c4c7c7;
+  --text:#1b1c19;
+  --text-muted:#444748;
+  --text-faint:#747878;
+  --primary:#1c1b1b;
+  --accent:#b7102a;
+  --accent-dark:#92001c;
+  --accent-container:#db313f;
+  --on-accent:#ffffff;
+  --amber:#bb7336;
+  --amber-light:#ffdcc4;
+  --shadow:rgba(26,26,26,0.08);
+}
+html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;line-height:1.6;background:var(--bg);color:var(--text);overflow-x:hidden}
 
-        @keyframes slideUp {
-            from { transform: translateY(80px); opacity: 0; }
-            to   { transform: translateY(0);    opacity: 1; }
-        }
-        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
+/* ── TYPOGRAPHY ── */
+.display{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);font-weight:700;line-height:1.1;letter-spacing:-0.02em}
+.display-sm{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:600;line-height:1.2}
+.headline{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:600;line-height:1.3}
+.label{font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.96); }
-            to   { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-in { animation: fadeIn 0.25s ease forwards; }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-dark);border-radius:4px}
 
-        @keyframes shake {
-            0%,100% { transform: translateX(0); }
-            20%     { transform: translateX(-7px); }
-            40%     { transform: translateX(7px); }
-            60%     { transform: translateX(-4px); }
-            80%     { transform: translateX(4px); }
-        }
-        .shake { animation: shake 0.42s ease; }
+/* ── LAYOUT ── */
+.max-w{max-width:1280px;margin-inline:auto;padding-inline:24px}
 
-        /* ── Menu card animations ── */
-        @keyframes menuCardIn {
-            from { opacity: 0; transform: translateY(18px) scale(0.97); }
-            to   { opacity: 1; transform: translateY(0)    scale(1); }
-        }
-        @keyframes menuCardOut {
-            from { opacity: 1; transform: translateY(0)    scale(1); }
-            to   { opacity: 0; transform: translateY(-10px) scale(0.97); }
-        }
-        @keyframes gridFadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
+/* ── NAV ── */
+#top-nav{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40;box-shadow:0 2px 20px var(--shadow)}
+.nav-inner{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;font-style:italic;color:var(--primary);letter-spacing:-.01em;white-space:nowrap}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-size:.8rem;font-weight:700;letter-spacing:.04em;color:var(--text-muted);text-decoration:none;transition:color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+.nav-actions{display:flex;align-items:center;gap:12px}
 
-        .menu-grid-enter {
-            animation: gridFadeIn 0.22s ease forwards;
-        }
-        .menu-card-anim {
-            opacity: 0;
-            animation: menuCardIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
+/* ── TABLE TAG ── */
+.table-tag{display:none;align-items:center;gap:6px;font-size:.7rem;font-weight:800;color:var(--accent);background:var(--bg);border:1.5px solid var(--accent);padding:5px 14px;border-radius:100px;letter-spacing:.04em}
 
-        /* ── Search highlight pulse ── */
-        @keyframes searchPulse {
-            0%   { border-color: rgba(245,158,11,0.2); }
-            50%  { border-color: rgba(245,158,11,0.6); }
-            100% { border-color: rgba(245,158,11,0.2); }
-        }
-        .search-active { animation: searchPulse 1.5s ease infinite; }
+/* ── ICON BTN ── */
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--primary);transition:background .15s,color .15s}
+.icon-btn:hover{background:var(--surface-low)}
+.icon-btn i{font-size:1rem}
 
-        /* ── Search result highlight on card ── */
-        @keyframes cardHighlight {
-            0%   { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
-            40%  { box-shadow: 0 0 0 3px rgba(245,158,11,0.35); }
-            100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
-        }
-        .search-hit { animation: cardHighlight 0.7s ease; }
+/* ── AVATAR ── */
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff;transition:opacity .15s;flex-shrink:0}
+.avatar:hover{opacity:.85}
 
-        /* ── Filter pill active transition ── */
-        @keyframes pillPop {
-            0%   { transform: scale(1); }
-            40%  { transform: scale(0.93); }
-            100% { transform: scale(1); }
-        }
-        .filter-pill-pop { animation: pillPop 0.22s ease; }
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.active{display:flex}
+.screen-center{min-height:100svh;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
 
-        /* ── No results bounce ── */
-        @keyframes noResultsBounce {
-            0%,100% { transform: translateY(0); }
-            40%     { transform: translateY(-6px); }
-            70%     { transform: translateY(-2px); }
-        }
-        .no-results-icon { animation: noResultsBounce 1.6s ease-in-out infinite; }
+/* ── WELCOME ── */
+.welcome-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:48px;max-width:640px;width:100%;box-shadow:0 20px 60px var(--shadow)}
+.badge-pill{display:inline-flex;align-items:center;gap:6px;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--surface-mid);color:var(--accent);border:1px solid var(--border);padding:5px 14px;border-radius:6px}
+.welcome-divider{height:1px;background:var(--border);margin:28px 0}
+.welcome-stat{display:flex;align-items:center;gap:10px;font-size:.85rem;font-weight:600;color:var(--text-muted)}
+.welcome-stat i{color:var(--accent);font-size:.9rem;width:18px;text-align:center}
+.btn-primary{background:var(--primary);color:#fff;border:none;padding:16px 36px;border-radius:12px;font-size:.9rem;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:10px;letter-spacing:.04em;transition:opacity .15s;white-space:nowrap}
+.btn-primary:hover{opacity:.88}
+.btn-outline{background:none;color:var(--text-muted);border:1px solid var(--border);padding:14px 28px;border-radius:12px;font-size:.85rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .15s,color .15s}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
 
-        /* ── Search bar clear button ── */
-        @keyframes clearBtnIn {
-            from { opacity: 0; transform: scale(0.6) rotate(-90deg); }
-            to   { opacity: 1; transform: scale(1) rotate(0deg); }
-        }
-        .clear-btn-in { animation: clearBtnIn 0.2s ease forwards; }
+/* ── TABLE SELECT ── */
+.table-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px}
+.table-btn{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 12px;display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.table-btn:hover{border-color:var(--accent);box-shadow:0 8px 24px var(--shadow)}
+.table-num{width:52px;height:52px;border-radius:12px;background:var(--surface-low);border:1px solid var(--border);color:var(--accent);font-size:1.3rem;font-weight:900;display:flex;align-items:center;justify-content:center}
+.table-label{font-size:.75rem;font-weight:700;color:var(--text-muted);letter-spacing:.04em}
 
-        .branch-bg {
-            background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('lazimpat.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
-        }
-        .modal-content-bg {
-            background-image: linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.78)), url('pic.jpg');
-            background-size: cover; background-position: center;
-        }
+/* ── MENU LAYOUT ── */
+#menu-screen{flex-direction:column}
+.menu-grid-wrap{display:grid;grid-template-columns:1fr;gap:32px;padding:48px 0 80px}
+.menu-main{display:flex;flex-direction:column;gap:28px}
 
-        .styled-scroll::-webkit-scrollbar { width: 4px; }
-        .styled-scroll::-webkit-scrollbar-track { background: transparent; }
-        .styled-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+/* ── HERO BANNER ── */
+.hero{background:var(--primary);border-radius:16px;overflow:hidden;position:relative;min-height:200px;display:flex;align-items:flex-end;box-shadow:0 12px 40px var(--shadow)}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35;mix-blend-mode:overlay}
+.hero-body{position:relative;z-index:2;padding:32px 36px}
+.hero-body h1{color:#fff;margin-bottom:8px}
+.hero-body p{color:rgba(255,255,255,.75);font-size:.95rem}
 
-        .qty-pill { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+/* ── HOW TO ORDER ── */
+.how-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:18px;box-shadow:0 4px 16px var(--shadow)}
+.how-icon{width:42px;height:42px;border-radius:10px;background:var(--surface-low);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1rem;flex-shrink:0}
+.no-charge-pill{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:700;background:var(--surface-low);border:1px solid var(--border);color:var(--text-muted);padding:5px 14px;border-radius:100px;margin-top:10px}
 
-        @media (max-width: 768px) {
-            button, select, input, textarea { min-height: 44px; }
-            .qty-pill button { min-height: unset; }
-        }
+/* ── SECTION HEADER ── */
+.section-hd{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.live-badge{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:800;letter-spacing:.04em;color:var(--accent);background:var(--surface);border:1px solid var(--border);padding:6px 14px;border-radius:8px}
 
-        /* ── Slide to confirm ── */
-        .slide-track {
-            position: relative; width: 100%; height: 56px;
-            background: rgba(22,163,74,0.12); border: 1px solid rgba(22,163,74,0.3);
-            border-radius: 100px; overflow: hidden; user-select: none; touch-action: none;
-        }
-        .slide-fill {
-            position: absolute; left: 0; top: 0; bottom: 0; width: 56px;
-            background: rgba(22,163,74,0.25); border-radius: 100px;
-            transition: width 0.05s linear; pointer-events: none;
-        }
-        .slide-label {
-            position: absolute; inset: 0; display: flex; align-items: center;
-            justify-content: center; font-size: 12px; font-weight: 700;
-            letter-spacing: 0.06em; color: rgba(134,239,172,0.7);
-            pointer-events: none; transition: opacity 0.2s;
-        }
-        .slide-thumb {
-            position: absolute; left: 4px; top: 4px; width: 48px; height: 48px;
-            background: #16a34a; border-radius: 100px; display: flex; align-items: center;
-            justify-content: center; color: white; font-size: 18px; cursor: grab;
-            transition: background 0.2s, left 0.08s linear; will-change: left;
-            box-shadow: 0 2px 12px rgba(22,163,74,0.4); z-index: 2;
-        }
-        .slide-thumb:active { cursor: grabbing; }
-        .slide-track.confirmed .slide-fill  { width: 100% !important; background: rgba(22,163,74,0.35); }
-        .slide-track.confirmed .slide-label { opacity: 0; }
-        .slide-track.confirmed .slide-thumb { left: calc(100% - 52px) !important; background: #15803d; cursor: default; }
+/* ── SEARCH ── */
+.search-wrap{position:relative}
+.search-input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:13px 44px 13px 42px;font-size:.875rem;color:var(--text);outline:none;transition:border-color .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--text-faint)}
+.search-ico{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:.85rem;pointer-events:none;transition:color .15s}
+.search-wrap:focus-within .search-ico{color:var(--accent)}
+.search-clear-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--surface-high);border:none;border-radius:50%;width:22px;height:22px;display:none;align-items:center;justify-content:center;cursor:pointer;color:#666;font-size:.6rem;transition:background .15s,color .15s}
+.search-clear-btn.visible{display:flex}
+.search-clear-btn:hover{background:#ef4444;color:#fff}
+.search-info{display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.search-info.visible{display:flex}
+.search-badge{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:800;background:var(--accent);color:#fff;padding:4px 12px;border-radius:100px}
+.match-hl{background:var(--amber-light);color:var(--amber);border-radius:3px;padding:0 3px}
 
-        .menu-card { transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s; }
-        .menu-card:hover { border-color: rgba(245,158,11,0.3) !important; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+/* ── FILTER PILLS ── */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-pill{background:var(--surface-high);border:1px solid var(--border);color:var(--text-muted);font-size:.7rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:8px 18px;border-radius:100px;cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.filter-pill:hover,.filter-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
 
-        .special-notes { transition: border-color 0.15s; }
-        .special-notes:focus { outline: none; border-color: rgba(245,158,11,0.4) !important; }
+/* ── MENU GRID ── */
+.menu-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:640px){.menu-cards{grid-template-columns:1fr}}
 
-        .filter-pill { transition: all 0.15s; cursor: pointer; }
-        .filter-pill.active, .filter-pill:hover {
-            background: rgba(245,158,11,0.15) !important;
-            border-color: rgba(245,158,11,0.4) !important;
-            color: #fbbf24 !important;
-        }
+/* ── MENU CARD ── */
+.menu-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px;box-shadow:0 4px 16px var(--shadow);transition:border-color .15s,transform .2s}
+.menu-card:hover{border-color:var(--border-dark);transform:translateY(-2px)}
+.cat-tag{display:inline-flex;align-items:center;font-size:.65rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--surface-low);border:1px solid var(--border);padding:4px 10px;border-radius:5px}
+.item-name{font-size:.95rem;font-weight:800;color:var(--text);line-height:1.3}
+.item-price{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--primary)}
+.item-est{font-size:.7rem;font-weight:600;color:var(--text-faint);display:flex;align-items:center;gap:5px}
+.card-actions{display:flex;justify-content:flex-end;margin-top:4px}
+.btn-add{background:var(--surface-low);border:1.5px solid var(--border-dark);color:var(--accent);font-size:.75rem;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;padding:9px 20px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .15s}
+.btn-add:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.qty-pill{display:flex;align-items:center;background:var(--surface-low);border:1px solid var(--border);border-radius:100px;padding:3px;gap:2px}
+.qty-btn{width:30px;height:30px;border:none;background:none;cursor:pointer;border-radius:50%;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;color:var(--text-muted)}
+.qty-btn.minus:hover{background:#ef4444;color:#fff}
+.qty-btn.plus{color:var(--accent)}
+.qty-btn.plus:hover{background:var(--accent);color:#fff}
+.qty-num{font-size:.85rem;font-weight:900;color:var(--text);min-width:28px;text-align:center}
 
-        /* ── Search input ── */
-        .search-input-wrap {
-            position: relative; width: 100%;
-        }
-        .search-input {
-            width: 100%;
-            background: rgba(15,23,42,0.85);
-            border: 1px solid rgba(51,65,85,0.8);
-            border-radius: 14px;
-            padding: 10px 40px 10px 38px;
-            font-size: 13px;
-            color: #e2e8f0;
-            outline: none;
-            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-            min-height: unset !important;
-        }
-        .search-input:focus {
-            border-color: rgba(245,158,11,0.45);
-            background: rgba(15,23,42,0.95);
-            box-shadow: 0 0 0 3px rgba(245,158,11,0.08);
-        }
-        .search-input::placeholder { color: #475569; }
-        .search-icon {
-            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-            color: #64748b; font-size: 13px; pointer-events: none;
-            transition: color 0.2s;
-        }
-        .search-input-wrap:focus-within .search-icon { color: #f59e0b; }
-        .search-clear {
-            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-            background: rgba(71,85,105,0.5); border: none; border-radius: 50%;
-            width: 20px; height: 20px !important; min-height: unset !important;
-            display: flex; align-items: center; justify-content: center;
-            color: #94a3b8; cursor: pointer; font-size: 9px;
-            transition: background 0.15s, color 0.15s;
-        }
-        .search-clear:hover { background: rgba(239,68,68,0.25); color: #f87171; }
+/* ── EMPTY STATE ── */
+.empty-state{grid-column:1/-1;text-align:center;padding:64px 0;color:var(--text-faint)}
+.empty-state i{font-size:2.2rem;margin-bottom:16px;display:block;opacity:.4}
+.empty-state p{font-size:1rem;font-weight:700;color:var(--text-muted)}
 
-        /* ── Search results count badge ── */
-        .search-count-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: 10px; font-weight: 700; color: #f59e0b;
-            background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
-            padding: 3px 10px; border-radius: 100px;
-            animation: fadeIn 0.2s ease;
-        }
+/* ── PROOF SECTION ── */
+.section-gap{margin-top:56px;padding-top:56px;border-top:1px solid var(--border)}
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+@media(max-width:640px){.proof-grid{grid-template-columns:1fr}}
+.proof-card{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface)}
+.proof-card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.proof-caption{padding:14px 18px;font-size:.8rem;color:var(--text-muted);line-height:1.5;font-weight:500}
+.proof-caption strong{color:var(--amber)}
+.info-note{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;display:flex;align-items:flex-start;gap:14px;font-size:.8rem;color:var(--text-muted);line-height:1.6}
+.info-note i{color:var(--accent);flex-shrink:0;margin-top:2px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+@media(max-width:640px){.stats-grid{grid-template-columns:1fr}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:6px}
+.stat-card .stars{display:flex;gap:3px;color:var(--amber);font-size:.85rem}
+.stat-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--text);line-height:1}
+.stat-card p{font-size:.75rem;color:var(--text-faint);font-weight:500}
 
-        /* ── Match highlight in item name ── */
-        .search-match-highlight {
-            background: rgba(245,158,11,0.22);
-            color: #fbbf24;
-            border-radius: 3px;
-            padding: 0 2px;
-        }
+/* ── CART SIDEBAR ── */
+.cart-sidebar{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;position:sticky;top:84px;max-height:calc(100svh - 100px);display:flex;flex-direction:column;box-shadow:0 8px 32px var(--shadow)}
+.cart-hd{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:20px}
+.cart-hd h3{font-size:1rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
+.cart-hd h3 i{color:var(--accent)}
+.cart-session-tag{font-size:.65rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint)}
+.cart-items{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;min-height:80px}
+.empty-cart-msg{text-align:center;padding:40px 0;color:var(--text-faint)}
+.empty-cart-msg i{font-size:1.8rem;margin-bottom:10px;display:block;opacity:.35}
+.empty-cart-msg p{font-size:.85rem;font-weight:600}
+.cart-item-row{display:flex;align-items:center;gap:12px;background:var(--surface-low);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.cart-item-info{flex:1;min-width:0}
+.cart-item-info p{font-size:.78rem;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cart-item-info span{font-size:.72rem;color:var(--text-faint);margin-top:2px;display:block}
+.cart-item-price{font-size:.85rem;font-weight:900;color:var(--accent);white-space:nowrap}
+.cart-remove{background:none;border:none;cursor:pointer;color:var(--text-faint);padding:4px;border-radius:6px;transition:color .15s}
+.cart-remove:hover{color:#ef4444}
+.notes-area{width:100%;background:var(--surface-low);border:1.5px solid var(--border);border-radius:12px;color:var(--text-muted);font-size:.82rem;padding:12px 14px;resize:none;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.5;outline:none;transition:border-color .15s;margin-top:16px}
+.notes-area:focus{border-color:var(--accent)}
+.cart-totals{border-top:1px solid var(--border);padding-top:16px;margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.total-row{display:flex;justify-content:space-between;font-size:.85rem;color:var(--text-muted);font-weight:500}
+.grand-row{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:10px}
+.grand-row span:first-child{font-size:.9rem;font-weight:800;color:var(--text)}
+.grand-row span:last-child{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--accent)}
+.btn-order{width:100%;background:var(--primary);color:#fff;border:none;padding:15px;border-radius:12px;font-size:.9rem;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;letter-spacing:.04em;transition:opacity .15s;margin-top:8px}
+.btn-order:hover{opacity:.88}
+.btn-status{width:100%;background:var(--surface-low);color:var(--accent);border:1px solid var(--border);font-size:.82rem;font-weight:700;padding:13px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Plus Jakarta Sans',sans-serif;transition:border-color .15s}
+.btn-status:hover{border-color:var(--accent)}
 
-        .s-badge {
-            display: inline-flex; align-items: center; gap: 3px;
-            font-size: 10px; font-weight: 700; padding: 2px 9px;
-            border-radius: 100px; text-transform: uppercase; letter-spacing: 0.05em;
-        }
-        .s-pending   { background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); }
-        .s-preparing { background:rgba(59,130,246,0.15);  color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
-        .s-ready     { background:rgba(34,197,94,0.15);   color:#4ade80; border:1px solid rgba(34,197,94,0.3); }
-        .s-paid      { background:rgba(168,85,247,0.15);  color:#c084fc; border:1px solid rgba(168,85,247,0.3); }
-        .s-rush      { background:rgba(239,68,68,0.15);   color:#f87171; border:1px solid rgba(239,68,68,0.3); }
+/* ── OVERLAYS ── */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(27,28,25,.7);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+.overlay.hidden{display:none}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px;width:100%;max-width:420px;box-shadow:0 24px 80px rgba(0,0,0,.2)}
 
-        .step-dot {
-            width: 22px; height: 22px; border-radius: 50%; border: 2px solid;
-            display: flex; align-items: center; justify-content: center; font-size: 9px;
-            flex-shrink: 0; transition: all 0.4s ease;
-        }
-        .step-dot.done    { background: #16a34a; border-color: #16a34a; color: white; }
-        .step-dot.active  { background: transparent; border-color: #f59e0b; color: #f59e0b; }
-        .step-dot.pending { background: transparent; border-color: #334155; color: #334155; }
-        .step-connector   { flex: 1; height: 2px; background: #1e293b; border-radius: 2px; margin: 0 3px; transition: background 0.4s ease; }
-        .step-connector.done { background: rgba(34,197,94,0.45); }
+/* ── AUTH MODAL ── */
+.auth-input-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);display:block;margin-bottom:8px}
+.auth-input{width:100%;background:var(--surface-low);border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;font-size:.875rem;color:var(--text);outline:none;transition:border-color .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.auth-input:focus{border-color:var(--accent)}
+.auth-input::placeholder{color:var(--text-faint)}
 
-        /* ── Auth overlay ── */
-        .auth-overlay {
-            position: fixed; inset: 0; z-index: 60;
-            background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
-            display: flex; align-items: center; justify-content: center; padding: 20px;
-        }
-        .auth-overlay.hidden { display: none; }
-        .auth-box {
-            background: #0f172a; border: 1px solid #1e293b;
-            border-radius: 24px; padding: 28px; width: 100%; max-width: 380px;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.6);
-        }
+/* ── CONFIRMATION SCREEN ── */
+#confirmation-screen{position:fixed;inset:0;z-index:30;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;background:var(--bg);padding:24px}
+.confirm-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:20px;box-shadow:0 20px 60px var(--shadow)}
+.confirm-header{text-align:center}
+.confirm-icon{width:60px;height:60px;border-radius:14px;background:var(--surface-low);border:1px solid var(--border);color:var(--accent);font-size:1.4rem;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px}
+.confirm-detail-box{background:var(--surface-low);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.confirm-row{display:flex;justify-content:space-between;font-size:.875rem;color:var(--text-muted)}
+.confirm-row strong{color:var(--accent)}
+.confirm-items-list{list-style:none;display:flex;flex-direction:column;gap:10px;font-size:.875rem}
+.confirm-items-list li{display:flex;justify-content:space-between;color:var(--text-muted)}
+.confirm-items-list li span:last-child{font-weight:700;color:var(--text)}
+.confirm-total-row{display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:14px;margin-top:4px}
+.confirm-total-row span:first-child{font-size:.85rem;color:var(--text-muted);font-weight:600}
+.confirm-total-row span:last-child{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--accent)}
+.email-confirm-row{background:var(--surface-low);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.email-confirm-info{display:flex;align-items:center;gap:12px;min-width:0}
+.email-ico-box{width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0}
+.email-confirm-info p:first-child{font-size:.65rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.email-confirm-info p:last-child{font-size:.85rem;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-edit-email{font-size:.72rem;font-weight:700;color:var(--text-muted);border:1px solid var(--border);background:var(--surface);padding:7px 12px;border-radius:10px;cursor:pointer;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;transition:color .15s,border-color .15s}
+.btn-edit-email:hover{color:var(--accent);border-color:var(--accent)}
+.btn-edit-order{width:100%;background:var(--surface-low);color:var(--text-muted);border:1px solid var(--border);padding:14px;border-radius:12px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:color .15s}
+.btn-edit-order:hover{color:var(--text)}
 
-        /* ── Account panel dropdown ── */
-        .account-panel {
-            position: absolute; top: calc(100% + 10px); right: 0; z-index: 55;
-            background: #0f172a; border: 1px solid #1e293b; border-radius: 16px;
-            padding: 14px; width: 230px; box-shadow: 0 16px 48px rgba(0,0,0,0.5);
-            display: none;
-        }
-        .account-panel.open { display: block; }
+/* ── SLIDE TO CONFIRM ── */
+.slide-track{position:relative;width:100%;height:54px;background:var(--surface-low);border:1.5px solid var(--border);border-radius:100px;overflow:hidden;user-select:none;touch-action:none}
+.slide-fill{position:absolute;left:0;top:0;bottom:0;width:54px;background:var(--accent);border-radius:100px;transition:width .05s linear;pointer-events:none}
+.slide-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;letter-spacing:.08em;color:var(--text-faint);pointer-events:none;transition:opacity .2s;text-transform:uppercase}
+.slide-thumb{position:absolute;left:3px;top:3px;width:46px;height:46px;background:var(--accent);border-radius:100px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;cursor:grab;transition:background .2s;z-index:2;will-change:left}
+.slide-thumb:active{cursor:grabbing}
+.slide-track.confirmed .slide-fill{width:100%!important}
+.slide-track.confirmed .slide-label{opacity:0}
+.slide-track.confirmed .slide-thumb{background:var(--accent-dark);cursor:default}
 
-        .auth-input {
-            width: 100%; background: #1e293b; border: 1px solid #334155;
-            border-radius: 12px; padding: 10px 14px; font-size: 13px; color: #e2e8f0;
-            outline: none; transition: border-color 0.15s; min-height: unset !important;
-        }
-        .auth-input:focus { border-color: rgba(245,158,11,0.5); }
-        .auth-input::placeholder { color: #475569; }
+/* ── ORDER STATUS ── */
+#status-screen{position:fixed;inset:0;z-index:30;flex-direction:column;align-items:center;overflow-y:auto;background:var(--bg);padding:24px 24px 80px}
+.status-inner{max-width:480px;width:100%;padding:40px 0;display:flex;flex-direction:column;gap:20px}
+.status-header{text-align:center;margin-bottom:8px}
+.status-header i{font-size:2.5rem;color:var(--accent);display:block;margin-bottom:14px}
+.status-order-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 4px 16px var(--shadow)}
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:.65rem;font-weight:800;padding:4px 12px;border-radius:100px;text-transform:uppercase;letter-spacing:.05em}
+.s-pending  {background:var(--surface-low);color:#d97706;border:1px solid #d97706}
+.s-preparing{background:var(--surface-low);color:#2563eb;border:1px solid #2563eb}
+.s-ready    {background:var(--surface-low);color:#16a34a;border:1px solid #16a34a}
+.s-paid     {background:var(--surface-low);color:#7c3aed;border:1px solid #7c3aed}
+.step-row{display:flex;align-items:flex-start;width:100%}
+.step-dot{width:22px;height:22px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0}
+.step-dot.done  {background:var(--accent);border-color:var(--accent);color:#fff}
+.step-dot.active{background:none;border-color:var(--accent);color:var(--accent)}
+.step-dot.pend  {background:none;border-color:var(--border-dark);color:var(--text-faint)}
+.step-conn{flex:1;height:2px;background:var(--border);border-radius:2px;margin:10px 3px 0;flex-shrink:0}
+.step-conn.done{background:var(--accent)}
+.step-col{display:flex;flex-direction:column;align-items:center;gap:5px}
+.step-name{font-size:.62rem;font-weight:700;color:var(--text-faint);white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
 
-        .email-banner {
-            background: linear-gradient(135deg, rgba(245,158,11,0.07), rgba(234,179,8,0.03));
-            border: 1px solid rgba(245,158,11,0.2); border-radius: 14px; padding: 12px 14px;
-        }
+/* ── EMAIL SENT OVERLAY ── */
+.email-sent-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:40px 32px;width:100%;max-width:380px;text-align:center}
+.email-sent-icon{width:72px;height:72px;border-radius:18px;background:var(--surface-low);border:1px solid var(--border);color:var(--accent);font-size:1.6rem;display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px}
 
-        /* ── User avatar ── */
-        .user-avatar {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, #f59e0b, #ea580c);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 800; color: white; cursor: pointer;
-            border: 2px solid rgba(245,158,11,0.4); flex-shrink: 0;
-            transition: border-color 0.15s, transform 0.15s;
-        }
-        .user-avatar:hover { border-color: rgba(245,158,11,0.7); transform: scale(1.05); }
+/* ── ACCOUNT PANEL ── */
+.account-wrap{position:relative}
+.account-panel{position:absolute;top:calc(100%+10px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;width:240px;box-shadow:0 12px 40px var(--shadow);display:none;z-index:60}
+.account-panel.open{display:block}
+.panel-user{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.panel-user-info p:first-child{font-size:.85rem;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.panel-user-info p:last-child{font-size:.72rem;color:var(--text-faint);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.panel-btn{width:100%;text-align:left;font-size:.78rem;font-weight:600;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:10px 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.panel-btn:hover{background:var(--surface-low);color:var(--text)}
+.panel-btn.danger{color:#ef4444}
+.panel-btn.danger:hover{background:#fef2f2;color:#ef4444}
+.panel-note{font-size:.7rem;color:var(--text-faint);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5}
 
-        /* ── Bill sent toast ── */
-        #bill-toast {
-            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            z-index: 55; transition: opacity 0.4s; max-width: 320px; width: calc(100% - 32px);
-        }
-        #bill-toast.hidden { opacity: 0; pointer-events: none; }
+/* ── TOAST ── */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:70;background:var(--primary);color:#fff;font-size:.82rem;font-weight:700;padding:13px 22px;border-radius:100px;opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;max-width:calc(100% - 48px);text-align:center}
 
-        #toast { transition: opacity 0.3s; pointer-events: none; }
+/* ── BILL TOAST ── */
+#bill-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:65;max-width:340px;width:calc(100% - 48px);opacity:1;transition:opacity .2s}
+#bill-toast.hidden{opacity:0;pointer-events:none}
+.bill-toast-inner{background:var(--surface);border:1.5px solid var(--accent);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 24px var(--shadow)}
+.bill-toast-icon{width:38px;height:38px;background:var(--surface-low);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0;font-size:.9rem}
+.bill-toast-text p:first-child{font-size:.8rem;font-weight:800;color:var(--accent);line-height:1.3}
+.bill-toast-text p:last-child{font-size:.72rem;color:var(--text-faint);margin-top:3px}
 
-        @keyframes pulseReady {
-            0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-            50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0.15); }
-        }
-        .pulse-ready { animation: pulseReady 1.8s ease-in-out infinite; }
+/* ── WAITER BTN ── */
+#call-waiter-btn{display:none;background:var(--accent);color:#fff;font-size:.75rem;font-weight:800;padding:9px 16px;border-radius:100px;border:none;cursor:pointer;align-items:center;gap:7px;letter-spacing:.04em;font-family:'Plus Jakarta Sans',sans-serif;transition:opacity .15s}
+#call-waiter-btn:hover{opacity:.88}
 
-        /* ── Category transition overlay ── */
-        @keyframes categorySlideRight {
-            from { opacity: 0; transform: translateX(-20px); }
-            to   { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes categorySlideLeft {
-            from { opacity: 0; transform: translateX(20px); }
-            to   { opacity: 1; transform: translateX(0); }
-        }
-        .cat-slide-right { animation: categorySlideRight 0.26s cubic-bezier(0.22,1,0.36,1) forwards; }
-        .cat-slide-left  { animation: categorySlideLeft  0.26s cubic-bezier(0.22,1,0.36,1) forwards; }
+/* ── MOBILE NAV ── */
+#mobile-nav{display:none;position:fixed;bottom:0;left:0;width:100%;z-index:40;background:var(--surface);border-top:1px solid var(--border);padding:10px 8px 14px;justify-content:space-around;align-items:center;box-shadow:0 -4px 20px var(--shadow)}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.6rem;font-weight:700;letter-spacing:.04em;color:var(--text-faint);background:none;border:none;cursor:pointer;padding:6px 16px;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;text-transform:uppercase}
+.mob-nav-btn i{font-size:1.1rem}
+.mob-nav-btn.active{background:var(--accent);color:#fff}
 
-        /* ── Stagger delays for cards ── */
-        .menu-card-anim:nth-child(1)  { animation-delay: 0ms;  }
-        .menu-card-anim:nth-child(2)  { animation-delay: 30ms; }
-        .menu-card-anim:nth-child(3)  { animation-delay: 55ms; }
-        .menu-card-anim:nth-child(4)  { animation-delay: 75ms; }
-        .menu-card-anim:nth-child(5)  { animation-delay: 95ms; }
-        .menu-card-anim:nth-child(6)  { animation-delay:110ms; }
-        .menu-card-anim:nth-child(7)  { animation-delay:125ms; }
-        .menu-card-anim:nth-child(8)  { animation-delay:138ms; }
-        .menu-card-anim:nth-child(9)  { animation-delay:150ms; }
-        .menu-card-anim:nth-child(10) { animation-delay:160ms; }
-        .menu-card-anim:nth-child(n+11) { animation-delay:168ms; }
-    </style>
+/* ── FOOTER ── */
+footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;text-align:center;font-size:.78rem;font-weight:500;margin-top:auto}
+footer .footer-brand{font-family:'Playfair Display',serif;font-size:1.15rem;font-style:italic;color:rgba(255,255,255,.95);margin-bottom:6px;letter-spacing:-.01em}
+footer .footer-tagline{font-size:.72rem;color:rgba(255,255,255,.4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
+footer .footer-divider{width:40px;height:1px;background:rgba(255,255,255,.15);margin:16px auto}
+footer .footer-copy{font-size:.72rem;color:rgba(255,255,255,.35)}
+
+/* ── SHAKE ── */
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.shake{animation:shake .42s ease}
+
+/* ── UTILITY ── */
+.hidden{display:none!important}
+
+/* ── RUSH BADGE ── */
+.s-rush{background:var(--surface-low);color:#dc2626;border:1px solid #dc2626}
+
+/* ── MOBILE CART DRAWER ── */
+.mobile-cart-drawer{display:none;position:fixed;inset:0;top:64px;z-index:35;flex-direction:column;border-radius:0;max-height:calc(100svh - 64px)}
+.mobile-cart-drawer.open{display:flex}
+.mobile-cart-close{display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:0;font-family:'Plus Jakarta Sans',sans-serif;transition:color .15s}
+.mobile-cart-close:hover{color:var(--accent)}
+
+@media(max-width:768px){
+  .nav-links{display:none}
+  #mobile-nav{display:flex}
+  .menu-grid-wrap{grid-template-columns:1fr;padding-bottom:120px}
+  .cart-sidebar{display:none}
+  .welcome-card{padding:28px}
+  .proof-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr}
+}
+
+/* ── DESKTOP CART PANEL ── */
+@media(min-width:1024px){
+  .menu-grid-wrap{grid-template-columns:1fr 360px}
+}
+</style>
 </head>
-<body class="branch-bg text-slate-100 min-h-screen flex flex-col justify-between">
+<body>
 
-<nav class="bg-slate-950/75 backdrop-blur-md border-b border-slate-900 sticky top-0 z-30 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-            <img src="logo.jpg" alt="Sekuwa by Kilo logo"
-                 class="h-9 w-auto object-contain rounded-lg border border-amber-500/20"
-                 onerror="this.style.display='none'">
-            <div class="hidden sm:block">
-                <p class="text-xs font-semibold text-white leading-none">Sekuwa by Kilo</p>
-                <p class="text-[10px] text-slate-500 mt-0.5">Lazimpat Branch</p>
+<!-- ═══ TOP NAV ═══════════════════════════════════════════════════════════ -->
+<nav id="top-nav">
+  <div class="max-w nav-inner">
+    <div class="brand">Sekuwa by Kilo</div>
+    <div class="nav-actions">
+      <span id="nav-table-tag" class="table-tag">
+        <i class="fa-solid fa-utensils"></i>
+        Table <span id="nav-table-num">0</span>
+      </span>
+      <button id="call-waiter-btn" onclick="callWaiter()">
+        <i class="fa-solid fa-bell"></i> Call Waiter
+      </button>
+      <div class="account-wrap hidden" id="account-nav-wrap">
+        <button class="avatar" id="nav-avatar" onclick="toggleAccountPanel()" title="My Account">
+          <span id="nav-avatar-initials">?</span>
+        </button>
+        <div class="account-panel" id="account-panel">
+          <div class="panel-user">
+            <div class="avatar" style="pointer-events:none;flex-shrink:0"><span id="panel-initials">?</span></div>
+            <div class="panel-user-info" style="min-width:0">
+              <p id="panel-name">Guest</p>
+              <p id="panel-email">No email set</p>
             </div>
+          </div>
+          <button class="panel-btn" onclick="openAuthModal('edit');closeAccountPanel()"><i class="fa-solid fa-pen" style="width:16px"></i>Edit Profile</button>
+          <button class="panel-btn danger" onclick="signOut();closeAccountPanel()"><i class="fa-solid fa-right-from-bracket" style="width:16px"></i>Sign Out</button>
+          <p class="panel-note">Your itemised bill will be emailed when your order is marked paid.</p>
         </div>
-        <div class="flex items-center gap-2.5">
-            <span id="nav-table-tag"
-                  class="hidden text-[11px] bg-amber-500/10 border border-amber-500/30 text-amber-400
-                         font-semibold px-3 py-1.5 rounded-full items-center gap-1.5">
-                <i class="fa-solid fa-utensils text-[10px]"></i>
-                Table <span id="nav-table-num">0</span>
-            </span>
-
-            <div class="relative" id="account-nav-wrap" style="display:none">
-                <button class="user-avatar" id="nav-avatar" onclick="toggleAccountPanel()" title="My Account">
-                    <span id="nav-avatar-initials">?</span>
-                </button>
-                <div class="account-panel" id="account-panel">
-                    <div class="flex items-center gap-3 mb-3 pb-3 border-b border-slate-800">
-                        <div class="user-avatar" style="pointer-events:none">
-                            <span id="panel-initials">?</span>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <p class="text-xs font-bold text-white truncate" id="panel-name">Guest</p>
-                            <p class="text-[10px] text-slate-500 truncate" id="panel-email">No email set</p>
-                        </div>
-                    </div>
-                    <button onclick="openAuthModal('edit'); closeAccountPanel()"
-                            class="w-full text-left text-[11px] text-slate-400 hover:text-amber-400
-                                   py-2 px-2 rounded-lg hover:bg-slate-800/60 transition-all
-                                   flex items-center gap-2 cursor-pointer" style="min-height:unset">
-                        <i class="fa-solid fa-pen text-[10px] w-4 text-center"></i> Edit Profile
-                    </button>
-                    <button onclick="signOut(); closeAccountPanel()"
-                            class="w-full text-left text-[11px] text-red-500 hover:text-red-400
-                                   py-2 px-2 rounded-lg hover:bg-red-950/30 transition-all
-                                   flex items-center gap-2 cursor-pointer" style="min-height:unset">
-                        <i class="fa-solid fa-right-from-bracket text-[10px] w-4 text-center"></i> Sign Out
-                    </button>
-                    <p class="text-[9px] text-slate-600 mt-3 pt-3 border-t border-slate-800 leading-relaxed">
-                        Your itemised bill will be emailed when your order is marked paid.
-                    </p>
-                </div>
-            </div>
-
-            <button id="call-waiter-btn"
-                    class="hidden bg-red-600 hover:bg-red-500 text-white text-[10px] font-bold
-                           px-3 py-2 rounded-full shadow-lg transition-all cursor-pointer items-center gap-1.5"
-                    onclick="callWaiter()">
-                <i class="fa-solid fa-bell fa-shake"></i> Call Waiter
-            </button>
-        </div>
+      </div>
     </div>
+  </div>
 </nav>
 
-<div class="auth-overlay hidden" id="auth-overlay" onclick="handleOverlayClick(event)">
-    <div class="auth-box animate-fade-in" id="auth-box">
-
-        <div id="auth-signin-view">
-            <div class="flex items-center gap-3 mb-5">
-                <div class="w-10 h-10 bg-amber-500/15 border border-amber-500/20 rounded-xl
-                            flex items-center justify-center text-amber-400 text-sm flex-shrink-0">
-                    <i class="fa-solid fa-envelope"></i>
-                </div>
-                <div>
-                    <h3 class="text-sm font-extrabold text-white">Receive your bill by email</h3>
-                    <p class="text-[10px] text-slate-500 mt-0.5">Completely optional · takes 10 seconds</p>
-                </div>
-            </div>
-            <div class="space-y-3 mb-5">
-                <div>
-                    <label class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Your Name</label>
-                    <input id="auth-name"  type="text"  class="auth-input" placeholder="e.g. Aarav Sharma"  autocomplete="name"  maxlength="60">
-                </div>
-                <div>
-                    <label class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Email Address</label>
-                    <input id="auth-email" type="email" class="auth-input" placeholder="you@example.com" autocomplete="email" maxlength="100">
-                    <p class="text-[10px] text-slate-600 mt-1.5 leading-relaxed">
-                        We'll send an itemised bill the moment your order is marked paid. No account, no password.
-                    </p>
-                </div>
-            </div>
-            <button onclick="saveAccount()"
-                    class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold
-                           py-3 rounded-xl text-sm transition-all cursor-pointer flex items-center
-                           justify-center gap-2 mb-3">
-                <i class="fa-solid fa-check text-[12px]"></i> Save &amp; Continue
-            </button>
-            <button onclick="skipAuth()"
-                    class="w-full bg-slate-800/50 hover:bg-slate-700 border border-slate-600 text-slate-200 hover:text-white text-xs font-semibold
-                           py-3 rounded-xl transition-all cursor-pointer mt-2 shadow-sm">
-                Skip — I don't need an email bill
-            </button>
-        </div>
-
-        <div id="auth-edit-view" class="hidden">
-            <div class="flex items-center justify-between mb-5">
-                <h3 class="text-sm font-extrabold text-white">Edit Profile</h3>
-                <button onclick="closeAuthModal()" class="text-slate-500 hover:text-white cursor-pointer"
-                        style="min-height:unset;background:none;border:none;padding:4px 8px">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <div class="space-y-3 mb-5">
-                <div>
-                    <label class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Name</label>
-                    <input id="edit-name"  type="text"  class="auth-input" placeholder="Your name"        maxlength="60">
-                </div>
-                <div>
-                    <label class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Email</label>
-                    <input id="edit-email" type="email" class="auth-input" placeholder="you@example.com"  maxlength="100">
-                </div>
-            </div>
-            <button onclick="saveEditAccount()"
-                    class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold
-                           py-3 rounded-xl text-sm transition-all cursor-pointer">
-                Save Changes
-            </button>
-        </div>
+<!-- ═══ WELCOME SCREEN ════════════════════════════════════════════════════ -->
+<div id="welcome-screen" class="screen screen-center active" style="min-height:calc(100svh - 65px); max-height:calc(100svh - 65px); overflow:hidden;">
+  <div class="welcome-card" style="max-height:100%; overflow-y:auto;">
+    <div>
+      <div class="badge-pill"><i class="fa-solid fa-location-dot"></i>Lazimpat Branch</div>
+      <h1 class="display" style="margin-top:20px;margin-bottom:12px">Freshly Grilled,<br>Sold by the Kilo.</h1>
+      <p style="font-size:.95rem;color:var(--text-muted);line-height:1.7">Table dining experience with freshly prepared charcoal-grilled recipes. Real-time ordering, live kitchen updates.</p>
     </div>
+    <div class="welcome-divider"></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+      <div class="welcome-stat"><i class="fa-solid fa-envelope"></i>Get your itemised bill by email after dining</div>
+      <div class="welcome-stat"><i class="fa-solid fa-fire"></i>Every order grilled fresh — no reheating</div>
+      <div class="welcome-stat"><i class="fa-solid fa-bolt"></i>No service charge — pay only what you order</div>
+    </div>
+    <button class="btn-primary" onclick="proceedToTableSelect()">Get Started <i class="fa-solid fa-chevron-right" style="font-size:.75rem"></i></button>
+  </div>
 </div>
 
-<div id="welcome-screen"
-     class="fixed inset-0 z-20 flex flex-col items-center justify-end p-6"
-     style="background:rgba(0,0,0,0.7); backdrop-filter:blur(5px);">
-    <div class="modal-content-bg border-2 border-amber-400/70 max-w-2xl w-full p-6 rounded-3xl
-                shadow-2xl animate-slide-up text-slate-100 flex flex-col md:flex-row
-                items-center justify-between gap-6 relative mb-10">
-        <div class="flex flex-col items-center md:items-start text-center md:text-left">
-            <img src="logo.jpg" alt="Sekuwa by Kilo"
-                 class="h-12 w-auto object-contain mb-3 rounded-xl" onerror="this.style.display='none'">
-            <span class="text-[9px] font-bold tracking-widest text-amber-300 uppercase mb-3
-                         bg-amber-500/10 px-3 py-0.5 rounded-md">Lazimpat Branch</span>
-            <p class="text-xs text-slate-300 max-w-xs leading-relaxed">
-                Start your table dining experience and explore freshly prepared charcoal-grilled recipes.
-            </p>
-            <div class="mt-3 flex items-center gap-2 text-[10px] text-amber-400/80
-                        border border-amber-500/20 bg-amber-500/6 px-3 py-1.5 rounded-lg">
-                <i class="fa-solid fa-envelope text-[9px]"></i>
-                Get your itemised bill by email after dining
-            </div>
-        </div>
-        <div class="flex flex-col items-center gap-2 shrink-0">
-            <button onclick="proceedToTableSelect()"
-                    class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400
-                           hover:to-orange-400 text-white font-bold text-xs px-10 py-4 rounded-2xl
-                           shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center
-                           gap-3 tracking-wide cursor-pointer">
-                GET STARTED <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </button>
-        </div>
+<!-- ═══ TABLE SELECT SCREEN ════════════════════════════════════════════════ -->
+<div id="table-screen" class="screen screen-center" style="flex-direction:column; min-height:calc(100svh - 65px); max-height:calc(100svh - 65px); overflow:hidden;">
+  <div style="max-width:480px; width:100%; text-align:center; display:flex; flex-direction:column; height:100%;">
+    <div style="flex-shrink:0;">
+      <div class="badge-pill" style="margin-bottom:20px"><i class="fa-solid fa-circle-dot"></i>Step 1</div>
+      <h2 class="display-sm" style="margin-bottom:8px">Select Your Table</h2>
+      <p style="font-size:.875rem;color:var(--text-muted)">Tap your table number to begin ordering.</p>
     </div>
+    <!-- The grid itself can scroll if you add a lot of tables, but the page won't -->
+    <div class="table-grid" id="table-grid" style="overflow-y:auto; padding-bottom:24px; margin-top:24px; flex-grow:1;"></div>
+  </div>
 </div>
 
-<div id="game-screen" class="hidden fixed inset-0 z-10 bg-slate-950 flex flex-col items-center justify-center p-6">
-    <div class="max-w-sm w-full text-center space-y-8">
+<!-- ═══ MENU SCREEN ═══════════════════════════════════════════════════════ -->
+<div id="menu-screen" class="screen">
+  <div class="max-w" style="width:100%">
+    <div class="menu-grid-wrap">
+      <!-- ─ LEFT COLUMN ─ -->
+      <div class="menu-main">
+        <!-- Hero -->
+        <div class="hero">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCdGxlzqsvQkAn0F9v_JRPeMcDoT5WcR_aNHJtREPOYyeGSY7oz6O0gfz5Uh6ei2GeR5Clhp0u-PW6u8PdzfRDBTE4DpXagmzeM_xP4rRnkqzsRTgAEOb88LzxX4vsEYN3FNcJmwNgf40LawNDEKuOrj6_zsiHJ5T8TgADRq9Sdm0lObbPJrHm5F8I1m5ppWh6sC46oMlrVYzxCmp-AzPU_sXx2s3lMNJ_84DHg0-aABL8_w1owBlRW7ot22kxQzcUqEBQmz2H2Mk" alt="Grill" onerror="this.style.display='none'"/>
+          <div class="hero-body">
+            <h1 class="display">Freshly Grilled,<br>Sold by the Kilo.</h1>
+            <p>Real-time weight-based pricing. Choose your cut, choose your weight.</p>
+          </div>
+        </div>
+
+        <!-- How to order -->
+        <div class="how-card">
+          <div class="how-icon"><i class="fa-solid fa-book-open"></i></div>
+          <div>
+            <p class="label" style="color:var(--accent);margin-bottom:6px">How to order</p>
+            <p style="font-size:.875rem;color:var(--text-muted)">Tap <strong style="color:var(--text)">Add</strong> on any item, adjust with <strong style="color:var(--text)">+/−</strong>, then hit <strong style="color:var(--text)">Order Now</strong>.</p>
+            <div class="no-charge-pill"><i class="fa-solid fa-bolt" style="color:var(--accent);font-size:.65rem"></i>No service charge</div>
+          </div>
+        </div>
+
+        <!-- Section heading -->
+        <div class="section-hd">
+          <div>
+            <h2 class="display-sm">Charcoal &amp; BBQ</h2>
+            <p style="font-size:.875rem;color:var(--text-muted);margin-top:4px">Pick from our freshly prepared categories</p>
+          </div>
+          <div class="live-badge"><i class="fa-solid fa-fire" style="color:var(--accent)"></i>Live grill</div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass search-ico"></i>
+          <input id="search-input" type="text" class="search-input" placeholder="Search dishes… e.g. pork sekuwa, fish, paneer" autocomplete="off" maxlength="80" oninput="handleSearch(this.value)"/>
+          <button id="search-clear-btn" class="search-clear-btn" onclick="clearSearch()" title="Clear"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Search info -->
+        <div id="search-info-bar" class="search-info">
+          <span class="search-badge"><i class="fa-solid fa-magnifying-glass" style="font-size:.65rem"></i><span id="search-count-text">0 results</span></span>
+          <button onclick="clearSearch()" style="font-size:.78rem;font-weight:600;color:var(--text-faint);background:none;border:none;cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-faint)'">Clear search</button>
+        </div>
+
+        <!-- Filter pills -->
+        <div class="filter-row" id="filter-row"></div>
+
+        <!-- Menu grid -->
+        <div class="menu-cards" id="menu-cards"></div>
+
+        <!-- ─ PROOF SECTION ─ -->
+        <div class="section-gap">
+          <div style="margin-bottom:28px">
+            <h2 class="display-sm">The Real Thing</h2>
+            <p style="font-size:.875rem;color:var(--text-muted);margin-top:6px;line-height:1.7">Real charcoal. Real smoke. No shortcuts. Here's what comes off our grill every day.</p>
+          </div>
+          <div class="proof-grid">
+            <div class="proof-card">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Sekuwa.jpg/640px-Sekuwa.jpg" alt="Sekuwa on charcoal grill" onerror="this.parentElement.style.display='none'"/>
+              <div class="proof-caption"><strong>Sekuwa</strong> — charcoal-grilled on open flame, the traditional Dharane way.</div>
+            </div>
+            <div class="proof-card">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chicken_sekuwa.jpg/640px-Chicken_sekuwa.jpg" alt="Chicken Sekuwa" onerror="this.parentElement.style.display='none'"/>
+              <div class="proof-caption"><strong>Chicken Sekuwa</strong> — marinated overnight, grilled to order.</div>
+            </div>
+            <div class="proof-card">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Nepali_food.jpg/640px-Nepali_food.jpg" alt="Nepali food spread" onerror="this.parentElement.style.display='none'"/>
+              <div class="proof-caption"><strong>Full Spread</strong> — sekuwa, khaja sets, curry, and sides.</div>
+            </div>
+          </div>
+          <div class="info-note">
+            <i class="fa-solid fa-circle-info"></i>
+            <p><strong style="color:var(--text)">Replace these with your own photos.</strong> Swap the <code style="color:var(--accent)">src</code> URLs with your real filenames (e.g. <code style="color:var(--accent)">grill1.jpg</code>). Your real photos will convert visitors better than any stock image.</p>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div>
+              <p class="stat-num">4.8 / 5</p>
+              <p>342+ Google reviews</p>
+            </div>
+            <div class="stat-card">
+              <i class="fa-solid fa-fire" style="color:var(--amber);font-size:1.1rem"></i>
+              <p class="stat-num">Live Grill</p>
+              <p>Every order grilled fresh — no reheating</p>
+            </div>
+            <div class="stat-card">
+              <i class="fa-solid fa-bolt" style="color:var(--amber);font-size:1.1rem"></i>
+              <p class="stat-num">No Charge</p>
+              <p>No service charge. Pay only for what you order.</p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /menu-main -->
+
+      <!-- ─ CART SIDEBAR ─ -->
+      <div class="cart-sidebar">
+        <div class="cart-hd">
+          <h3><i class="fa-solid fa-basket-shopping"></i>Your Order</h3>
+          <span class="cart-session-tag">Session</span>
+        </div>
+        <div class="cart-items" id="cart-items">
+          <div class="empty-cart-msg" id="empty-cart-msg">
+            <i class="fa-solid fa-basket-shopping"></i>
+            <p>Your basket is empty</p>
+          </div>
+        </div>
+        <textarea id="special-notes" class="notes-area" rows="2" placeholder="Special requests or allergies…"></textarea>
+        <div class="cart-totals">
+          <div class="total-row"><span>Subtotal</span><span id="cart-subtotal" style="font-weight:700;color:var(--text)">Rs. 0</span></div>
+          <div class="grand-row"><span>Total</span><span id="cart-total">Rs. 0</span></div>
+          <button class="btn-order" id="order-now-btn" onclick="placeOrder()">ORDER NOW</button>
+          <button class="btn-status" onclick="openOrderStatus()"><i class="fa-solid fa-circle-info"></i>Check Order Status</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONFIRMATION SCREEN ═══════════════════════════════════════════════ -->
+<div id="confirmation-screen" class="screen">
+  <div class="confirm-card">
+    <div class="confirm-header">
+      <div class="confirm-icon"><i class="fa-solid fa-circle-check"></i></div>
+      <h2 class="display-sm">Review Your Order</h2>
+      <p style="font-size:.875rem;color:var(--text-muted);margin-top:6px">Confirm before sending to the kitchen.</p>
+    </div>
+    <div class="confirm-detail-box">
+      <div class="confirm-row"><span>Table</span><strong id="confirm-table">0</strong></div>
+      <ul class="confirm-items-list" id="confirm-items-list"></ul>
+      <div id="confirm-notes-row" class="hidden" style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px">
+        <p style="font-size:.7rem;color:var(--text-faint);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Notes:</p>
+        <p id="confirm-notes-text" style="font-size:.85rem;color:var(--text-muted);margin-top:4px;font-style:italic;line-height:1.5"></p>
+      </div>
+      <div class="confirm-total-row"><span>Grand Total</span><span id="confirm-total">Rs. 0</span></div>
+    </div>
+    <div class="email-confirm-row hidden" id="confirm-email-row">
+      <div class="email-confirm-info">
+        <div class="email-ico-box"><i class="fa-solid fa-envelope"></i></div>
+        <div style="min-width:0">
+          <p>Bill will be emailed to</p>
+          <p id="confirm-email-display">—</p>
+        </div>
+      </div>
+      <button class="btn-edit-email" onclick="openAuthModal('edit')">Edit</button>
+    </div>
+    <div class="slide-track" id="slide-track">
+      <div class="slide-fill" id="slide-fill"></div>
+      <div class="slide-label" id="slide-label"><span>SLIDE TO SEND &nbsp;›&nbsp;›&nbsp;›</span></div>
+      <div class="slide-thumb" id="slide-thumb"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+    <button class="btn-edit-order" onclick="editOrder()"><i class="fa-solid fa-pen-to-square" style="margin-right:8px"></i>Edit Order</button>
+  </div>
+</div>
+
+<!-- ═══ ORDER STATUS SCREEN ═══════════════════════════════════════════════ -->
+<div id="status-screen" class="screen">
+  <div class="status-inner">
+    <div class="status-header">
+      <i class="fa-solid fa-fire-burner"></i>
+      <h2 class="display-sm" id="status-headline">Your Orders</h2>
+      <p style="font-size:.875rem;color:var(--text-muted);margin-top:6px" id="status-subline">Live updates from the kitchen.</p>
+    </div>
+    <div id="status-email-set" class="hidden" style="background:var(--surface-low);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px">
+      <i class="fa-solid fa-circle-check" style="color:var(--accent);font-size:1.1rem;flex-shrink:0"></i>
+      <div>
+        <p style="font-size:.65rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.06em">Bill email confirmed</p>
+        <p id="status-email-display" style="font-size:.875rem;font-weight:700;color:var(--text);margin-top:4px">—</p>
+      </div>
+    </div>
+    <div id="status-orders-list" style="display:flex;flex-direction:column;gap:16px"></div>
+    <button class="btn-outline" style="width:100%;justify-content:center" onclick="backToMenu()"><i class="fa-solid fa-arrow-left"></i>Place Another Order</button>
+  </div>
+</div>
+
+<!-- ═══ AUTH OVERLAY ═══════════════════════════════════════════════════════ -->
+<div class="overlay hidden" id="auth-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-box" id="auth-box">
+    <!-- Sign-in view -->
+    <div id="auth-signin-view">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+        <div class="how-icon"><i class="fa-solid fa-envelope"></i></div>
         <div>
-            <span class="bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full text-[10px]
-                         font-bold uppercase tracking-wider">
-                <i class="fa-solid fa-circle-dot mr-1"></i> Step 1
-            </span>
-            <h2 class="text-2xl font-extrabold text-white mt-4 tracking-tight">Select Your Table</h2>
-            <p class="text-slate-500 text-xs mt-2">Tap your table number to begin.</p>
+          <h3 style="font-size:1rem;font-weight:800;color:var(--text);line-height:1.3">Receive your bill by email</h3>
+          <p style="font-size:.75rem;color:var(--text-faint);margin-top:3px">Completely optional · takes 10 seconds</p>
         </div>
-        <div class="grid grid-cols-3 gap-4" id="token-container"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:20px">
+        <div><label class="auth-input-label">Your Name</label><input id="auth-name" type="text" class="auth-input" placeholder="e.g. Aarav Sharma" autocomplete="name" maxlength="60"/></div>
+        <div>
+          <label class="auth-input-label">Email Address</label>
+          <input id="auth-email" type="email" class="auth-input" placeholder="you@example.com" autocomplete="email" maxlength="100"/>
+          <p style="font-size:.75rem;color:var(--text-faint);margin-top:8px;line-height:1.5">We'll send an itemised bill the moment your order is marked paid. No account, no password.</p>
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center;margin-bottom:10px" onclick="saveAccount()"><i class="fa-solid fa-check"></i>Save &amp; Continue</button>
+      <button class="btn-outline" style="width:100%;justify-content:center" onclick="skipAuth()">Skip — I don't need an email bill</button>
     </div>
+    <!-- Edit view -->
+    <div id="auth-edit-view" class="hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <h3 style="font-size:1rem;font-weight:800;color:var(--text)">Edit Profile</h3>
+        <button onclick="closeAuthModal()" style="color:var(--text-faint);background:none;border:none;cursor:pointer;font-size:1.1rem;padding:4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-faint)'"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:24px">
+        <div><label class="auth-input-label">Name</label><input id="edit-name" type="text" class="auth-input" placeholder="Your name" maxlength="60"/></div>
+        <div><label class="auth-input-label">Email</label><input id="edit-email" type="email" class="auth-input" placeholder="you@example.com" maxlength="100"/></div>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center" onclick="saveEditAccount()">Save Changes</button>
+    </div>
+  </div>
 </div>
 
-<main id="menu-screen"
-      class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow
-             grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
-
-    <div class="lg:col-span-2 space-y-5">
-        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl flex items-start gap-4">
-            <div class="w-10 h-10 bg-amber-500/15 text-amber-400 rounded-xl flex items-center
-                        justify-center text-base flex-shrink-0">
-                <i class="fa-solid fa-book-open"></i>
-            </div>
-            <div>
-                <p class="text-[11px] font-bold text-amber-400 mb-1 tracking-widest uppercase">How to order</p>
-                <p class="text-xs text-slate-400 leading-relaxed">
-                    Tap <b class="text-slate-200">Add</b> on any item, adjust with <b class="text-slate-200">+/−</b>, then hit <b class="text-slate-200">Order Now</b>.
-                </p>
-                <span class="mt-2 inline-flex items-center gap-1.5 text-[10px] bg-slate-800 text-slate-500 px-3 py-1 rounded-full">
-                    <i class="fa-solid fa-bolt text-amber-500 text-[9px]"></i> No service charge
-                </span>
-            </div>
-        </div>
-
-        <div class="flex items-end justify-between">
-            <div>
-                <h2 class="text-xl font-black text-white tracking-tight">Charcoal &amp; BBQ</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Pick from our freshly prepared categories</p>
-            </div>
-            <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20
-                         px-2.5 py-1 rounded-lg font-semibold hidden sm:block">
-                <i class="fa-solid fa-fire mr-1"></i> Live grill
-            </span>
-        </div>
-
-        <!-- ── Search Bar ── -->
-        <div class="search-input-wrap">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input
-                id="search-input"
-                type="text"
-                class="search-input"
-                placeholder="Search dishes… e.g. pork sekuwa, fish, paneer"
-                autocomplete="off"
-                maxlength="80"
-                oninput="handleSearch(this.value)"
-            >
-            <button id="search-clear" class="search-clear hidden clear-btn-in" onclick="clearSearch()" title="Clear search">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <!-- ── Search results info bar ── -->
-        <div id="search-info-bar" class="hidden flex items-center justify-between flex-wrap gap-2">
-            <span id="search-count-el" class="search-count-badge">
-                <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
-                <span id="search-count-text">0 results</span>
-            </span>
-            <button onclick="clearSearch()"
-                    class="text-[10px] text-slate-500 hover:text-amber-400 transition-colors cursor-pointer"
-                    style="min-height:unset;background:none;border:none;padding:4px 8px">
-                Clear search
-            </button>
-        </div>
-
-        <div class="flex gap-2 flex-wrap" id="filter-row"></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 menu-grid-enter" id="menu-items"></div>
-    </div>
-
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl
-                sticky top-20 flex flex-col max-h-[85vh]">
-        <div class="border-b border-slate-800 pb-3 mb-4 flex justify-between items-center">
-            <h3 class="text-sm font-bold text-slate-100">Order Summary</h3>
-            <span class="text-[10px] font-bold tracking-wider text-amber-500 uppercase">Session</span>
-        </div>
-
-        <div class="flex-grow overflow-y-auto space-y-2.5 styled-scroll pr-1" id="cart-items">
-            <div class="text-center py-12 text-slate-600" id="empty-cart">
-                <i class="fa-solid fa-basket-shopping text-xl mb-2 block"></i>
-                <p class="text-xs font-medium">Your basket is empty</p>
-            </div>
-        </div>
-
-        <div class="mt-3">
-            <textarea id="special-notes"
-                      class="special-notes w-full bg-slate-950/70 border border-slate-800 rounded-xl
-                             text-slate-400 text-xs p-3 resize-none placeholder-slate-600"
-                      rows="2" placeholder="Special requests or allergies…"></textarea>
-        </div>
-
-        <div class="border-t border-slate-800 pt-3 mt-3 space-y-2">
-            <div class="flex justify-between text-xs text-slate-500">
-                <span>Subtotal</span>
-                <span id="cart-subtotal" class="font-semibold text-slate-300">Rs. 0</span>
-            </div>
-            <div class="flex justify-between items-center border-t border-slate-800 pt-2.5">
-                <span class="text-xs font-bold text-slate-200">Total</span>
-                <span id="cart-total" class="text-xl font-black text-amber-500">Rs. 0</span>
-            </div>
-            <button id="order-now-btn" onclick="placeOrder()"
-                    class="w-full mt-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold
-                           py-3.5 px-6 rounded-xl shadow-md transition-all cursor-pointer text-sm">
-                ORDER NOW
-            </button>
-            <button onclick="openOrderStatus()"
-                    class="w-full bg-slate-950/60 text-amber-400 border border-amber-500/20 text-xs
-                           font-semibold py-3 px-6 rounded-xl hover:bg-amber-500/10 transition-all
-                           cursor-pointer flex items-center justify-center gap-2">
-                <i class="fa-solid fa-circle-info"></i> Check Order Status
-            </button>
-        </div>
-    </div>
-</main>
-
-<div id="confirmation-screen"
-     class="hidden fixed inset-0 z-20 bg-slate-950/95 flex flex-col items-center justify-center p-6">
-    <div class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-5">
-        <div class="text-center">
-            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl
-                        bg-green-500/10 border border-green-500/20 text-green-400 text-xl mb-4">
-                <i class="fa-solid fa-circle-check"></i>
-            </div>
-            <h2 class="text-xl font-extrabold text-white tracking-tight">Review Your Order</h2>
-            <p class="text-xs text-slate-500 mt-1">Confirm before sending to the kitchen.</p>
-        </div>
-
-        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 text-left">
-            <div class="flex justify-between text-xs pb-3 border-b border-slate-800 mb-3">
-                <span class="text-slate-500">Table</span>
-                <span id="confirm-table" class="font-bold text-amber-400">0</span>
-            </div>
-            <ul class="space-y-2 text-xs" id="confirm-items"></ul>
-            <div id="confirm-notes-row" class="hidden mt-3 pt-3 border-t border-slate-800">
-                <p class="text-slate-500 text-xs">Notes:</p>
-                <p id="confirm-notes-text" class="text-slate-400 text-xs mt-1 italic"></p>
-            </div>
-            <div class="flex justify-between text-sm border-t border-slate-800 pt-3 mt-3">
-                <span class="text-slate-500">Grand Total</span>
-                <span id="confirm-total" class="font-bold text-amber-400">Rs. 0</span>
-            </div>
-        </div>
-
-        <div id="confirm-email-row" class="hidden email-banner">
-            <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <div class="w-7 h-7 bg-amber-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-envelope text-amber-400 text-[10px]"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <p class="text-[10px] font-semibold text-amber-400">Bill will be emailed to</p>
-                        <p class="text-[11px] text-slate-300 font-bold truncate" id="confirm-email-display">—</p>
-                    </div>
-                </div>
-                <button onclick="openAuthModal('edit')" style="min-height:unset"
-                        class="text-[9px] text-slate-500 hover:text-amber-400 cursor-pointer transition
-                               px-2 py-1 rounded border border-slate-700 hover:border-amber-500/30">
-                    Edit
-                </button>
-            </div>
-        </div>
-
-        <div class="slide-track" id="slide-track">
-            <div class="slide-fill"  id="slide-fill"></div>
-            <div class="slide-label" id="slide-label"><span>SLIDE TO SEND &nbsp;›››</span></div>
-            <div class="slide-thumb" id="slide-thumb"><i class="fa-solid fa-chevron-right"></i></div>
-        </div>
-
-        <button onclick="editOrder()"
-                class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold
-                       py-3.5 px-6 rounded-xl border border-slate-800 transition-all cursor-pointer text-xs">
-            <i class="fa-solid fa-pen-to-square mr-2"></i> Edit Order
-        </button>
-    </div>
+<!-- ═══ EMAIL SENT OVERLAY ════════════════════════════════════════════════ -->
+<div class="overlay hidden" id="email-info-overlay" onclick="if(event.target===this)closeEmailInfoModal()">
+  <div class="email-sent-box">
+    <div class="email-sent-icon"><i class="fa-solid fa-paper-plane"></i></div>
+    <h3 class="display-sm" style="margin-bottom:10px">Order Sent!</h3>
+    <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:28px;line-height:1.6">Your itemised bill will be sent to<br><strong id="info-modal-email" style="color:var(--accent);font-size:1rem;display:block;margin-top:6px"></strong> as soon as your payment is completed.</p>
+    <button class="btn-primary" style="width:100%;justify-content:center" onclick="closeEmailInfoModal()">Awesome, thanks!</button>
+  </div>
 </div>
 
-<div class="auth-overlay hidden" id="email-info-overlay" onclick="if(event.target === this) closeEmailInfoModal()">
-    <div class="auth-box animate-fade-in text-center" style="padding: 32px 24px;">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 text-2xl mb-4">
-            <i class="fa-solid fa-paper-plane"></i>
-        </div>
-        <h3 class="text-xl font-black text-white mb-2 tracking-tight">Order Sent!</h3>
-        <p class="text-xs text-slate-400 leading-relaxed mb-6 px-2">
-            Your itemised bill will be sent to <br>
-            <b class="text-amber-400" id="info-modal-email"></b><br>
-            as soon as your payment is completed.
-        </p>
-        <button onclick="closeEmailInfoModal()"
-                class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-3.5 rounded-xl shadow-md transition-all cursor-pointer">
-            Awesome, thanks!
-        </button>
-    </div>
-</div>
-
-<div id="external-screen"
-     class="hidden fixed inset-0 z-25 bg-slate-950/95 flex flex-col items-center justify-start p-6 overflow-y-auto">
-    <div class="max-w-md w-full space-y-4 py-8">
-        <div class="text-center">
-            <i class="fa-solid fa-fire-burner text-4xl text-amber-500 animate-pulse block mb-3"></i>
-            <h3 class="text-xl font-extrabold text-white mb-1" id="status-headline">Your Orders</h3>
-            <p class="text-xs text-slate-500" id="status-subline">Live updates from the kitchen.</p>
-        </div>
-
-        <div id="status-email-set" class="email-banner hidden">
-            <div class="flex items-center gap-2.5">
-                <i class="fa-solid fa-circle-check text-amber-400 text-base flex-shrink-0"></i>
-                <div>
-                    <p class="text-[10px] font-semibold text-amber-400">Bill email confirmed</p>
-                    <p class="text-[11px] text-slate-300 font-bold" id="status-email-display">—</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="status-orders-list" class="space-y-3"></div>
-
-        <button onclick="backToMenuScreen()"
-                class="w-full bg-slate-900 text-amber-400 border border-slate-800 text-xs
-                       font-bold py-3.5 px-6 rounded-xl hover:bg-amber-500/10 transition-all cursor-pointer">
-            <i class="fa-solid fa-arrow-left mr-2"></i> Place Another Order
-        </button>
-    </div>
-</div>
-
+<!-- ═══ BILL TOAST ════════════════════════════════════════════════════════ -->
 <div id="bill-toast" class="hidden">
-    <div class="bg-green-950 border border-green-500/40 text-green-300
-                px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
-        <div class="w-9 h-9 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-            <i class="fa-solid fa-envelope-circle-check text-green-400 text-base"></i>
-        </div>
-        <div>
-            <p class="font-extrabold text-green-300 text-xs">Bill will be sent after payment!</p>
-            <p class="text-green-500 text-[10px] mt-0.5" id="bill-toast-email">Check your inbox.</p>
-        </div>
+  <div class="bill-toast-inner">
+    <div class="bill-toast-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
+    <div class="bill-toast-text">
+      <p>Bill will be sent after payment!</p>
+      <p id="bill-toast-email">Check your inbox.</p>
     </div>
+  </div>
 </div>
 
-<div id="toast"
-     class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700
-            text-white text-xs font-semibold px-5 py-3 rounded-full shadow-2xl opacity-0 whitespace-nowrap">
+<!-- ═══ MOBILE CART DRAWER ════════════════════════════════════════════════ -->
+<div id="mobile-cart-drawer" class="cart-sidebar mobile-cart-drawer">
+  <div class="cart-hd">
+    <h3><i class="fa-solid fa-basket-shopping"></i>Your Order</h3>
+    <button class="mobile-cart-close" onclick="closeMobileCart()"><i class="fa-solid fa-xmark"></i>Close</button>
+  </div>
+  <div class="cart-items" id="cart-items-mobile">
+    <div class="empty-cart-msg">
+      <i class="fa-solid fa-basket-shopping"></i>
+      <p>Your basket is empty</p>
+    </div>
+  </div>
+  <textarea id="special-notes-mobile" class="notes-area" rows="2" placeholder="Special requests or allergies…"></textarea>
+  <div class="cart-totals">
+    <div class="total-row"><span>Subtotal</span><span id="cart-subtotal-mobile" style="font-weight:700;color:var(--text)">Rs. 0</span></div>
+    <div class="grand-row"><span>Total</span><span id="cart-total-mobile">Rs. 0</span></div>
+    <button class="btn-order" id="order-now-btn-mobile" onclick="placeOrder()">ORDER NOW</button>
+    <button class="btn-status" onclick="openOrderStatus()"><i class="fa-solid fa-circle-info"></i>Check Order Status</button>
+  </div>
 </div>
 
-<footer class="bg-slate-900/80 border-t border-slate-800 py-5 text-center text-[10px] text-slate-700">
-    &copy; 2026 Sekuwa by Kilo &mdash; Lazimpat Branch
+<!-- ═══ TOAST ════════════════════════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<!-- ═══ MOBILE NAV ════════════════════════════════════════════════════════ -->
+<nav id="mobile-nav">
+  <button class="mob-nav-btn active" id="mob-menu-btn" onclick="showMobileNav('menu')"><i class="fa-solid fa-utensils"></i>Menu</button>
+  <button class="mob-nav-btn" id="mob-status-btn" onclick="openOrderStatus()"><i class="fa-solid fa-circle-info"></i>Status</button>
+  <button class="mob-nav-btn" id="mob-profile-btn" onclick="openAuthModal(hasAccount&&hasAccount()?'edit':'signin')"><i class="fa-solid fa-person"></i>Profile</button>
+</nav>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════════════════ -->
+<footer>
+  <p class="footer-brand">Sekuwa by Kilo</p>
+  <p class="footer-tagline">Lazimpat Branch · Kathmandu</p>
+  <div class="footer-divider"></div>
+  <p class="footer-copy">© 2026 Sekuwa by Kilo. Primal Grilling, Modern Metrics.</p>
 </footer>
 
+<!-- ═══ SCRIPTS ═══════════════════════════════════════════════════════════ -->
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, get, update }
-        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-
-    const EMAILJS_PUBLIC_KEY  = 'B7TxLhcukvBJeNDLu';
-    const EMAILJS_SERVICE_ID  = 'service_py2n2bm';
-    const EMAILJS_TEMPLATE_ID = 'template_ruuryg5';
-
-    const EMAIL_CONFIGURED = ![EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID]
-        .some(v => v.startsWith('YOUR_'));
-
-    if (EMAIL_CONFIGURED) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyAdQtFwyOHoixp2rALMKBllaeqg2jvCl5w",
-        authDomain: "sekuwa-by-kilo.firebaseapp.com",
-        databaseURL: "https://sekuwa-by-kilo-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "sekuwa-by-kilo",
-        storageBucket: "sekuwa-by-kilo.firebasestorage.app",
-        messagingSenderId: "524646744577",
-        appId: "1:524646744577:web:5b8f1a500b8f09cea43600"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db  = getDatabase(app);
-
-    function esc(s) {
-        if (!s && s !== 0) return '';
-        return String(s).replace(/[&<>'"]/g,
-            c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c]);
-    }
-    function fmt(n) { return 'Rs.\u00a0' + Number(n).toLocaleString(); }
-    function nowStamp() {
-        return {
-            time:      new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false }),
-            date:      new Date().toISOString().split('T')[0],
-            createdAt: new Date().toISOString()
-        };
-    }
-    function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e).trim()); }
-
-    let _toastTimer;
-    function showToast(msg, dur = 3500) {
-        const t = document.getElementById('toast');
-        t.textContent = msg; t.style.opacity = '1';
-        clearTimeout(_toastTimer);
-        _toastTimer = setTimeout(() => { t.style.opacity = '0'; }, dur);
-    }
-    function showScreen(id) {
-        ['welcome-screen','game-screen','menu-screen','confirmation-screen','external-screen']
-            .forEach(s => document.getElementById(s).classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-    }
-
-    /* ─── Account state ─────────────────────────────────────────────────── */
-    let account = {
-        name:  localStorage.getItem('sbk_name')  || '',
-        email: localStorage.getItem('sbk_email') || ''
-    };
-
-    function persistAccount(name, email) {
-        account.name  = name.trim();
-        account.email = email.trim().toLowerCase();
-        localStorage.setItem('sbk_name',  account.name);
-        localStorage.setItem('sbk_email', account.email);
-    }
-    function hasAccount() { return !!(account.email && isValidEmail(account.email)); }
-    function initials(name) {
-        if (!name) return '?';
-        return name.trim().split(/\s+/).map(w => w[0].toUpperCase()).slice(0,2).join('');
-    }
-
-    function refreshAccountUI() {
-        const wrap  = document.getElementById('account-nav-wrap');
-        const avEl  = document.getElementById('nav-avatar-initials');
-        const piEl  = document.getElementById('panel-initials');
-        const pnEl  = document.getElementById('panel-name');
-        const peEl  = document.getElementById('panel-email');
-
-        if (selectedTable) wrap.style.display = 'block';
-
-        if (hasAccount()) {
-            const ini = initials(account.name || account.email);
-            avEl.textContent = ini;
-            piEl.textContent = ini;
-            pnEl.textContent = account.name  || 'Guest';
-            peEl.textContent = account.email;
-        } else {
-            avEl.textContent = '?';
-            piEl.textContent = '?';
-            pnEl.textContent = 'Guest';
-            peEl.textContent = 'No email set';
-        }
-
-        const cer = document.getElementById('confirm-email-row');
-        if (cer) {
-            cer.classList.toggle('hidden', !hasAccount());
-            if (hasAccount()) document.getElementById('confirm-email-display').textContent = account.email;
-        }
-
-        const ses = document.getElementById('status-email-set');
-        const sed = document.getElementById('status-email-display');
-        if (ses) {
-            ses.classList.toggle('hidden', !hasAccount());
-            if (hasAccount() && sed) sed.textContent = account.email;
-        }
-    }
-
-    /* ─── Auth modal ────────────────────────────────────────────────────── */
-    window.openAuthModal = function(mode = 'signin') {
-        document.getElementById('auth-overlay').classList.remove('hidden');
-        document.getElementById('auth-signin-view').classList.toggle('hidden', mode !== 'signin');
-        document.getElementById('auth-edit-view').classList.toggle('hidden',   mode !== 'edit');
-        if (mode === 'signin') {
-            document.getElementById('auth-name').value  = account.name  || '';
-            document.getElementById('auth-email').value = account.email || '';
-            setTimeout(() => document.getElementById('auth-name').focus(), 50);
-        } else {
-            document.getElementById('edit-name').value  = account.name  || '';
-            document.getElementById('edit-email').value = account.email || '';
-            setTimeout(() => document.getElementById('edit-name').focus(), 50);
-        }
-    };
-    window.closeAuthModal = function() {
-        document.getElementById('auth-overlay').classList.add('hidden');
-    };
-    window.handleOverlayClick = function(e) {
-        if (e.target === document.getElementById('auth-overlay')) closeAuthModal();
-    };
-
-    window.saveAccount = function() {
-        const name  = document.getElementById('auth-name').value.trim();
-        const email = document.getElementById('auth-email').value.trim();
-        if (!name)              { document.getElementById('auth-name').focus();  showToast('Please enter your name.'); return; }
-        if (!isValidEmail(email)) { document.getElementById('auth-email').focus(); showToast('Please enter a valid email.'); return; }
-        persistAccount(name, email);
-        
-        if (selectedTable) {
-            push(ref(db, 'customer_emails'), { name, email, table: selectedTable, date: nowStamp().date }).catch(()=>{});
-        }
-        
-        closeAuthModal();
-        refreshAccountUI();
-        showToast(`✅ Got it, ${name}! Bill will go to ${email}`);
-
-        if (sessionOrders.length > 0) {
-            const latestOrder = sessionOrders[sessionOrders.length - 1];
-            update(ref(db, `kitchen_orders/${latestOrder.originalKey}`), {
-                customerEmail: account.email,
-                customerName: account.name
-            }).catch(()=>{});
-            latestOrder.data.customerEmail = account.email;
-            latestOrder.data.customerName = account.name;
-            openEmailInfoModal();
-            sendBillEmail(latestOrder);
-        }
-    };
-
-    window.skipAuth = function() {
-        closeAuthModal();
-        showToast('Order received! You can track its status here.');
-    };
-
-    window.saveEditAccount = function() {
-        const name  = document.getElementById('edit-name').value.trim();
-        const email = document.getElementById('edit-email').value.trim();
-        if (!name)              { document.getElementById('edit-name').focus();  showToast('Please enter your name.'); return; }
-        if (!isValidEmail(email)) { document.getElementById('edit-email').focus(); showToast('Please enter a valid email.'); return; }
-        persistAccount(name, email);
-        closeAuthModal();
-        refreshAccountUI();
-        showToast('✅ Profile updated!');
-    };
-    
-    window.signOut = function() {
-        if (!confirm('Remove your saved email from this device?')) return;
-        account = { name:'', email:'' };
-        localStorage.removeItem('sbk_name');
-        localStorage.removeItem('sbk_email');
-        refreshAccountUI();
-        showToast('Signed out. No bill will be emailed.');
-    };
-
-    let _panelOpen = false;
-    window.toggleAccountPanel = function() {
-        _panelOpen = !_panelOpen;
-        document.getElementById('account-panel').classList.toggle('open', _panelOpen);
-    };
-    window.closeAccountPanel = function() {
-        _panelOpen = false;
-        document.getElementById('account-panel').classList.remove('open');
-    };
-    document.addEventListener('click', e => {
-        const wrap = document.getElementById('account-nav-wrap');
-        if (wrap && !wrap.contains(e.target)) closeAccountPanel();
-    });
-
-    window.openEmailInfoModal = function() {
-        document.getElementById('info-modal-email').textContent = account.email;
-        document.getElementById('email-info-overlay').classList.remove('hidden');
-    };
-    window.closeEmailInfoModal = function() {
-        document.getElementById('email-info-overlay').classList.add('hidden');
-    };
-
-    /* ─── Email billing ─────────────────────────────────────────────────── */
-    const billedKeys = new Set();
-
-    function sendBillEmail(entry) {
-        if (!hasAccount()) return;
-        if (billedKeys.has(entry.originalKey)) return;
-        billedKeys.add(entry.originalKey);
-
-        const d     = entry.data;
-        const items = (d.items || []).map(i =>
-            `${i.name} × ${i.quantity}  —  ${fmt(i.price * i.quantity)}`
-        ).join('\n');
-        const total = (d.items || []).reduce((s,i) => s + i.price * i.quantity, 0);
-
-        const params = {
-            to_name:         account.name  || 'Valued Customer',
-            to_email:        account.email,
-            table_number:    String(d.table || selectedTable || '—'),
-            order_items:     items || '—',
-            order_total:     fmt(total),
-            order_date:      d.date || nowStamp().date,
-            order_time:      d.time || nowStamp().time,
-            order_notes:     d.notes || '—',
-            restaurant_name: 'Sekuwa by Kilo — Lazimpat'
-        };
-
-        if (!EMAIL_CONFIGURED) return;
-
-        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
-            .then(() => {
-                document.getElementById('bill-toast-email').textContent = `Sent to ${account.email}`;
-                const bt = document.getElementById('bill-toast');
-                bt.classList.remove('hidden');
-                setTimeout(() => bt.classList.add('hidden'), 7000);
-            })
-            .catch(err => {
-                console.error('EmailJS send error:', err);
-                showToast('⚠️ Bill email failed. Please ask for a printed receipt.', 5000);
-            });
-    }
-
-    /* ─── Menu Data ─────────────────────────────────────────────────────── */
-    const menuData = [
-        { id: 1,  name: 'Chicken Butter Masala',             price: 469,  category: 'Curry' },
-        { id: 2,  name: 'Paneer Butter Masala',              price: 489,  category: 'Curry' },
-        { id: 3,  name: 'Mutter Paneer',                     price: 374,  category: 'Curry' },
-        { id: 4,  name: 'Mutter Mushroom',                   price: 294,  category: 'Curry' },
-        { id: 5,  name: 'Mushroom Paneer',                   price: 399,  category: 'Curry' },
-        { id: 6,  name: 'Trout Fish Curry',                  price: 629,  category: 'Curry' },
-        { id: 7,  name: 'Fish Curry',                        price: 389,  category: 'Curry' },
-        { id: 8,  name: 'Local Chicken Curry',               price: 409,  category: 'Curry' },
-        { id: 9,  name: 'Pork Curry',                        price: 364,  category: 'Curry' },
-        { id: 10, name: 'Mutton Curry',                      price: 499,  category: 'Curry' },
-        { id: 11, name: 'Mixed Veg Curry',                   price: 299,  category: 'Curry' },
-        { id: 12, name: 'Daal Fry',                          price: 149,  category: 'Curry' },
-        { id: 13, name: 'Dharane Sekuwa Combo Platter Set',  price: 2699, category: 'Special' },
-        { id: 14, name: 'Pork Sekuwa (1 Plate)',             price: 299,  category: 'Sekuwa' },
-        { id: 15, name: 'Pork Sekuwa (½ kg)',                price: 589,  category: 'Sekuwa' },
-        { id: 16, name: 'Pork Sekuwa (1 kg)',                price: 1149, category: 'Sekuwa' },
-        { id: 17, name: 'Chicken Sekuwa (1 Plate)',          price: 279,  category: 'Sekuwa' },
-        { id: 18, name: 'Chicken Sekuwa (½ kg)',             price: 529,  category: 'Sekuwa' },
-        { id: 19, name: 'Chicken Sekuwa (1 kg)',             price: 1049, category: 'Sekuwa' },
-        { id: 20, name: 'Wings Sekuwa & Fry (1 Plate)',      price: 279,  category: 'Sekuwa' },
-        { id: 21, name: 'Wings Sekuwa & Fry (½ kg)',         price: 529,  category: 'Sekuwa' },
-        { id: 22, name: 'Wings Sekuwa & Fry (1 kg)',         price: 1049, category: 'Sekuwa' },
-        { id: 23, name: 'Mutton Sekuwa (1 Plate)',           price: 489,  category: 'Sekuwa' },
-        { id: 24, name: 'Mutton Sekuwa (½ kg)',              price: 1199, category: 'Sekuwa' },
-        { id: 25, name: 'Mutton Sekuwa (1 kg)',              price: 2399, category: 'Sekuwa' },
-        { id: 26, name: 'Chicken Sausage',                   price: 269,  category: 'Sausages' },
-        { id: 27, name: 'Buff Sausage',                      price: 269,  category: 'Sausages' },
-        { id: 28, name: 'Pork Kasaudi Khaja Set',            price: 424,  category: 'Khaja Set' },
-        { id: 29, name: 'Local Chicken Kasaudi Khaja Set',   price: 449,  category: 'Khaja Set' },
-        { id: 30, name: 'Mutton Kasaudi Khaja Set',          price: 489,  category: 'Khaja Set' },
-        { id: 31, name: 'Veg Kasaudi Khaja Set',             price: 254,  category: 'Khaja Set' },
-        { id: 32, name: 'Pork Kasaudi Dry',                  price: 364,  category: 'Kasaudi Dry' },
-        { id: 33, name: 'Local Chicken Kasaudi Dry',         price: 409,  category: 'Kasaudi Dry' },
-        { id: 34, name: 'Mutton Kasaudi Dry',                price: 444,  category: 'Kasaudi Dry' },
-        { id: 35, name: 'Chicken Fried (Full Dose)',         price: 1619, category: 'Chicken Snacks' },
-        { id: 36, name: 'Chicken Fried (Half Dose)',         price: 819,  category: 'Chicken Snacks' },
-        { id: 37, name: 'Chicken Fried 2 pcs',              price: 414,  category: 'Chicken Snacks' },
-        { id: 38, name: 'Potato wrapped Chicken',            price: 599,  category: 'Chicken Snacks' },
-        { id: 39, name: 'Pan Fried Chicken with Veg',        price: 569,  category: 'Chicken Snacks' },
-        { id: 40, name: 'Cashewnut Chicken',                 price: 679,  category: 'Chicken Snacks' },
-        { id: 41, name: 'Chicken Drumstick',                 price: 549,  category: 'Chicken Snacks' },
-        { id: 42, name: 'Chicken Meatball',                  price: 489,  category: 'Chicken Snacks' },
-        { id: 43, name: 'Chicken Roast',                     price: 559,  category: 'Chicken Snacks' },
-        { id: 44, name: 'Chicken Parma with Cheese',         price: 649,  category: 'Chicken Snacks' },
-        { id: 45, name: 'Timoor Chicken',                    price: 569,  category: 'Chicken Snacks' },
-        { id: 46, name: 'Chicken Fajita',                    price: 629,  category: 'Chicken Snacks' },
-        { id: 47, name: 'Diamond Chicken',                   price: 569,  category: 'Chicken Snacks' },
-        { id: 48, name: 'Beijing Chicken',                   price: 644,  category: 'Chicken Snacks' },
-        { id: 49, name: 'Chicken Boil',                      price: 349,  category: 'Chicken Snacks' },
-        { id: 50, name: 'Pangra Fry',                        price: 409,  category: 'Chicken Snacks' },
-        { id: 51, name: 'Battai Fry',                        price: 579,  category: 'Chicken Snacks' },
-        { id: 52, name: 'Grilled Salmon with Veg',           price: 1599, category: 'Seafood Snacks' },
-        { id: 53, name: 'Roasted Whole Baked Fish',          price: 1049, category: 'Seafood Snacks' },
-        { id: 54, name: 'Tiger Prawn with Papaya Salad',     price: 979,  category: 'Seafood Snacks' },
-        { id: 55, name: 'King Prawn Fry',                    price: 719,  category: 'Seafood Snacks' },
-        { id: 56, name: 'Golden Fry Fish',                   price: 499,  category: 'Seafood Snacks' },
-        { id: 57, name: 'Fish & Chips',                      price: 579,  category: 'Seafood Snacks' },
-        { id: 58, name: 'Grilled Fish',                      price: 589,  category: 'Seafood Snacks' },
-        { id: 59, name: 'Fish Ball',                         price: 489,  category: 'Seafood Snacks' },
-        { id: 60, name: 'Fish Finger',                       price: 489,  category: 'Seafood Snacks' },
-        { id: 61, name: 'Thai Prawn',                        price: 799,  category: 'Seafood Snacks' },
-        { id: 62, name: 'Tawa Fried Fish',                   price: 624,  category: 'Seafood Snacks' },
-        { id: 63, name: 'Trout Fish with Hot Spicy Sauce',   price: 689,  category: 'Seafood Snacks' },
-        { id: 64, name: 'Roasted Pork Belly',                price: 559,  category: 'Pork Snacks' },
-        { id: 65, name: 'Peri Peri Pork Chop',               price: 589,  category: 'Pork Snacks' },
-        { id: 66, name: 'Pork Bacon',                        price: 619,  category: 'Pork Snacks' },
-        { id: 67, name: 'Pork Fajita',                       price: 649,  category: 'Pork Snacks' },
-        { id: 68, name: 'Pork Boil',                         price: 349,  category: 'Pork Snacks' },
-        { id: 69, name: 'Badel Dameko',                      price: 739,  category: 'Pork Snacks' },
-        { id: 70, name: 'Mutton Hyakula Fry',                price: 589,  category: 'Mutton Snacks' },
-        { id: 71, name: 'Mutton Tauko Fry',                  price: 399,  category: 'Mutton Snacks' },
-        { id: 72, name: 'Mutton Tauko Boil',                 price: 399,  category: 'Mutton Snacks' },
-        { id: 73, name: 'Mutton Fila Boil',                  price: 599,  category: 'Mutton Snacks' },
-        { id: 74, name: 'Duck Chhoila',                      price: 549,  category: 'Chhoila' },
-        { id: 75, name: 'Battai Chhoila',                    price: 599,  category: 'Chhoila' },
-        { id: 76, name: 'Pork Chhoila',                      price: 414,  category: 'Chhoila' },
-        { id: 77, name: 'Chicken Chhoila',                   price: 414,  category: 'Chhoila' }
-    ];
-
-    let cart                = [];
-    let selectedTable       = null;
-    let sessionOrders       = [];
-    let activeFilter        = 'All';
-    let searchQuery         = '';
-    let tableCount          = 6;
-    let waiterCooldownUntil = 0;
-    let sliderConfirmed     = false;
-
-    /* ── Track last filter index for direction detection ── */
-    const categories = ['All', ...new Set(menuData.map(m => m.category))];
-    let lastFilterIdx = 0;
-
-    async function fetchTableCount() {
-        try {
-            const snap = await get(ref(db, 'config/tableCount'));
-            if (snap.exists() && typeof snap.val() === 'number' && snap.val() > 0)
-                tableCount = snap.val();
-        } catch(_) {}
-    }
-
-    /* ─── Search ────────────────────────────────────────────────────────── */
-    window.handleSearch = function(val) {
-        searchQuery = val.trim().toLowerCase();
-        const clearBtn = document.getElementById('search-clear');
-        const infoBar  = document.getElementById('search-info-bar');
-
-        if (searchQuery) {
-            clearBtn.classList.remove('hidden');
-            // When searching, reset to "All" filter so all results are visible
-            if (activeFilter !== 'All') {
-                activeFilter = 'All';
-                lastFilterIdx = 0;
-                updateFilterPillsUI();
-            }
-            infoBar.classList.remove('hidden');
-            infoBar.classList.add('flex');
-        } else {
-            clearBtn.classList.add('hidden');
-            infoBar.classList.add('hidden');
-            infoBar.classList.remove('flex');
-        }
-        renderMenu();
-    };
-
-    window.clearSearch = function() {
-        const inp = document.getElementById('search-input');
-        inp.value = '';
-        searchQuery = '';
-        document.getElementById('search-clear').classList.add('hidden');
-        document.getElementById('search-info-bar').classList.add('hidden');
-        document.getElementById('search-info-bar').classList.remove('flex');
-        inp.focus();
-        renderMenu();
-    };
-
-    /* Highlight matching portion of text */
-    function highlightMatch(text, query) {
-        if (!query) return esc(text);
-        const idx = text.toLowerCase().indexOf(query.toLowerCase());
-        if (idx < 0) return esc(text);
-        const before = esc(text.slice(0, idx));
-        const match  = esc(text.slice(idx, idx + query.length));
-        const after  = esc(text.slice(idx + query.length));
-        return `${before}<span class="search-match-highlight">${match}</span>${after}`;
-    }
-
-    /* ─── Category filters ──────────────────────────────────────────────── */
-    function buildFilterPills() {
-        document.getElementById('filter-row').innerHTML = categories.map(cat => `
-            <button data-cat="${esc(cat)}" onclick="setFilter('${esc(cat)}')"
-                    class="filter-pill ${cat === 'All'
-                        ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
-                        : 'bg-slate-900/50 border-slate-700 text-slate-400'}
-                           text-[11px] font-semibold px-3.5 py-1.5 rounded-full border">
-                ${esc(cat)}
-            </button>`).join('');
-    }
-
-    function updateFilterPillsUI() {
-        document.querySelectorAll('#filter-row .filter-pill').forEach(btn => {
-            const a = btn.dataset.cat === activeFilter;
-            btn.className = `filter-pill ${a
-                ? 'active bg-amber-500/15 border-amber-500/40 text-amber-400'
-                : 'bg-slate-900/50 border-slate-700 text-slate-400'}
-                text-[11px] font-semibold px-3.5 py-1.5 rounded-full border transition-all`;
-        });
-    }
-
-    window.setFilter = function(cat) {
-        if (cat === activeFilter && !searchQuery) return;
-        const newIdx = categories.indexOf(cat);
-        const direction = newIdx >= lastFilterIdx ? 'left' : 'right';
-        lastFilterIdx = newIdx;
-        activeFilter  = cat;
-
-        // Clear search when switching categories
-        if (searchQuery) {
-            searchQuery = '';
-            document.getElementById('search-input').value = '';
-            document.getElementById('search-clear').classList.add('hidden');
-            document.getElementById('search-info-bar').classList.add('hidden');
-            document.getElementById('search-info-bar').classList.remove('flex');
-        }
-
-        updateFilterPillsUI();
-        renderMenu(direction);
-
-        // Animate the clicked pill
-        const btn = document.querySelector(`#filter-row [data-cat="${CSS.escape(cat)}"]`);
-        if (btn) {
-            btn.classList.add('filter-pill-pop');
-            btn.addEventListener('animationend', () => btn.classList.remove('filter-pill-pop'), { once: true });
-        }
-    };
-
-    /* ─── Screens ───────────────────────────────────────────────────────── */
-    window.proceedToTableSelect = function() {
-        showScreen('game-screen'); generateTableButtons();
-    };
-
-    function generateTableButtons() {
-        document.getElementById('token-container').innerHTML =
-            Array.from({ length: tableCount }, (_,i) => i+1).map(n => `
-                <button onclick="selectTable(${n})"
-                        class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col
-                               items-center justify-center gap-3 group hover:border-amber-500/50
-                               transition-all cursor-pointer">
-                    <div class="w-12 h-12 rounded-xl bg-slate-950 text-amber-500 font-extrabold
-                                flex items-center justify-center text-lg group-hover:bg-amber-500
-                                group-hover:text-slate-950 transition-all">${n}</div>
-                    <span class="text-xs font-semibold text-slate-400 group-hover:text-amber-400
-                                 transition-colors">Table ${n}</span>
-                </button>`).join('');
-    }
-
-    window.selectTable = function(num) {
-        selectedTable = num;
-        sessionStorage.setItem('sbk_table', num);
-        document.getElementById('nav-table-tag').classList.remove('hidden');
-        document.getElementById('nav-table-tag').classList.add('flex');
-        document.getElementById('call-waiter-btn').classList.remove('hidden');
-        document.getElementById('call-waiter-btn').classList.add('flex');
-        document.getElementById('nav-table-num').textContent = num;
-        document.getElementById('account-nav-wrap').style.display = 'block';
-        showScreen('menu-screen');
-        buildFilterPills(); renderMenu(); refreshAccountUI();
-
-        // Auto-focus search after a brief delay for smooth UX
-        setTimeout(() => document.getElementById('search-input').focus(), 600);
-    };
-
-    window.callWaiter = function() {
-        const now = Date.now();
-        if (now < waiterCooldownUntil) {
-            showToast(`⏳ Please wait ${Math.ceil((waiterCooldownUntil-now)/1000)}s before calling again.`); return;
-        }
-        waiterCooldownUntil = now + 60_000;
-        const { time, date } = nowStamp();
-        push(ref(db,'waiter_calls'), { table:selectedTable, time, date, status:'Pending' })
-            .then(() => showToast(`🔔 Waiter request sent for Table ${selectedTable}.`))
-            .catch(() => showToast('❌ Connection error. Please try again.'));
-    };
-
-    /* ─── Menu render (with animation direction) ────────────────────────── */
-    function getQty(id) { return (cart.find(c => c.id===id)||{}).quantity||0; }
-
-    function renderMenu(direction = null) {
-        const grid = document.getElementById('menu-items');
-
-        // Filter items
-        let items = activeFilter === 'All' ? menuData : menuData.filter(m => m.category === activeFilter);
-
-        // Apply search
-        if (searchQuery) {
-            const q = searchQuery;
-            items = menuData.filter(m =>
-                m.name.toLowerCase().includes(q) ||
-                m.category.toLowerCase().includes(q)
-            );
-            // Update search count
-            const countEl = document.getElementById('search-count-text');
-            if (countEl) countEl.textContent = `${items.length} result${items.length !== 1 ? 's' : ''} for "${searchQuery}"`;
-        }
-
-        // Animate out old content
-        grid.style.opacity = '0';
-        grid.style.transform = direction === 'left'  ? 'translateX(16px)'  :
-                               direction === 'right' ? 'translateX(-16px)' : 'translateY(8px)';
-        grid.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
-
-        setTimeout(() => {
-            if (items.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-2 text-center py-16 text-slate-500">
-                        <i class="fa-solid fa-bowl-food text-3xl mb-4 block opacity-40 no-results-icon"></i>
-                        <p class="text-sm font-semibold text-slate-400">No items found</p>
-                        <p class="text-xs mt-1 text-slate-600">
-                            ${searchQuery ? `Try a different search term` : 'Nothing in this category yet'}
-                        </p>
-                        ${searchQuery ? `<button onclick="clearSearch()" class="mt-4 text-[11px] text-amber-400 border border-amber-500/20 px-4 py-2 rounded-xl hover:bg-amber-500/10 transition-all cursor-pointer" style="min-height:unset">Clear Search</button>` : ''}
-                    </div>`;
-            } else {
-                grid.innerHTML = items.map(item => {
-                    const qty      = getQty(item.id);
-                    const nameHtml = searchQuery
-                        ? highlightMatch(item.name, searchQuery)
-                        : esc(item.name);
-                    return `
-                    <div class="menu-card menu-card-anim bg-slate-900/90 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md">${esc(item.category)}</span>
-                            <h4 class="text-sm font-extrabold text-white mt-3 mb-1 leading-snug">${nameHtml}</h4>
-                            <p class="text-base font-black text-amber-500">${fmt(item.price)}</p>
-                            <p class="text-[10px] text-green-500 mt-1 flex items-center gap-1"><i class="fa-solid fa-bolt text-[8px]"></i> ~9 mins</p>
-                        </div>
-                        <div class="mt-5 flex justify-end">
-                            ${qty === 0
-                                ? `<button onclick="addItem(${item.id})"
-                                           class="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold
-                                                  text-xs py-2 px-5 rounded-xl hover:bg-amber-500 hover:text-slate-950
-                                                  transition-all cursor-pointer">
-                                       <i class="fa-solid fa-plus mr-1 text-[10px]"></i> Add
-                                   </button>`
-                                : `<div class="qty-pill flex items-center bg-slate-950 border border-slate-800 rounded-full p-0.5 w-28 justify-between">
-                                       <button onclick="decItem(${item.id})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-500/20 text-red-400 text-sm font-bold cursor-pointer transition-colors">−</button>
-                                       <span class="text-xs font-black text-slate-300">${qty}</span>
-                                       <button onclick="incItem(${item.id})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-amber-500/20 text-amber-400 text-sm font-bold cursor-pointer transition-colors">+</button>
-                                   </div>`}
-                        </div>
-                    </div>`;
-                }).join('');
-            }
-
-            // Animate in
-            grid.style.transition = 'opacity 0.24s ease, transform 0.24s cubic-bezier(0.22,1,0.36,1)';
-            grid.style.opacity    = '1';
-            grid.style.transform  = 'translateX(0) translateY(0)';
-        }, 160);
-    }
-
-    /* ─── Cart ──────────────────────────────────────────────────────────── */
-    window.addItem = function(id) {
-        const e = cart.find(c => c.id === id);
-        if (e) e.quantity++; else cart.push({ ...menuData.find(m => m.id === id), quantity: 1 });
-        renderMenu(); updateCartUI();
-    };
-    window.incItem = window.addItem;
-    window.decItem = function(id) {
-        const e = cart.find(c => c.id === id); if (!e) return;
-        if (e.quantity > 1) e.quantity--; else cart = cart.filter(c => c.id !== id);
-        renderMenu(); updateCartUI();
-    };
-    window.removeFromCart = function(id) {
-        cart = cart.filter(c => c.id !== id); renderMenu(); updateCartUI();
-    };
-    function calcTotal() { return cart.reduce((s,i) => s + i.price * i.quantity, 0); }
-
-    function updateCartUI() {
-        const con = document.getElementById('cart-items');
-        if (cart.length === 0) {
-            con.innerHTML = `<div class="text-center py-12 text-slate-600"><i class="fa-solid fa-basket-shopping text-xl mb-2 block"></i><p class="text-xs font-medium">Your basket is empty</p></div>`;
-            document.getElementById('cart-subtotal').textContent = fmt(0);
-            document.getElementById('cart-total').textContent    = fmt(0);
-            return;
-        }
-        con.innerHTML = cart.map(item => {
-            const line = item.price * item.quantity;
-            return `
-            <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800">
-                <div class="min-w-0 flex-1 mr-2">
-                    <p class="text-[11px] font-semibold text-slate-300 truncate">${esc(item.name)}</p>
-                    <p class="text-[10px] text-slate-600 mt-0.5">${item.quantity} × ${fmt(item.price)}</p>
-                </div>
-                <div class="flex items-center gap-2 shrink-0">
-                    <span class="text-xs font-bold text-amber-400">${fmt(line)}</span>
-                    <button onclick="removeFromCart(${item.id})" class="text-slate-600 hover:text-red-500 p-1 cursor-pointer transition-colors">
-                        <i class="fa-solid fa-trash text-[9px]"></i>
-                    </button>
-                </div>
-            </div>`;
-        }).join('');
-        const total = calcTotal();
-        document.getElementById('cart-subtotal').textContent = fmt(total);
-        document.getElementById('cart-total').textContent    = fmt(total);
-    }
-
-    /* ─── Order flow ────────────────────────────────────────────────────── */
-    window.placeOrder = function() {
-        if (cart.length === 0) {
-            const btn = document.getElementById('order-now-btn');
-            btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake');
-            showToast('🛒 Add at least one item first.'); return;
-        }
-        const notes = document.getElementById('special-notes').value.trim();
-        document.getElementById('confirm-table').textContent = selectedTable;
-        document.getElementById('confirm-items').innerHTML = cart.map(i => `
-            <li class="flex justify-between text-slate-400">
-                <span>${esc(i.name)} × <b class="text-amber-500">${i.quantity}</b></span>
-                <span class="font-bold text-slate-200">${fmt(i.price*i.quantity)}</span>
-            </li>`).join('');
-        document.getElementById('confirm-total').textContent = fmt(calcTotal());
-        const nr = document.getElementById('confirm-notes-row');
-        if (notes) { document.getElementById('confirm-notes-text').textContent = notes; nr.classList.remove('hidden'); }
-        else nr.classList.add('hidden');
-        refreshAccountUI();
-        showScreen('confirmation-screen'); resetSlider();
-    };
-
-    window.confirmFinalOrder = function() {
-        if (cart.length === 0) { showToast('Basket is empty.'); return; }
-        const notes = document.getElementById('special-notes').value.trim();
-        const snap  = [...cart];
-        const { time, date, createdAt } = nowStamp();
-        const payload = {
-            table: selectedTable, items: snap,
-            notes: notes||null, time, date, createdAt, status: 'Pending',
-            customerEmail: account.email||null,
-            customerName:  account.name||null
-        };
-
-        push(ref(db, 'kitchen_orders'), payload)
-            .then(orderRef => {
-                const originalKey = orderRef.key;
-                const entry = { originalKey, data: { ...payload }, unsubscribe: null };
-
-                function handleStatusUpdate(live) {
-                    if (!live) return;
-                    const prev = entry.data.status;
-                    entry.data = { ...entry.data, ...live };
-                    if (!document.getElementById('external-screen').classList.contains('hidden'))
-                        renderStatusScreen();
-                    if (live.status && live.status !== prev) {
-                        if (live.status === 'Preparing') showToast('👨‍🍳 Kitchen is preparing your order!', 4000);
-                        else if (live.status === 'Ready') showToast('✅ Your order is ready! Please collect.', 6000);
-                        else if (live.status === 'Paid')  showToast('💜 Payment confirmed — thank you!', 6000);
-                    }
-                }
-
-                const unsubStatus  = onValue(ref(db, `order_status/${originalKey}`),  snap2 => { handleStatusUpdate(snap2.val()); });
-                const unsubKitchen = onValue(ref(db, `kitchen_orders/${originalKey}`), snap2 => { handleStatusUpdate(snap2.val()); });
-
-                entry.unsubscribe = () => { unsubStatus(); unsubKitchen(); };
-                sessionOrders.push(entry);
-                cart = []; document.getElementById('special-notes').value = '';
-                updateCartUI(); renderMenu(); openOrderStatus();
-                
-                if (!hasAccount()) {
-                    openAuthModal('signin');
-                } else {
-                    openEmailInfoModal();
-                    sendBillEmail(entry);
-                }
-            })
-            .catch(() => {
-                showToast('❌ Connection error. Order failed. Try again.');
-                resetSlider(); showScreen('confirmation-screen');
-            });
-    };
-
-    window.editOrder = function() { showScreen('menu-screen'); };
-
-    /* ─── Status screen ─────────────────────────────────────────────────── */
-    function statusBadge(status, rush) {
-        const map = {
-            Pending:   ['s-pending',   'fa-clock',        'Pending'],
-            Preparing: ['s-preparing', 'fa-fire',         'Preparing'],
-            Ready:     ['s-ready',     'fa-check-circle', 'Ready to Collect'],
-            Paid:      ['s-paid',      'fa-check-double', 'Paid'],
-        };
-        const [cls, icon, label] = map[status] || ['s-pending','fa-clock',status];
-        const rushBadge = rush ? `<span class="s-badge s-rush ml-1"><i class="fa-solid fa-bolt"></i> Rush</span>` : '';
-        return `<span class="s-badge ${cls}"><i class="fa-solid ${icon}"></i> ${label}</span>${rushBadge}`;
-    }
-
-    function statusSteps(status) {
-        const stages = ['Pending','Preparing','Ready','Paid'];
-        const labels = ['Received','Preparing','Ready','Paid'];
-        const curIdx = stages.indexOf(status); const safeIdx = curIdx < 0 ? 0 : curIdx;
-        const html = stages.map((_,i) => {
-            let dc = 'pending';
-            if (i < safeIdx) dc = 'done'; else if (i === safeIdx) dc = 'active';
-            const inner = dc === 'done' ? '<i class="fa-solid fa-check" style="font-size:9px"></i>' : String(i+1);
-            const conn  = i < stages.length-1
-                ? `<div class="step-connector ${i < safeIdx ? 'done' : ''}"></div>` : '';
-            return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-                        <div class="step-dot ${dc}">${inner}</div>
-                        <span style="font-size:8px;color:${i<=safeIdx?'#94a3b8':'#334155'};white-space:nowrap">${labels[i]}</span>
-                    </div>${conn}`;
-        }).join('');
-        return `<div style="display:flex;align-items:flex-start;width:100%;padding:4px 0">${html}</div>`;
-    }
-
-    function renderStatusScreen() {
-        const list = document.getElementById('status-orders-list');
-        const hl   = document.getElementById('status-headline');
-        const sl   = document.getElementById('status-subline');
-        refreshAccountUI();
-
-        if (sessionOrders.length === 0) {
-            hl.textContent = 'No Orders Yet'; sl.textContent = 'Browse the menu and place an order first.';
-            list.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs"><i class="fa-solid fa-basket-shopping text-2xl mb-3 block opacity-50"></i>No orders placed this session.</div>`;
-            return;
-        }
-
-        const allPaid = sessionOrders.every(o => o.data.status === 'Paid');
-        hl.textContent = allPaid ? 'All Settled — Thank You! 🙏' : 'Your Orders';
-        sl.textContent = allPaid
-            ? (hasAccount() ? `Bill emailed to ${account.email}` : 'We hope you enjoyed your meal.')
-            : 'Live updates from the kitchen.';
-
-        list.innerHTML = sessionOrders.map((entry, idx) => {
-            const d = entry.data; const items = d.items || [];
-            const total     = items.reduce((s,i) => s + i.price * i.quantity, 0);
-            const itemCount = items.reduce((s,i) => s + i.quantity, 0);
-            const status    = d.status || 'Pending';
-
-            let waitLabel = '';
-            if (status === 'Pending' || status === 'Preparing') {
-                if (d.createdAt) {
-                    const elapsed = Math.floor((Date.now() - new Date(d.createdAt)) / 60000);
-                    const rem     = Math.max(1, 15 + itemCount * 2 - elapsed);
-                    waitLabel = `~${rem} min${rem !== 1 ? 's' : ''}`;
-                } else waitLabel = '~15 mins';
-            }
-
-            const sColor = {Ready:'text-green-400', Paid:'text-purple-400'}[status] || 'text-amber-400';
-            const sLine  = status === 'Ready' ? '✅ Collect now!'
-                         : status === 'Paid'  ? '💜 Paid'
-                         : waitLabel;
-
-            return `
-            <div class="bg-slate-900 border ${status==='Ready'?'border-green-500/30 pulse-ready':'border-slate-800'}
-                        p-5 rounded-2xl text-left space-y-3 transition-all">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <span class="text-xs font-bold text-slate-400">Order ${idx+1} &middot; Table ${esc(d.table)}</span>
-                    <div class="flex flex-wrap gap-1">${statusBadge(status, d.rush)}</div>
-                </div>
-                ${statusSteps(status)}
-                <ul class="text-xs text-slate-400 space-y-1.5 mt-1">
-                    ${items.map(i => `
-                        <li class="flex justify-between">
-                            <span>${esc(i.name)} × ${i.quantity}</span>
-                            <span class="text-amber-400 font-semibold">${fmt(i.price*i.quantity)}</span>
-                        </li>`).join('')}
-                </ul>
-                ${d.notes ? `<p class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-2">📝 ${esc(d.notes)}</p>` : ''}
-                <div class="flex justify-between text-xs border-t border-slate-800 pt-2">
-                    <span class="text-slate-500">${(status==='Pending'||status==='Preparing')?'Est. wait':'Status'}</span>
-                    <span class="font-bold ${sColor}">${sLine}</span>
-                </div>
-                <div class="flex justify-between text-xs">
-                    <span class="text-slate-500">Total</span>
-                    <span class="font-bold text-amber-400">${fmt(total)}</span>
-                </div>
-                ${status==='Paid'&&hasAccount() ? `
-                <div class="flex items-center gap-2 pt-2 border-t border-slate-800">
-                    <i class="fa-solid fa-envelope-circle-check text-[10px] text-green-500 flex-shrink-0"></i>
-                    <span class="text-[10px] text-slate-500">Bill emailed to <b class="text-slate-400">${esc(account.email)}</b></span>
-                </div>` : ''}
-            </div>`;
-        }).join('');
-    }
-
-    window.openOrderStatus  = function() { renderStatusScreen(); showScreen('external-screen'); };
-    window.backToMenuScreen = function() { showScreen('menu-screen'); };
-
-    /* ─── Slide-to-confirm ──────────────────────────────────────────────── */
-    function initSlider() {
-        const track = document.getElementById('slide-track');
-        const thumb = document.getElementById('slide-thumb');
-        const fill  = document.getElementById('slide-fill');
-        const label = document.getElementById('slide-label');
-        let dragging = false, startX = 0, currentX = 0;
-        const maxLeft = () => track.offsetWidth - 56;
-
-        function setPos(x) {
-            const c = Math.max(0, Math.min(x, maxLeft())); currentX = c;
-            thumb.style.left = (4 + c) + 'px'; fill.style.width = (56 + c) + 'px';
-            label.style.opacity = Math.max(0, 1 - (c / maxLeft()) * 1.6);
-        }
-        function onStart(e) {
-            if (sliderConfirmed) return; dragging = true;
-            startX = (e.touches ? e.touches[0].clientX : e.clientX) - currentX;
-            thumb.style.transition = fill.style.transition = 'none'; e.preventDefault();
-        }
-        function onMove(e) {
-            if (!dragging) return;
-            setPos((e.touches ? e.touches[0].clientX : e.clientX) - startX); e.preventDefault();
-        }
-        function onEnd() {
-            if (!dragging) return; dragging = false;
-            thumb.style.transition = fill.style.transition = '';
-            if (currentX >= maxLeft() * 0.85) {
-                sliderConfirmed = true; track.classList.add('confirmed');
-                thumb.innerHTML = '<i class="fa-solid fa-check"></i>'; label.style.opacity = 0;
-                setTimeout(confirmFinalOrder, 420);
-            } else { setPos(0); label.style.opacity = 1; }
-        }
-        thumb.addEventListener('mousedown',  onStart, { passive: false });
-        thumb.addEventListener('touchstart', onStart, { passive: false });
-        document.addEventListener('mousemove', onMove, { passive: false });
-        document.addEventListener('touchmove', onMove, { passive: false });
-        document.addEventListener('mouseup',  onEnd);
-        document.addEventListener('touchend', onEnd);
-    }
-
-    function resetSlider() {
-        sliderConfirmed = false;
-        const track = document.getElementById('slide-track');
-        const thumb = document.getElementById('slide-thumb');
-        const fill  = document.getElementById('slide-fill');
-        const label = document.getElementById('slide-label');
-        if (!track) return;
-        track.classList.remove('confirmed');
-        thumb.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
-        thumb.style.left = '4px'; fill.style.width = '56px'; label.style.opacity = 1;
-    }
-
-    /* ─── Init ──────────────────────────────────────────────────────────── */
-    async function init() {
-        await fetchTableCount();
-        updateCartUI(); initSlider(); refreshAccountUI();
-        showScreen('welcome-screen');
-    }
-    init();
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getDatabase, ref, push, onValue, get, update }
+  from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+const EMAILJS_PUBLIC_KEY  = 'B7TxLhcukvBJeNDLu';
+const EMAILJS_SERVICE_ID  = 'service_py2n2bm';
+const EMAILJS_TEMPLATE_ID = 'template_ruuryg5';
+const EMAIL_CONFIGURED = ![EMAILJS_PUBLIC_KEY,EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID].some(v=>v.startsWith('YOUR_'));
+if(EMAIL_CONFIGURED) emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
+
+const firebaseConfig={
+  apiKey:"AIzaSyAdQtFwyOHoixp2rALMKBllaeqg2jvCl5w",
+  authDomain:"sekuwa-by-kilo.firebaseapp.com",
+  databaseURL:"https://sekuwa-by-kilo-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"sekuwa-by-kilo",storageBucket:"sekuwa-by-kilo.firebasestorage.app",
+  messagingSenderId:"524646744577",appId:"1:524646744577:web:5b8f1a500b8f09cea43600"
+};
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+// ── helpers ──────────────────────────────────────────────
+function esc(s){if(!s&&s!==0)return '';return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c])}
+function fmt(n){return 'Rs.\u00a0'+Number(n).toLocaleString()}
+function nowStamp(){return{time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}),date:new Date().toISOString().split('T')[0],createdAt:new Date().toISOString()}}
+function isValidEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e).trim())}
+
+let _toastTimer;
+function showToast(msg,dur=3500){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>t.style.opacity='0',dur)}
+window.showToast=showToast;
+
+// ── screens ──────────────────────────────────────────────
+function showScreen(id){
+  ['welcome-screen','table-screen','menu-screen','confirmation-screen','status-screen'].forEach(s=>{
+    document.getElementById(s).classList.remove('active');
+    document.getElementById(s).style.display='none';
+  });
+  const el=document.getElementById(id);
+  el.classList.add('active');
+  el.style.display='flex';
+  document.querySelector('footer').style.display=(id==='menu-screen')?'block':'none';
+  document.getElementById('mobile-nav').style.display=(id==='menu-screen')?'flex':'none';
+}
+
+// ── account ──────────────────────────────────────────────
+let account={name:localStorage.getItem('sbk_name')||'',email:localStorage.getItem('sbk_email')||''};
+function persistAccount(name,email){account.name=name.trim();account.email=email.trim().toLowerCase();localStorage.setItem('sbk_name',account.name);localStorage.setItem('sbk_email',account.email)}
+function hasAccount(){return !!(account.email&&isValidEmail(account.email))}
+window.hasAccount=hasAccount;
+function initials(name){if(!name)return '?';return name.trim().split(/\s+/).map(w=>w[0].toUpperCase()).slice(0,2).join('')}
+
+function refreshAccountUI(){
+  const wrap=document.getElementById('account-nav-wrap');
+  if(selectedTable){wrap.classList.remove('hidden');wrap.style.display='block'}
+  const ini=hasAccount()?initials(account.name||account.email):'?';
+  ['nav-avatar-initials','panel-initials'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ini});
+  const pn=document.getElementById('panel-name');const pe=document.getElementById('panel-email');
+  if(pn)pn.textContent=account.name||'Guest';
+  if(pe)pe.textContent=account.email||'No email set';
+  const cer=document.getElementById('confirm-email-row');
+  if(cer){cer.classList.toggle('hidden',!hasAccount());if(hasAccount())document.getElementById('confirm-email-display').textContent=account.email}
+  const ses=document.getElementById('status-email-set');const sed=document.getElementById('status-email-display');
+  if(ses){ses.classList.toggle('hidden',!hasAccount());if(hasAccount()&&sed)sed.textContent=account.email}
+}
+
+// ── auth modal ───────────────────────────────────────────
+window.openAuthModal=function(mode='signin'){
+  document.getElementById('auth-overlay').classList.remove('hidden');
+  document.getElementById('auth-signin-view').classList.toggle('hidden',mode!=='signin');
+  document.getElementById('auth-edit-view').classList.toggle('hidden',mode!=='edit');
+  if(mode==='signin'){document.getElementById('auth-name').value=account.name||'';document.getElementById('auth-email').value=account.email||'';setTimeout(()=>document.getElementById('auth-name').focus(),50)}
+  else{document.getElementById('edit-name').value=account.name||'';document.getElementById('edit-email').value=account.email||'';setTimeout(()=>document.getElementById('edit-name').focus(),50)}
+};
+window.closeAuthModal=function(){document.getElementById('auth-overlay').classList.add('hidden')};
+window.handleOverlayClick=function(e){if(e.target===document.getElementById('auth-overlay'))closeAuthModal()};
+
+window.saveAccount=function(){
+  const name=document.getElementById('auth-name').value.trim();
+  const email=document.getElementById('auth-email').value.trim();
+  if(!name){document.getElementById('auth-name').focus();showToast('Please enter your name.');return}
+  if(!isValidEmail(email)){document.getElementById('auth-email').focus();showToast('Please enter a valid email.');return}
+  persistAccount(name,email);
+  if(selectedTable)push(ref(db,'customer_emails'),{name,email,table:selectedTable,date:nowStamp().date}).catch(()=>{});
+  closeAuthModal();refreshAccountUI();showToast(`✅ Got it, ${name}! Bill will go to ${email}`);
+  if(sessionOrders.length>0){const lo=sessionOrders[sessionOrders.length-1];update(ref(db,`kitchen_orders/${lo.originalKey}`),{customerEmail:account.email,customerName:account.name}).catch(()=>{});lo.data.customerEmail=account.email;lo.data.customerName=account.name;openEmailInfoModal();sendBillEmail(lo)}
+};
+window.skipAuth=function(){closeAuthModal();showToast('Order received! Track status here.')};
+window.saveEditAccount=function(){
+  const name=document.getElementById('edit-name').value.trim();
+  const email=document.getElementById('edit-email').value.trim();
+  if(!name){document.getElementById('edit-name').focus();showToast('Please enter your name.');return}
+  if(!isValidEmail(email)){document.getElementById('edit-email').focus();showToast('Please enter a valid email.');return}
+  persistAccount(name,email);closeAuthModal();refreshAccountUI();showToast('✅ Profile updated!');
+};
+window.signOut=function(){if(!confirm('Remove your saved email from this device?'))return;account={name:'',email:''};localStorage.removeItem('sbk_name');localStorage.removeItem('sbk_email');refreshAccountUI();showToast('Signed out. No bill will be emailed.')};
+
+let _panelOpen=false;
+window.toggleAccountPanel=function(){_panelOpen=!_panelOpen;document.getElementById('account-panel').classList.toggle('open',_panelOpen)};
+window.closeAccountPanel=function(){_panelOpen=false;document.getElementById('account-panel').classList.remove('open')};
+document.addEventListener('click',e=>{const w=document.getElementById('account-nav-wrap');if(w&&!w.contains(e.target))closeAccountPanel()});
+
+window.openEmailInfoModal=function(){document.getElementById('info-modal-email').textContent=account.email;document.getElementById('email-info-overlay').classList.remove('hidden')};
+window.closeEmailInfoModal=function(){document.getElementById('email-info-overlay').classList.add('hidden')};
+
+// ── email billing ─────────────────────────────────────────
+const billedKeys=new Set();
+function sendBillEmail(entry){
+  if(!hasAccount())return;if(billedKeys.has(entry.originalKey))return;billedKeys.add(entry.originalKey);
+  const d=entry.data;const items=(d.items||[]).map(i=>`${i.name} × ${i.quantity}  —  ${fmt(i.price*i.quantity)}`).join('\n');
+  const total=(d.items||[]).reduce((s,i)=>s+i.price*i.quantity,0);
+  const params={to_name:account.name||'Valued Customer',to_email:account.email,table_number:String(d.table||selectedTable||'—'),order_items:items||'—',order_total:fmt(total),order_date:d.date||nowStamp().date,order_time:d.time||nowStamp().time,order_notes:d.notes||'—',restaurant_name:'Sekuwa by Kilo — Lazimpat'};
+  if(!EMAIL_CONFIGURED)return;
+  emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,params)
+    .then(()=>{document.getElementById('bill-toast-email').textContent=`Sent to ${account.email}`;const bt=document.getElementById('bill-toast');bt.classList.remove('hidden');setTimeout(()=>bt.classList.add('hidden'),7000)})
+    .catch(err=>{console.error('EmailJS:',err);showToast('⚠️ Bill email failed. Please ask for a printed receipt.',5000)});
+}
+
+// ── menu data ─────────────────────────────────────────────
+const menuData=[
+  {id:1,name:'Chicken Butter Masala',price:469,category:'Curry'},
+  {id:2,name:'Paneer Butter Masala',price:489,category:'Curry'},
+  {id:3,name:'Mutter Paneer',price:374,category:'Curry'},
+  {id:4,name:'Mutter Mushroom',price:294,category:'Curry'},
+  {id:5,name:'Mushroom Paneer',price:399,category:'Curry'},
+  {id:6,name:'Trout Fish Curry',price:629,category:'Curry'},
+  {id:7,name:'Fish Curry',price:389,category:'Curry'},
+  {id:8,name:'Local Chicken Curry',price:409,category:'Curry'},
+  {id:9,name:'Pork Curry',price:364,category:'Curry'},
+  {id:10,name:'Mutton Curry',price:499,category:'Curry'},
+  {id:11,name:'Mixed Veg Curry',price:299,category:'Curry'},
+  {id:12,name:'Daal Fry',price:149,category:'Curry'},
+  {id:13,name:'Dharane Sekuwa Combo Platter Set',price:2699,category:'Special'},
+  {id:14,name:'Pork Sekuwa (1 Plate)',price:299,category:'Sekuwa'},
+  {id:15,name:'Pork Sekuwa (½ kg)',price:589,category:'Sekuwa'},
+  {id:16,name:'Pork Sekuwa (1 kg)',price:1149,category:'Sekuwa'},
+  {id:17,name:'Chicken Sekuwa (1 Plate)',price:279,category:'Sekuwa'},
+  {id:18,name:'Chicken Sekuwa (½ kg)',price:529,category:'Sekuwa'},
+  {id:19,name:'Chicken Sekuwa (1 kg)',price:1049,category:'Sekuwa'},
+  {id:20,name:'Wings Sekuwa & Fry (1 Plate)',price:279,category:'Sekuwa'},
+  {id:21,name:'Wings Sekuwa & Fry (½ kg)',price:529,category:'Sekuwa'},
+  {id:22,name:'Wings Sekuwa & Fry (1 kg)',price:1049,category:'Sekuwa'},
+  {id:23,name:'Mutton Sekuwa (1 Plate)',price:489,category:'Sekuwa'},
+  {id:24,name:'Mutton Sekuwa (½ kg)',price:1199,category:'Sekuwa'},
+  {id:25,name:'Mutton Sekuwa (1 kg)',price:2399,category:'Sekuwa'},
+  {id:26,name:'Chicken Sausage',price:269,category:'Sausages'},
+  {id:27,name:'Buff Sausage',price:269,category:'Sausages'},
+  {id:28,name:'Pork Kasaudi Khaja Set',price:424,category:'Khaja Set'},
+  {id:29,name:'Local Chicken Kasaudi Khaja Set',price:449,category:'Khaja Set'},
+  {id:30,name:'Mutton Kasaudi Khaja Set',price:489,category:'Khaja Set'},
+  {id:31,name:'Veg Kasaudi Khaja Set',price:254,category:'Khaja Set'},
+  {id:32,name:'Pork Kasaudi Dry',price:364,category:'Kasaudi Dry'},
+  {id:33,name:'Local Chicken Kasaudi Dry',price:409,category:'Kasaudi Dry'},
+  {id:34,name:'Mutton Kasaudi Dry',price:444,category:'Kasaudi Dry'},
+  {id:35,name:'Chicken Fried (Full Dose)',price:1619,category:'Chicken Snacks'},
+  {id:36,name:'Chicken Fried (Half Dose)',price:819,category:'Chicken Snacks'},
+  {id:37,name:'Chicken Fried 2 pcs',price:414,category:'Chicken Snacks'},
+  {id:38,name:'Potato wrapped Chicken',price:599,category:'Chicken Snacks'},
+  {id:39,name:'Pan Fried Chicken with Veg',price:569,category:'Chicken Snacks'},
+  {id:40,name:'Cashewnut Chicken',price:679,category:'Chicken Snacks'},
+  {id:41,name:'Chicken Drumstick',price:549,category:'Chicken Snacks'},
+  {id:42,name:'Chicken Meatball',price:489,category:'Chicken Snacks'},
+  {id:43,name:'Chicken Roast',price:559,category:'Chicken Snacks'},
+  {id:44,name:'Chicken Parma with Cheese',price:649,category:'Chicken Snacks'},
+  {id:45,name:'Timoor Chicken',price:569,category:'Chicken Snacks'},
+  {id:46,name:'Chicken Fajita',price:629,category:'Chicken Snacks'},
+  {id:47,name:'Diamond Chicken',price:569,category:'Chicken Snacks'},
+  {id:48,name:'Beijing Chicken',price:644,category:'Chicken Snacks'},
+  {id:49,name:'Chicken Boil',price:349,category:'Chicken Snacks'},
+  {id:50,name:'Pangra Fry',price:409,category:'Chicken Snacks'},
+  {id:51,name:'Battai Fry',price:579,category:'Chicken Snacks'},
+  {id:52,name:'Grilled Salmon with Veg',price:1599,category:'Seafood Snacks'},
+  {id:53,name:'Roasted Whole Baked Fish',price:1049,category:'Seafood Snacks'},
+  {id:54,name:'Tiger Prawn with Papaya Salad',price:979,category:'Seafood Snacks'},
+  {id:55,name:'King Prawn Fry',price:719,category:'Seafood Snacks'},
+  {id:56,name:'Golden Fry Fish',price:499,category:'Seafood Snacks'},
+  {id:57,name:'Fish & Chips',price:579,category:'Seafood Snacks'},
+  {id:58,name:'Grilled Fish',price:589,category:'Seafood Snacks'},
+  {id:59,name:'Fish Ball',price:489,category:'Seafood Snacks'},
+  {id:60,name:'Fish Finger',price:489,category:'Seafood Snacks'},
+  {id:61,name:'Thai Prawn',price:799,category:'Seafood Snacks'},
+  {id:62,name:'Tawa Fried Fish',price:624,category:'Seafood Snacks'},
+  {id:63,name:'Trout Fish with Hot Spicy Sauce',price:689,category:'Seafood Snacks'},
+  {id:64,name:'Roasted Pork Belly',price:559,category:'Pork Snacks'},
+  {id:65,name:'Peri Peri Pork Chop',price:589,category:'Pork Snacks'},
+  {id:66,name:'Pork Bacon',price:619,category:'Pork Snacks'},
+  {id:67,name:'Pork Fajita',price:649,category:'Pork Snacks'},
+  {id:68,name:'Pork Boil',price:349,category:'Pork Snacks'},
+  {id:69,name:'Badel Dameko',price:739,category:'Pork Snacks'},
+  {id:70,name:'Mutton Hyakula Fry',price:589,category:'Mutton Snacks'},
+  {id:71,name:'Mutton Tauko Fry',price:399,category:'Mutton Snacks'},
+  {id:72,name:'Mutton Tauko Boil',price:399,category:'Mutton Snacks'},
+  {id:73,name:'Mutton Fila Boil',price:599,category:'Mutton Snacks'},
+  {id:74,name:'Duck Chhoila',price:549,category:'Chhoila'},
+  {id:75,name:'Battai Chhoila',price:599,category:'Chhoila'},
+  {id:76,name:'Pork Chhoila',price:414,category:'Chhoila'},
+  {id:77,name:'Chicken Chhoila',price:414,category:'Chhoila'},
+];
+
+let cart=[],selectedTable=null,sessionOrders=[],activeFilter='All',searchQuery='',tableCount=6,waiterCooldown=0,sliderConfirmed=false;
+
+async function fetchTableCount(){try{const s=await get(ref(db,'config/tableCount'));if(s.exists()&&typeof s.val()==='number'&&s.val()>0)tableCount=s.val()}catch(_){}}
+
+// ── search ────────────────────────────────────────────────
+window.handleSearch=function(val){
+  searchQuery=val.trim().toLowerCase();
+  const cb=document.getElementById('search-clear-btn');
+  const ib=document.getElementById('search-info-bar');
+  if(searchQuery){cb.classList.add('visible');if(activeFilter!=='All'){activeFilter='All';updateFilterUI()}ib.classList.add('visible')}
+  else{cb.classList.remove('visible');ib.classList.remove('visible')}
+  renderMenu();
+};
+window.clearSearch=function(){const inp=document.getElementById('search-input');inp.value='';searchQuery='';document.getElementById('search-clear-btn').classList.remove('visible');document.getElementById('search-info-bar').classList.remove('visible');inp.focus();renderMenu()};
+
+function hl(text,q){if(!q)return esc(text);const idx=text.toLowerCase().indexOf(q.toLowerCase());if(idx<0)return esc(text);return esc(text.slice(0,idx))+`<span class="match-hl">${esc(text.slice(idx,idx+q.length))}</span>`+esc(text.slice(idx+q.length))}
+
+// ── filters ───────────────────────────────────────────────
+const categories=['All',...new Set(menuData.map(m=>m.category))];
+function buildFilters(){document.getElementById('filter-row').innerHTML=categories.map(cat=>`<button class="filter-pill${cat==='All'?' active':''}" data-cat="${esc(cat)}" onclick="setFilter('${esc(cat)}')">${esc(cat)}</button>`).join('')}
+function updateFilterUI(){document.querySelectorAll('.filter-pill').forEach(b=>b.classList.toggle('active',b.dataset.cat===activeFilter))}
+window.setFilter=function(cat){if(cat===activeFilter&&!searchQuery)return;activeFilter=cat;if(searchQuery){searchQuery='';document.getElementById('search-input').value='';document.getElementById('search-clear-btn').classList.remove('visible');document.getElementById('search-info-bar').classList.remove('visible')}updateFilterUI();renderMenu()};
+
+// ── welcome / table select ────────────────────────────────
+window.proceedToTableSelect=function(){showScreen('table-screen');generateTableBtns()};
+function generateTableBtns(){
+  document.getElementById('table-grid').innerHTML=Array.from({length:tableCount},(_,i)=>i+1).map(n=>`
+    <button class="table-btn" onclick="selectTable(${n})">
+      <div class="table-num">${n}</div>
+      <span class="table-label">Table ${n}</span>
+    </button>`).join('');
+}
+window.selectTable=function(num){
+  selectedTable=num;sessionStorage.setItem('sbk_table',num);
+  document.getElementById('nav-table-tag').style.display='flex';
+  document.getElementById('nav-table-num').textContent=num;
+  document.getElementById('call-waiter-btn').style.display='flex';
+  showScreen('menu-screen');buildFilters();renderMenu();refreshAccountUI();
+  setTimeout(()=>document.getElementById('search-input').focus(),100);
+};
+
+window.callWaiter=function(){
+  const now=Date.now();if(now<waiterCooldown){showToast(`⏳ Please wait ${Math.ceil((waiterCooldown-now)/1000)}s before calling again.`);return}
+  waiterCooldown=now+60_000;const{time,date}=nowStamp();
+  push(ref(db,'waiter_calls'),{table:selectedTable,time,date,status:'Pending'}).then(()=>showToast(`🔔 Waiter request sent for Table ${selectedTable}.`)).catch(()=>showToast('❌ Connection error. Please try again.'));
+};
+
+// ── menu rendering ────────────────────────────────────────
+function getQty(id){return(cart.find(c=>c.id===id)||{}).quantity||0}
+function cardActionsHTML(id){
+  const qty=getQty(id);
+  if(qty===0)return`<button class="btn-add" onclick="addItem(${id})"><i class="fa-solid fa-plus" style="font-size:.65rem"></i>Add</button>`;
+  return`<div class="qty-pill">
+    <button class="qty-btn minus" onclick="decItem(${id})">−</button>
+    <span class="qty-num">${qty}</span>
+    <button class="qty-btn plus" onclick="incItem(${id})">+</button>
+  </div>`;
+}
+function updateCardAction(id){const el=document.getElementById(`card-actions-${id}`);if(el)el.innerHTML=cardActionsHTML(id)}
+
+function renderMenu(){
+  const grid=document.getElementById('menu-cards');
+  let items=activeFilter==='All'?menuData:menuData.filter(m=>m.category===activeFilter);
+  if(searchQuery){const q=searchQuery;items=menuData.filter(m=>m.name.toLowerCase().includes(q)||m.category.toLowerCase().includes(q));const ct=document.getElementById('search-count-text');if(ct)ct.textContent=`${items.length} result${items.length!==1?'s':''} for "${searchQuery}"`}
+  if(items.length===0){
+    grid.innerHTML=`<div class="empty-state"><i class="fa-solid fa-bowl-food"></i><p>${searchQuery?'No items found for that search':'Nothing in this category yet'}</p>${searchQuery?`<button class="btn-outline" style="margin-top:20px" onclick="clearSearch()">Clear Search</button>`:''}</div>`;return;
+  }
+  grid.innerHTML=items.map(item=>`
+    <div class="menu-card">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span class="cat-tag">${esc(item.category)}</span>
+        <h4 class="item-name">${searchQuery?hl(item.name,searchQuery):esc(item.name)}</h4>
+        <p class="item-price">${fmt(item.price)}</p>
+        <p class="item-est"><i class="fa-solid fa-bolt" style="color:var(--amber);font-size:.6rem"></i>~9 mins</p>
+      </div>
+      <div class="card-actions" id="card-actions-${item.id}">${cardActionsHTML(item.id)}</div>
+    </div>`).join('');
+}
+
+// ── cart ──────────────────────────────────────────────────
+window.addItem=function(id){const e=cart.find(c=>c.id===id);if(e)e.quantity++;else cart.push({...menuData.find(m=>m.id===id),quantity:1});updateCardAction(id);updateCartUI()};
+window.incItem=window.addItem;
+window.decItem=function(id){const e=cart.find(c=>c.id===id);if(!e)return;if(e.quantity>1)e.quantity--;else cart=cart.filter(c=>c.id!==id);updateCardAction(id);updateCartUI()};
+window.removeFromCart=function(id){cart=cart.filter(c=>c.id!==id);updateCardAction(id);updateCartUI()};
+function calcTotal(){return cart.reduce((s,i)=>s+i.price*i.quantity,0)}
+
+function cartItemsHTML(){
+  if(cart.length===0)return'<div class="empty-cart-msg"><i class="fa-solid fa-basket-shopping"></i><p>Your basket is empty</p></div>';
+  return cart.map(item=>`
+    <div class="cart-item-row">
+      <div class="cart-item-info">
+        <p>${esc(item.name)}</p>
+        <span>${item.quantity} × ${fmt(item.price)}</span>
+      </div>
+      <span class="cart-item-price">${fmt(item.price*item.quantity)}</span>
+      <button class="cart-remove" onclick="removeFromCart(${item.id})" title="Remove"><i class="fa-solid fa-trash" style="font-size:.75rem"></i></button>
+    </div>`).join('');
+}
+function updateCartUI(){
+  const total=calcTotal();
+  const con=document.getElementById('cart-items');
+  if(con){con.innerHTML=cartItemsHTML()}
+  const ds=document.getElementById('cart-subtotal');const dt=document.getElementById('cart-total');
+  if(ds)ds.textContent=fmt(total);if(dt)dt.textContent=fmt(total);
+  const mcon=document.getElementById('cart-items-mobile');
+  if(mcon){mcon.innerHTML=cartItemsHTML()}
+  const ms=document.getElementById('cart-subtotal-mobile');const mt=document.getElementById('cart-total-mobile');
+  if(ms)ms.textContent=fmt(total);if(mt)mt.textContent=fmt(total);
+  ['order-now-btn','order-now-btn-mobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=cart.length===0});
+}
+
+// ── order flow ────────────────────────────────────────────
+window.placeOrder=function(){
+  if(cart.length===0){const b=document.getElementById('order-now-btn')||document.getElementById('order-now-btn-mobile');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}showToast('🛒 Add at least one item first.');return}
+  const mobileNotes=(document.getElementById('special-notes-mobile')?.value||'').trim();
+  const desktopNotes=(document.getElementById('special-notes')?.value||'').trim();
+  const notes=mobileNotes||desktopNotes;
+  if(document.getElementById('special-notes'))document.getElementById('special-notes').value=notes;
+  if(document.getElementById('special-notes-mobile'))document.getElementById('special-notes-mobile').value=notes;
+  document.getElementById('confirm-table').textContent=selectedTable;
+  document.getElementById('confirm-items-list').innerHTML=cart.map(i=>`<li><span>${esc(i.name)} × <strong style="color:var(--accent)">${i.quantity}</strong></span><span>${fmt(i.price*i.quantity)}</span></li>`).join('');
+  document.getElementById('confirm-total').textContent=fmt(calcTotal());
+  const nr=document.getElementById('confirm-notes-row');
+  if(notes){document.getElementById('confirm-notes-text').textContent=notes;nr.classList.remove('hidden')}else nr.classList.add('hidden');
+  closeMobileCart();refreshAccountUI();showScreen('confirmation-screen');resetSlider();
+};
+
+window.confirmFinalOrder=function(){
+  if(cart.length===0){showToast('Basket is empty.');return}
+  const notes=document.getElementById('special-notes').value.trim();
+  const snap=[...cart];const{time,date,createdAt}=nowStamp();
+  const payload={table:selectedTable,items:snap,notes:notes||null,time,date,createdAt,status:'Pending',customerEmail:account.email||null,customerName:account.name||null};
+  push(ref(db,'kitchen_orders'),payload).then(orderRef=>{
+    const key=orderRef.key;const entry={originalKey:key,data:{...payload},unsubscribe:null};
+    function handleUpdate(live){if(!live)return;const prev=entry.data.status;entry.data={...entry.data,...live};if(!document.getElementById('status-screen').classList.contains('active'))return;renderStatusScreen();if(live.status&&live.status!==prev){if(live.status==='Preparing')showToast('👨‍🍳 Kitchen is preparing your order!',4000);else if(live.status==='Ready')showToast('✅ Your order is ready! Please collect.',6000);else if(live.status==='Paid')showToast('💜 Payment confirmed — thank you!',6000)}}
+    const u1=onValue(ref(db,`order_status/${key}`),s=>handleUpdate(s.val()));
+    const u2=onValue(ref(db,`kitchen_orders/${key}`),s=>handleUpdate(s.val()));
+    entry.unsubscribe=()=>{u1();u2()};sessionOrders.push(entry);
+    cart=[];['special-notes','special-notes-mobile'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});updateCartUI();renderMenu();openOrderStatus();
+    if(!hasAccount())openAuthModal('signin');else{openEmailInfoModal();sendBillEmail(entry)}
+  }).catch(()=>{showToast('❌ Connection error. Order failed. Try again.');resetSlider();showScreen('confirmation-screen')});
+};
+window.editOrder=function(){showScreen('menu-screen')};
+
+// ── status screen ─────────────────────────────────────────
+function statusBadge(status,rush){const map={Pending:['s-pending','fa-clock','Pending'],Preparing:['s-preparing','fa-fire','Preparing'],Ready:['s-ready','fa-check-circle','Ready'],Paid:['s-paid','fa-check-double','Paid']};const[cls,icon,label]=map[status]||['s-pending','fa-clock',status];const r=rush?`<span class="status-badge s-rush" style="border:1px solid #dc2626;color:#dc2626"><i class="fa-solid fa-bolt"></i>Rush</span>`:'';return`<span class="status-badge ${cls}"><i class="fa-solid ${icon}"></i>${label}</span>${r}`}
+function statusSteps(status){const stages=['Pending','Preparing','Ready','Paid'];const labels=['Received','Preparing','Ready','Paid'];const ci=stages.indexOf(status);const si=ci<0?0:ci;let html='<div class="step-row">';stages.forEach((_,i)=>{const dc=i<si?'done':i===si?'active':'pend';const inner=dc==='done'?'<i class="fa-solid fa-check" style="font-size:.5rem"></i>':String(i+1);html+=`<div class="step-col"><div class="step-dot ${dc}">${inner}</div><span class="step-name">${labels[i]}</span></div>`;if(i<stages.length-1)html+=`<div class="step-conn${i<si?' done':''}"></div>`});return html+'</div>'}
+
+function renderStatusScreen(){
+  refreshAccountUI();const list=document.getElementById('status-orders-list');const hl2=document.getElementById('status-headline');const sl=document.getElementById('status-subline');
+  if(sessionOrders.length===0){hl2.textContent='No Orders Yet';sl.textContent='Browse the menu and place an order first.';list.innerHTML=`<div class="status-order-card" style="text-align:center;color:var(--text-faint);padding:40px 0"><i class="fa-solid fa-basket-shopping" style="font-size:2rem;margin-bottom:14px;display:block;opacity:.3"></i><p style="font-size:.875rem;font-weight:600">No orders placed this session.</p></div>`;return}
+  const allPaid=sessionOrders.every(o=>o.data.status==='Paid');
+  hl2.textContent=allPaid?'All Settled — Thank You! 🙏':'Your Orders';
+  sl.textContent=allPaid?(hasAccount()?`Bill emailed to ${account.email}`:'We hope you enjoyed your meal.'):'Live updates from the kitchen.';
+  list.innerHTML=sessionOrders.map((entry,idx)=>{
+    const d=entry.data;const items=d.items||[];const total=items.reduce((s,i)=>s+i.price*i.quantity,0);const ic=items.reduce((s,i)=>s+i.quantity,0);const status=d.status||'Pending';
+    let waitLabel='';if((status==='Pending'||status==='Preparing')&&d.createdAt){const el=Math.floor((Date.now()-new Date(d.createdAt))/60000);const rem=Math.max(1,15+ic*2-el);waitLabel=`~${rem} min${rem!==1?'s':''}`}else waitLabel='~15 mins';
+    const sColor={Ready:'#16a34a',Paid:'#7c3aed'}[status]||'var(--accent)';
+    const sLine=status==='Ready'?'✅ Collect now!':status==='Paid'?'💜 Paid':waitLabel;
+    return`<div class="status-order-card" style="border-color:${status==='Ready'?'var(--accent)':'var(--border)'}">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <span style="font-size:.9rem;font-weight:800;color:var(--text)">Order ${idx+1} · Table ${esc(d.table)}</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${statusBadge(status,d.rush)}</div>
+      </div>
+      ${statusSteps(status)}
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:.85rem">${items.map(i=>`<li style="display:flex;justify-content:space-between;color:var(--text-muted)"><span>${esc(i.name)} × ${i.quantity}</span><span style="color:var(--accent);font-weight:700">${fmt(i.price*i.quantity)}</span></li>`).join('')}</ul>
+      ${d.notes?`<p style="font-size:.78rem;color:var(--text-faint);font-style:italic;border-top:1px solid var(--border);padding-top:10px;line-height:1.5">📝 ${esc(d.notes)}</p>`:''}
+      <div style="display:flex;justify-content:space-between;font-size:.85rem;border-top:1px solid var(--border);padding-top:10px">
+        <span style="color:var(--text-muted);font-weight:500">${(status==='Pending'||status==='Preparing')?'Est. wait':'Status'}</span>
+        <span style="font-weight:800;color:${sColor}">${sLine}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.9rem">
+        <span style="color:var(--text-muted);font-weight:600">Total</span>
+        <span style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--accent)">${fmt(total)}</span>
+      </div>
+      ${status==='Paid'&&hasAccount()?`<div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border)"><i class="fa-solid fa-envelope-circle-check" style="color:var(--accent);font-size:.9rem;flex-shrink:0"></i><span style="font-size:.78rem;font-weight:500;color:var(--text-muted)">Bill emailed to <strong style="color:var(--text)">${esc(account.email)}</strong></span></div>`:''}
+    </div>`}).join('');
+}
+window.openOrderStatus=function(){renderStatusScreen();showScreen('status-screen')};
+window.backToMenu=function(){showScreen('menu-screen')};
+
+// ── mobile nav ────────────────────────────────────────────
+let mobileCartVisible=false;
+window.showMobileNav=function(tab){
+  ['mob-menu-btn','mob-cart-btn'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  const drawer=document.getElementById('mobile-cart-drawer');
+  if(tab==='cart'){
+    document.getElementById('mob-cart-btn').classList.add('active');
+    if(drawer){drawer.classList.add('open');mobileCartVisible=true}
+  }else{
+    document.getElementById('mob-menu-btn').classList.add('active');
+    if(drawer){drawer.classList.remove('open');mobileCartVisible=false}
+  }
+};
+window.closeMobileCart=function(){
+  const drawer=document.getElementById('mobile-cart-drawer');
+  if(drawer)drawer.classList.remove('open');
+  mobileCartVisible=false;
+  document.getElementById('mob-cart-btn')?.classList.remove('active');
+  document.getElementById('mob-menu-btn')?.classList.add('active');
+};
+
+// ── slide to confirm ──────────────────────────────────────
+function initSlider(){
+  const track=document.getElementById('slide-track'),thumb=document.getElementById('slide-thumb'),fill=document.getElementById('slide-fill'),label=document.getElementById('slide-label');
+  let dragging=false,startX=0,curX=0;
+  const maxLeft=()=>track.offsetWidth-52;
+  function setPos(x){const c=Math.max(0,Math.min(x,maxLeft()));curX=c;thumb.style.left=(3+c)+'px';fill.style.width=(52+c)+'px';label.style.opacity=Math.max(0,1-(c/maxLeft())*1.6)}
+  function onStart(e){if(sliderConfirmed)return;dragging=true;startX=(e.touches?e.touches[0].clientX:e.clientX)-curX;thumb.style.transition=fill.style.transition='none';e.preventDefault()}
+  function onMove(e){if(!dragging)return;setPos((e.touches?e.touches[0].clientX:e.clientX)-startX);e.preventDefault()}
+  function onEnd(){if(!dragging)return;dragging=false;thumb.style.transition=fill.style.transition='';if(curX>=maxLeft()*.85){sliderConfirmed=true;track.classList.add('confirmed');thumb.innerHTML='<i class="fa-solid fa-check"></i>';label.style.opacity=0;setTimeout(confirmFinalOrder,420)}else{setPos(0);label.style.opacity=1}}
+  thumb.addEventListener('mousedown',onStart,{passive:false});thumb.addEventListener('touchstart',onStart,{passive:false});
+  document.addEventListener('mousemove',onMove,{passive:false});document.addEventListener('touchmove',onMove,{passive:false});
+  document.addEventListener('mouseup',onEnd);document.addEventListener('touchend',onEnd);
+}
+function resetSlider(){
+  sliderConfirmed=false;const track=document.getElementById('slide-track'),thumb=document.getElementById('slide-thumb'),fill=document.getElementById('slide-fill'),label=document.getElementById('slide-label');
+  if(!track)return;track.classList.remove('confirmed');thumb.innerHTML='<i class="fa-solid fa-chevron-right"></i>';thumb.style.left='3px';fill.style.width='52px';label.style.opacity=1;
+}
+
+// ── init ──────────────────────────────────────────────────
+async function init(){
+  await fetchTableCount();
+  ['welcome-screen','table-screen','menu-screen','confirmation-screen','status-screen'].forEach(s=>{const el=document.getElementById(s);el.classList.remove('active');el.style.display='none'});
+  document.querySelector('footer').style.display='none';
+  document.getElementById('mobile-nav').style.display='none';
+  updateCartUI();initSlider();refreshAccountUI();showScreen('welcome-screen');
+}
+init();
 </script>
 </body>
 </html>
