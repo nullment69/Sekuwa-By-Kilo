@@ -1,301 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Station - Sekuwa by Kilo</title>
-    <link rel="icon" type="image/jpeg" href="logo.jpg" onerror="this.href='data:image/x-icon;base64,'">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700;800&display=swap');
-        * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; }
-        .candy-font { font-family: 'Fredoka One', cursive; }
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Sekuwa by Kilo - Admin Dashboard</title>
+  <link rel="icon" type="image/jpeg" href="logo.jpg" onerror="this.href='data:image/x-icon;base64,'">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  
+  <!-- Google Fonts: Playfair Display & Inter -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+          },
+          colors: {
+            surface: {
+              DEFAULT: '#fbf9f4',
+              dim: '#dbdad5',
+              bright: '#ffffff',
+              container: {
+                lowest: '#ffffff',
+                low: '#f5f3ee',
+                DEFAULT: '#efede8',
+                high: '#e9e8e2',
+                highest: '#e4e2dc'
+              }
+            },
+            primary: {
+              DEFAULT: '#1a1a1a',
+              on: '#ffffff',
+              container: '#333333',
+              'on-container': '#ffffff'
+            },
+            secondary: {
+              DEFAULT: '#4d4d4d',
+              on: '#ffffff',
+              container: '#e6e6e6',
+              'on-container': '#1a1a1a'
+            },
+            error: {
+              DEFAULT: '#ba1a1a',
+              on: '#ffffff',
+              container: '#ffdad6',
+              'on-container': '#410002'
+            },
+            amber: {
+              600: '#d97706',
+              700: '#b45309'
+            },
+            green: {
+              600: '#16a34a',
+              700: '#15803d'
+            }
+          },
+          borderRadius: {
+            '8': '8px',
+          }
+        }
+      }
+    }
+  </script>
+  <style data-purpose="custom-utilities">
+    body {
+      background-color: #fbf9f4;
+      color: #1a1a1a;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .font-serif { font-family: 'Playfair Display', serif; }
 
-        /* ── Payment slide ── */
-        .pay-track {
-            position: relative; width: 100%; height: 52px;
-            background: rgba(22,163,74,0.1); border: 1px solid rgba(22,163,74,0.28);
-            border-radius: 100px; overflow: hidden; user-select: none;
-            touch-action: none; margin-top: 12px;
-        }
-        .pay-fill {
-            position: absolute; left: 0; top: 0; bottom: 0; width: 52px;
-            background: rgba(22,163,74,0.22); border-radius: 100px; pointer-events: none;
-        }
-        .pay-label {
-            position: absolute; inset: 0; display: flex; align-items: center;
-            justify-content: center; font-size: 11px; font-weight: 700;
-            letter-spacing: 0.07em; color: rgba(134,239,172,0.65);
-            pointer-events: none; transition: opacity 0.2s; gap: 6px;
-        }
-        .pay-thumb {
-            position: absolute; left: 4px; top: 3px; width: 46px; height: 46px;
-            background: #16a34a; border-radius: 100px; display: flex;
-            align-items: center; justify-content: center; color: white;
-            font-size: 16px; cursor: grab; will-change: left;
-            box-shadow: 0 2px 10px rgba(22,163,74,0.4); z-index: 2;
-        }
-        .pay-thumb:active { cursor: grabbing; }
-        .pay-track.confirmed .pay-fill  { width: 100% !important; background: rgba(22,163,74,0.32); }
-        .pay-track.confirmed .pay-label { opacity: 0; }
-        .pay-track.confirmed .pay-thumb { left: calc(100% - 50px) !important; background: #15803d; cursor: default; }
-        .pay-track.confirmed .paid-label { opacity: 1 !important; }
-        .paid-label {
-            position: absolute; inset: 0; display: flex; align-items: center;
-            justify-content: center; font-size: 11px; font-weight: 700;
-            letter-spacing: 0.07em; color: rgba(134,239,172,0.85);
-            pointer-events: none; opacity: 0; transition: opacity 0.3s 0.15s;
-        }
+    /* Empty states */
+    .dashed-container { border: 1px dashed #dbdad5; background-color: #f5f3ee; }
 
-        @keyframes rushFlash {
-            0%,100% { border-color: rgba(239,68,68,0.5); box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-            50%      { border-color: rgba(239,68,68,0.9); box-shadow: 0 0 12px 3px rgba(239,68,68,0.25); }
-        }
-        .rush-card { animation: rushFlash 1.4s ease-in-out infinite; border-color: rgba(239,68,68,0.5) !important; }
+    /* ── Interactive Utilities ── */
+    .item-check {
+      width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #dbdad5;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; transition: all 0.15s; background: #ffffff;
+    }
+    .item-check.checked { background: #16a34a; border-color: #16a34a; }
+    .item-done { text-decoration: line-through; color: #737373; }
+    
+    .elapsed-ok   { color: #4d4d4d; }
+    .elapsed-warn { color: #d97706; }
+    .elapsed-crit { color: #ba1a1a; font-weight: 700; }
 
-        .timer-normal { color: #4ade80; }
-        .timer-warn   { color: #fb923c; }
-        .timer-over   { color: #f87171; animation: rushFlash 1s ease-in-out infinite; }
+    @keyframes rushFlash {
+      0%,100% { border-color: rgba(186,26,26,0.3); box-shadow: 0 0 0 0 rgba(186,26,26,0); }
+      50%      { border-color: rgba(186,26,26,0.8); box-shadow: 0 0 10px 2px rgba(186,26,26,0.15); }
+    }
+    .rush-card { animation: rushFlash 1.4s ease-in-out infinite; border-color: #ba1a1a !important; }
 
-        .item-check {
-            width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #475569;
-            display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; flex-shrink: 0; transition: all 0.15s;
-        }
-        .item-check.checked { background: #16a34a; border-color: #16a34a; }
-        .item-done { text-decoration: line-through; color: #334155; }
+    @keyframes readyGlow {
+      0%,100% { border-color: rgba(22,163,74,0.4); box-shadow: 0 0 0 0 rgba(22,163,74,0); }
+      50%      { border-color: rgba(22,163,74,1); box-shadow: 0 0 10px 2px rgba(22,163,74,0.15); }
+    }
+    .ready-card { animation: readyGlow 2s ease-in-out infinite; border-color: #16a34a !important; }
 
-        .item-row-incoming {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 9px 12px; border-radius: 10px;
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-            margin-bottom: 6px;
-        }
-        .item-row-incoming:last-child { margin-bottom: 0; }
-        .item-name-text { font-size: 13px; font-weight: 600; color: #f1f5f9; letter-spacing: -0.1px; }
-        .item-qty-badge {
-            display: inline-flex; align-items: center; justify-content: center;
-            background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.35);
-            color: #fbbf24; font-size: 11px; font-weight: 800;
-            width: 26px; height: 26px; border-radius: 7px; flex-shrink: 0; margin-right: 8px;
-        }
-        .item-price-text { font-size: 12px; font-weight: 700; color: #94a3b8; }
+    /* ── Payment Slide ── */
+    .pay-track {
+      position: relative; width: 100%; height: 48px;
+      background: #f5f3ee; border: 1px solid #dbdad5;
+      border-radius: 100px; overflow: hidden; user-select: none; touch-action: none;
+    }
+    .pay-fill {
+      position: absolute; left: 0; top: 0; bottom: 0; width: 48px;
+      background: #16a34a; border-radius: 100px; pointer-events: none; opacity: 0.2;
+    }
+    .pay-label {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #4d4d4d;
+      pointer-events: none; transition: opacity 0.2s; gap: 4px; text-transform: uppercase;
+    }
+    .pay-thumb {
+      position: absolute; left: 4px; top: 4px; width: 40px; height: 40px;
+      background: #16a34a; border-radius: 100px; display: flex; align-items: center; justify-content: center; 
+      color: white; font-size: 14px; cursor: grab; will-change: left; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .pay-thumb:active { cursor: grabbing; }
+    .pay-track.confirmed .pay-fill  { width: 100% !important; background: #15803d; opacity: 1; }
+    .pay-track.confirmed .pay-label { opacity: 0; }
+    .pay-track.confirmed .pay-thumb { left: calc(100% - 44px) !important; background: #15803d; box-shadow: none; cursor: default; }
+    .pay-track.confirmed .paid-label { opacity: 1 !important; }
+    .paid-label {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: white;
+      pointer-events: none; opacity: 0; transition: opacity 0.3s 0.15s;
+    }
 
-        .item-row-prep {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 12px; border-radius: 10px;
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-            margin-bottom: 6px; transition: background 0.15s;
-        }
-        .item-row-prep:last-child { margin-bottom: 0; }
-        .item-row-prep.item-row-done {
-            background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.03);
-        }
+    /* ── Modals & Toasts ── */
+    #toast {
+      position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+      background: #1a1a1a; border-radius: 8px; padding: 14px 24px; font-size: 13px; color: white; font-weight: 500;
+      transform: translateY(20px); opacity: 0; transition: all 0.3s ease; pointer-events: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    
+    #editModal {
+      display: none; position: fixed; inset: 0; z-index: 9000;
+      background: rgba(26,26,26,0.6); align-items: center; justify-content: center; backdrop-filter: blur(2px);
+    }
+    #editModal.open { display: flex; }
 
-        .elapsed-ok   { color: #94a3b8; }
-        .elapsed-warn { color: #fb923c; }
-        .elapsed-crit { color: #f87171; }
+    @media print {
+      body > *:not(#kotPrint) { display: none !important; }
+      #kotPrint { display: block !important; font-family: monospace; font-size: 13px; color: #000; }
+    }
+    #kotPrint { display: none; }
 
-        kbd {
-            display: inline-block; padding: 1px 5px; font-size: 9px;
-            background: #1e293b; border: 1px solid #334155; border-radius: 4px;
-            color: #94a3b8; font-family: monospace; line-height: 1.4;
-        }
-
-        #toast {
-            position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-            background: #1e293b; border: 1px solid #334155; border-radius: 12px;
-            padding: 10px 16px; font-size: 12px; color: #e2e8f0;
-            transform: translateY(12px); opacity: 0;
-            transition: all 0.25s; pointer-events: none;
-        }
-        #toast.show { transform: translateY(0); opacity: 1; }
-
-        #editModal {
-            display: none; position: fixed; inset: 0; z-index: 9000;
-            background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
-        }
-        #editModal.open { display: flex; }
-        .modal-box {
-            background: #0f172a; border: 1px solid #334155; border-radius: 20px;
-            padding: 24px; width: 92%; max-width: 420px;
-        }
-
-        .sync-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; }
-        .sync-live { background: #4ade80; animation: pulse 2s infinite; }
-        .sync-stale { background: #fb923c; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-        .rev-bar {
-            background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
-            border-radius: 10px; padding: 6px 14px; font-size: 11px; color: #fbbf24;
-            display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
-        }
-        .rev-bar span { font-weight: 700; }
-
-        .stage-pill {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 3px 10px; border-radius: 100px; font-size: 10px; font-weight: 700;
-            border: 1px solid #334155; color: #475569; background: transparent;
-            letter-spacing: 0.04em;
-        }
-        .stage-pill.active { background: rgba(22,163,74,0.15); border-color: rgba(22,163,74,0.5); color: #4ade80; }
-        .stage-pill.done   { background: rgba(100,116,139,0.12); color: #64748b; border-color: transparent; }
-
-        @media print {
-            body > *:not(#kotPrint) { display: none !important; }
-            #kotPrint { display: block !important; font-family: monospace; font-size: 13px; color: #000; }
-        }
-        #kotPrint { display: none; }
-
-        .mute-on  { background: rgba(239,68,68,0.12) !important; border-color: rgba(239,68,68,0.4) !important; color: #f87171 !important; }
-
-        @keyframes readyGlow {
-            0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-            50%      { box-shadow: 0 0 14px 4px rgba(34,197,94,0.2); }
-        }
-        .ready-card { animation: readyGlow 2s ease-in-out infinite; border-color: rgba(34,197,94,0.4) !important; }
-    </style>
+    .mute-on { background-color: rgba(255,255,255,0.2) !important; border-color: rgba(255,255,255,0.4) !important; color: #ffdad6 !important; }
+  </style>
 </head>
-<body class="bg-slate-950 min-h-screen text-slate-100 flex flex-col justify-between">
+<body class="min-h-screen flex flex-col font-sans">
 
+<!-- Toast & Print -->
 <div id="toast"></div>
 <div id="kotPrint"></div>
 
-<!-- ── Edit-order modal ── -->
+<!-- Edit Modal -->
 <div id="editModal">
-    <div class="modal-box">
-        <h3 class="text-sm font-bold text-white mb-4">
-            <i class="fa-solid fa-pen mr-2 text-amber-400"></i>Edit Order — <span id="editTableLabel"></span>
-        </h3>
-        <div id="editItemsWrap" class="space-y-3 mb-5"></div>
-        <div class="flex gap-2 justify-end">
-            <button onclick="closeEditModal()"
-                    class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl transition cursor-pointer">Cancel</button>
-            <button onclick="saveEditModal()"
-                    class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl transition cursor-pointer">Save Changes</button>
-        </div>
+  <div class="bg-surface-bright rounded-8 p-6 w-[90%] max-w-md shadow-2xl border border-surface-dim">
+    <h3 class="font-serif text-xl font-bold text-primary mb-4 flex items-center border-b border-surface-dim pb-3">
+      <i class="fa-solid fa-pen text-secondary mr-2"></i>Edit Order — <span id="editTableLabel" class="ml-1"></span>
+    </h3>
+    <div id="editItemsWrap" class="space-y-2 mb-6 max-h-[50vh] overflow-y-auto"></div>
+    <div class="flex gap-3 justify-end pt-2">
+      <button onclick="closeEditModal()" class="px-4 py-2 text-sm font-medium text-secondary bg-surface-container-low border border-surface-dim rounded-8 hover:bg-surface-dim transition">Cancel</button>
+      <button onclick="saveEditModal()" class="px-4 py-2 text-sm font-medium text-primary-on bg-primary rounded-8 hover:bg-primary-container transition shadow-sm">Save Changes</button>
     </div>
+  </div>
 </div>
 
-<!-- ── Header ── -->
-<header class="bg-slate-900/50 backdrop-blur-md border-b border-slate-900 shadow-sm sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3 flex-wrap">
-        <div class="flex items-center gap-3">
-            <img src="logo.jpg" alt="Sekuwa by Kilo"
-                 class="h-8 w-auto object-contain brightness-90 contrast-125 rounded-md"
-                 onerror="this.style.display='none'">
-            <span class="candy-font text-xs tracking-tight text-white">
-                Sekuwa by <span class="text-amber-500">Kilo</span>
-            </span>
-            <span class="text-[9px] bg-slate-900 px-2 py-0.5 rounded text-slate-500 uppercase tracking-wider ml-1">Station</span>
-        </div>
-
-        <div class="rev-bar" id="revBar">
-            <span id="revTotal">Rs. 0</span>
-            <span style="color:#64748b;font-weight:400">today</span>
-            <span id="revCount" style="color:#94a3b8">0 orders</span>
-        </div>
-
-        <div class="flex items-center gap-2 flex-wrap">
-            <div class="flex items-center gap-1.5 text-[10px] text-slate-500">
-                <span class="sync-dot sync-live" id="syncDot"></span>
-                <span id="syncLabel">Synced just now</span>
-                <button onclick="manualRefresh()" title="Manual refresh"
-                        class="ml-1 text-slate-600 hover:text-amber-400 transition cursor-pointer text-xs">
-                    <i class="fa-solid fa-rotate-right"></i>
-                </button>
-            </div>
-
-            <button id="muteBtn" onclick="toggleMute()"
-                    class="text-[9px] bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg
-                           text-slate-400 hover:text-white transition font-bold uppercase tracking-wider cursor-pointer flex items-center gap-1.5">
-                <i class="fa-solid fa-volume-high" id="muteIcon"></i>
-                <span id="muteLabel">Sound On</span>
-            </button>
-
-            <div class="text-[9px] text-slate-600 hidden md:flex items-center gap-1">
-                <kbd>P</kbd><span>Prep</span>
-                <kbd>H</kbd><span>Paid</span>
-            </div>
-
-            <div class="text-[10px] text-slate-500 flex items-center gap-2">
-                <i class="fa-solid fa-circle text-green-500 text-[8px] animate-pulse"></i>
-                <span class="text-[10px] uppercase font-bold tracking-wider hidden sm:inline">Live Station</span>
-            </div>
-        </div>
+<!-- BEGIN: TopNavigation -->
+<header class="border-b border-surface-dim sticky top-0 z-50 px-6 py-3 flex items-center justify-between bg-[#8B0000]" data-purpose="main-header">
+  <div class="flex items-center space-x-4">
+    <div class="w-8 h-8 bg-primary rounded-8 flex items-center justify-center text-primary-on font-serif font-bold text-lg shadow-sm">S</div>
+    <h1 class="font-serif text-xl font-semibold italic tracking-tight text-white">Sekuwa by Kilo</h1>
+    <span class="px-2.5 py-1 text-[10px] font-bold rounded-8 uppercase tracking-wider bg-white/20 text-white border border-white/10">Station</span>
+  </div>
+  
+  <div class="flex items-center space-x-3 bg-surface-container-low px-4 py-1.5 rounded-full border border-surface-dim shadow-inner">
+    <span class="font-bold text-primary font-serif text-sm" id="revTotal">Rs. 0</span>
+    <span class="text-[10px] font-medium uppercase tracking-wider text-secondary">Today</span>
+    <div class="w-px h-4 bg-surface-dim mx-1"></div>
+    <span class="text-xs font-semibold text-primary" id="revCount">0 orders</span>
+  </div>
+  
+  <div class="flex items-center space-x-6">
+    <div class="flex items-center text-xs text-white/90">
+      <span class="w-2 h-2 rounded-full bg-green-400 mr-2 shadow-[0_0_8px_rgba(74,222,128,0.8)]" id="syncDot"></span>
+      Synced <span class="font-bold ml-1 font-mono" id="sync-time">just now</span>
+      <button onclick="manualRefresh()" class="ml-2 text-white/70 hover:text-white transition-colors" title="Manual Refresh"><i class="fa-solid fa-arrow-rotate-right"></i></button>
     </div>
+    <button class="flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-bold transition-colors bg-white/10 text-white border border-white/20 hover:bg-white/20 cursor-pointer" id="sound-toggle" onclick="toggleMute()">
+      <i class="fa-solid fa-volume-high" id="muteIcon"></i>
+      <span id="muteLabel">SOUND ON</span>
+    </button>
+    <div class="flex items-center space-x-3 text-[10px] font-bold uppercase tracking-wider text-white/90">
+      <div class="flex items-center space-x-1"><kbd class="px-1.5 py-0.5 rounded bg-white/20 border border-white/30 font-sans text-white">P</kbd><span>Prep</span></div>
+      <div class="flex items-center space-x-1"><kbd class="px-1.5 py-0.5 rounded bg-white/20 border border-white/30 font-sans text-white">H</kbd><span>Paid</span></div>
+    </div>
+  </div>
 </header>
+<!-- END: TopNavigation -->
 
-<main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full space-y-10">
-
-    <!-- ── Waiter calls ── -->
-    <div>
-        <h2 class="text-xl font-extrabold mb-1 text-white flex items-center justify-between">
-            <span><i class="fa-solid fa-bell mr-2 text-red-500"></i>Service Desk Notifications</span>
-            <button onclick="clearAllCalls()"
-                    class="text-[10px] text-slate-600 hover:text-red-400 uppercase tracking-widest cursor-pointer transition-colors">
-                <i class="fa-solid fa-trash mr-1"></i>Clear All Alerts
-            </button>
+<!-- BEGIN: MainContent -->
+<main class="flex-grow p-8 max-w-7xl mx-auto w-full space-y-12">
+  
+  <!-- Section 1: Service Desk -->
+  <section class="border-t-4 border-error pt-4">
+    <div class="flex items-end justify-between mb-5">
+      <div>
+        <h2 class="font-serif text-2xl font-bold text-primary flex items-center">
+          <i class="fa-solid fa-bell text-error mr-3 text-xl"></i>Service Desk Notifications
         </h2>
-        <p class="text-xs text-slate-500 mb-6">Real-time alerts for customer-called service requests.</p>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-5" id="bell-container"></div>
+        <p class="text-sm text-secondary mt-1">Real-time alerts for customer-called service requests.</p>
+      </div>
+      <button onclick="clearAllCalls()" class="text-xs font-bold text-secondary hover:text-error uppercase tracking-wider flex items-center transition-colors cursor-pointer">
+        <i class="fa-solid fa-trash mr-1.5"></i> Clear All Alerts
+      </button>
     </div>
+    <div id="bell-container" class="grid grid-cols-1 md:grid-cols-4 gap-4"></div>
+  </section>
+  <hr class="border-surface-dim"/>
 
-    <!-- ── Incoming orders ── -->
-    <div class="border-t border-slate-900 pt-8">
-        <h1 class="text-xl font-extrabold mb-1 tracking-tight text-white flex items-center gap-3">
-            Incoming Orders
-            <span class="text-xs font-normal text-slate-500">
-                <kbd>P</kbd> = move highlighted order to Prep
-            </span>
-        </h1>
-        <p class="text-xs text-slate-500 mb-6">Process pending orders from dining tables.</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="order-container"></div>
+  <!-- Section 2: Incoming Orders -->
+  <section class="border-t-4 border-amber-600 pt-4">
+    <div class="flex items-end justify-between mb-5">
+      <div>
+        <div class="flex items-center space-x-4">
+          <h2 class="font-serif text-2xl font-bold text-primary">Incoming Orders</h2>
+          <div class="flex items-center text-xs text-secondary bg-surface-container-low px-2.5 py-1 rounded-8 border border-surface-dim font-medium">
+            <kbd class="font-sans font-bold bg-surface-bright px-1.5 py-0.5 border border-surface-dim rounded shadow-sm mr-1.5">P</kbd> = move to Prep
+          </div>
+        </div>
+        <p class="text-sm text-secondary mt-1">Process pending orders from dining tables.</p>
+      </div>
     </div>
+    <div id="order-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </section>
+  <hr class="border-surface-dim"/>
 
-    <!-- ── In preparation ── -->
-    <div class="border-t border-slate-900 pt-8">
-        <h2 class="text-xl font-extrabold mb-1 text-white flex items-center gap-3">
-            <i class="fa-solid fa-burger mr-2 text-amber-500"></i>In Preparation
-            <span class="text-xs font-normal text-slate-500 ml-1">
-                <kbd>H</kbd> = mark highlighted order Paid
-            </span>
+  <!-- Section 3: In Preparation -->
+  <section class="border-t-4 border-green-600 pt-4">
+    <div class="flex items-end justify-between mb-5">
+      <div>
+        <div class="flex items-center space-x-4">
+          <h2 class="font-serif text-2xl font-bold text-primary flex items-center">
+            <i class="fa-solid fa-fire text-amber-600 mr-3 text-xl"></i>In Preparation
+          </h2>
+          <div class="flex items-center text-xs text-secondary bg-surface-container-low px-2.5 py-1 rounded-8 border border-surface-dim font-medium">
+            <kbd class="font-sans font-bold bg-surface-bright px-1.5 py-0.5 border border-surface-dim rounded shadow-sm mr-1.5">H</kbd> = slide to Pay
+          </div>
+        </div>
+        <p class="text-sm text-secondary mt-1">Tick off items as they're ready. Finalize and settle bills.</p>
+      </div>
+    </div>
+    <div id="prep-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </section>
+  <hr class="border-surface-dim"/>
+
+  <!-- Section 4: History -->
+  <section class="border-t-4 border-secondary pt-4">
+    <div class="flex items-end justify-between mb-5">
+      <div>
+        <h2 class="font-serif text-2xl font-bold text-primary flex items-center">
+          <i class="fa-solid fa-clock-rotate-left text-green-700 mr-3 text-xl"></i>Completed Order History
         </h2>
-        <p class="text-xs text-slate-500 mb-6">Tick off items as they're ready. Slide to mark paid.</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="prep-container"></div>
+        <p class="text-sm text-secondary mt-1">Full historical record of paid orders.</p>
+      </div>
+      <button onclick="clearHistory()" class="text-xs font-bold text-secondary hover:text-error uppercase tracking-wider flex items-center transition-colors cursor-pointer">
+        <i class="fa-solid fa-trash mr-1.5"></i> Clear Ledger
+      </button>
     </div>
-
-    <!-- ── History ── -->
-    <div class="border-t border-slate-900 pt-8">
-        <h2 class="text-xl font-extrabold mb-1 text-white flex items-center justify-between">
-            <span><i class="fa-solid fa-clock-rotate-left mr-2 text-amber-500"></i>Completed Order History</span>
-            <button onclick="clearHistory()"
-                    class="text-[10px] text-slate-600 hover:text-red-400 uppercase tracking-widest cursor-pointer transition-colors">
-                <i class="fa-solid fa-trash mr-1"></i>Clear Ledger
-            </button>
-        </h2>
-        <p class="text-xs text-slate-500 mb-4">Full historical record of paid orders.</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="history-container"></div>
-    </div>
+    <div id="history-container" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
+  </section>
 
 </main>
+<!-- END: MainContent -->
 
-<footer class="bg-slate-900 border-t border-slate-900 py-6 text-center text-[10px] text-slate-600">
-    &copy; 2026 Sekuwa by Kilo. Kitchen &amp; Waiter Sync.
-    <br><br>
-    <button onclick="factoryReset()"
-            class="text-red-500 hover:text-red-400 uppercase font-bold border border-red-900/50
-                   px-3 py-1 rounded cursor-pointer transition-colors">
-        <i class="fa-solid fa-triangle-exclamation mr-1"></i>Emergency Reset Data
+<!-- BEGIN: Footer -->
+<footer class="bg-primary text-primary-on mt-8 py-8" data-purpose="main-footer">
+  <div class="max-w-7xl mx-auto px-8 flex flex-col items-center justify-center space-y-4">
+    <p class="text-sm font-medium text-gray-400">© 2026 Sekuwa by Kilo. Kitchen &amp; Waiter Sync.</p>
+    <button onclick="factoryReset()" class="border border-error/40 bg-error/20 text-error-container hover:bg-error hover:text-white px-4 py-2.5 rounded-8 text-xs font-bold uppercase tracking-wider transition-colors flex items-center cursor-pointer">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i> Emergency Reset Data
     </button>
+  </div>
 </footer>
+<!-- END: Footer -->
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getDatabase, ref, onValue, push, set, remove, update, get }
+import { getDatabase, ref, onValue, push, remove, update }
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 const firebaseConfig = {
@@ -311,17 +321,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Helpers ──
 function esc(str) {
     if (!str && str !== 0) return '';
-    return String(str).replace(/[&<>'"]/g, m =>
-        ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[m]);
+    return String(str).replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[m]);
 }
-function calcTotal(items) {
-    return (items||[]).reduce((s,i) => s + Number(i.price)*Number(i.quantity), 0);
-}
-function fmt(n) { return 'Rs.\u00a0' + Number(n).toLocaleString(); }
-
+function calcTotal(items) { return (items||[]).reduce((s,i) => s + Number(i.price)*Number(i.quantity), 0); }
+function fmt(n) { return 'Rs. ' + Number(n).toLocaleString(); }
 function parseTs(val) {
     if (!val) return Date.now();
     const n = Number(val);
@@ -346,7 +352,7 @@ function playBeep() {
 
 function showToast(msg, icon='info') {
     const el = document.getElementById('toast');
-    const iconMap = { info:'fa-circle-info', ok:'fa-circle-check', warn:'fa-triangle-exclamation' };
+    const iconMap = { info:'fa-circle-info', ok:'fa-circle-check', warn:'fa-triangle-exclamation text-amber-500' };
     el.innerHTML = `<i class="fa-solid ${iconMap[icon]||iconMap.info} mr-2"></i>${esc(msg)}`;
     el.classList.add('show');
     clearTimeout(window._toastTimer);
@@ -369,7 +375,7 @@ function elapsedClass(ms) {
 
 function todayStr() { return new Date().toISOString().split('T')[0]; }
 
-// ── State ────────────────────────────────────────────────────────────────────
+// ── State ──
 let globalCalls   = {};
 let globalOrders  = {};
 let globalPrep    = {};
@@ -380,8 +386,6 @@ let syncSeconds   = 0;
 let highlightedIncoming = null;
 let highlightedPrep     = null;
 
-// LOCAL per-prep-card state: discount, split, method, checks
-// FIX: method defaults to 'cash' so payment is never unset
 const LOCAL = {};
 function localState(key) {
     if (!LOCAL[key]) LOCAL[key] = { checks:{}, discount:0, split:1, method:'cash' };
@@ -390,27 +394,19 @@ function localState(key) {
 
 let editKey   = null;
 let editItems = [];
+const payConfirmed = {};
 
-// FIX: Pay slider — keyed by prep key. Stores {attached, confirmed} to avoid
-//      re-attaching listeners on re-render while still re-attaching when DOM refreshes.
-//      DOM is fully replaced on each renderPrep() call, so we must re-attach always.
-//      We track 'confirmed' state separately so confirmed cards stay confirmed after re-render.
-const payConfirmed = {}; // key → true if slider was confirmed
-
-// ── Sync indicator ────────────────────────────────────────────────────────────
+// ── Sync indicator ──
 function updateSyncLabel() {
-    const lbl = document.getElementById('syncLabel');
-    lbl.textContent = syncSeconds === 0 ? 'Synced just now' : 'Synced ' + syncSeconds + 's ago';
+    const lbl = document.getElementById('sync-time');
+    if(lbl) lbl.textContent = syncSeconds === 0 ? 'just now' : syncSeconds + 's ago';
     const dot = document.getElementById('syncDot');
-    dot.className = 'sync-dot ' + (syncSeconds > 10 ? 'sync-stale' : 'sync-live');
+    if(dot) dot.className = 'w-2 h-2 rounded-full mr-2 ' + (syncSeconds > 10 ? 'bg-amber-500' : 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]');
 }
 setInterval(() => { syncSeconds++; updateSyncLabel(); }, 1000);
+window.manualRefresh = function() { syncSeconds = 0; updateSyncLabel(); showToast('Data refreshed', 'ok'); };
 
-window.manualRefresh = function() {
-    syncSeconds = 0; updateSyncLabel(); showToast('Data refreshed', 'ok');
-};
-
-// ── Revenue helpers ───────────────────────────────────────────────────────────
+// ── Revenue helpers ──
 function recomputeRevenue() {
     const today = todayStr();
     let total = 0, count = 0;
@@ -418,63 +414,57 @@ function recomputeRevenue() {
         if ((h.date||'') === today) { total += calcTotal(h.items); count++; }
     });
     document.getElementById('revTotal').textContent = fmt(total);
-    document.getElementById('revCount').textContent = count + ' order' + (count!==1?'s':'');
+    document.getElementById('revCount').textContent = count + ' orders';
 }
 
-/**
- * FIX: Status mirror — station writes to order_status/<originalKey> on every status change.
- *
- * The originalKey is the kitchen_orders key the customer app listened on.
- * It is stored in prep_orders as 'originalKey' when moved to prep.
- * This ensures the customer status listener always receives updates regardless
- * of which Firebase collection the order currently lives in.
- */
 function writeOrderStatus(originalKey, status, extra = {}) {
     if (!originalKey) return Promise.resolve();
     return update(ref(db, `order_status/${originalKey}`), { status, ...extra });
 }
 
-// ── Firebase listeners ────────────────────────────────────────────────────────
+// ── Firebase listeners ──
 onValue(ref(db,'waiter_calls'), snap => {
     globalCalls = snap.val()||{};
     const count = Object.keys(globalCalls).length;
     if (count > lastCallCount) playBeep();
-    lastCallCount = count;
-    syncSeconds = 0;
-    renderCalls();
+    lastCallCount = count; syncSeconds = 0; renderCalls();
 });
 
 onValue(ref(db,'kitchen_orders'), snap => {
     const prevCount = Object.keys(globalOrders).length;
     globalOrders = snap.val()||{};
     if (Object.keys(globalOrders).length > prevCount) playBeep();
-    syncSeconds = 0;
-    renderOrders();
+    syncSeconds = 0; renderOrders();
 });
 
 onValue(ref(db,'prep_orders'), snap => {
     globalPrep = snap.val()||{};
-    syncSeconds = 0;
-    renderPrep();
+    syncSeconds = 0; renderPrep();
 });
 
 onValue(ref(db,'order_history'), snap => {
     globalHistory = snap.val()||{};
-    syncSeconds = 0;
-    recomputeRevenue();
-    renderHistory();
+    syncSeconds = 0; recomputeRevenue(); renderHistory();
 });
 
-// ── Mute toggle ───────────────────────────────────────────────────────────────
+// ── Actions ──
 window.toggleMute = function() {
     mutedSound = !mutedSound;
-    document.getElementById('muteBtn').classList.toggle('mute-on', mutedSound);
-    document.getElementById('muteIcon').className = mutedSound ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
-    document.getElementById('muteLabel').textContent = mutedSound ? 'Muted' : 'Sound On';
+    const btn = document.getElementById('sound-toggle');
+    if (mutedSound) {
+      btn.classList.add('bg-white/20', 'border-white/40', 'text-white');
+      btn.classList.remove('bg-white/10', 'border-white/20');
+      document.getElementById('muteIcon').className = 'fa-solid fa-volume-xmark';
+      document.getElementById('muteLabel').textContent = 'MUTED';
+    } else {
+      btn.classList.remove('bg-white/20', 'border-white/40');
+      btn.classList.add('bg-white/10', 'border-white/20');
+      document.getElementById('muteIcon').className = 'fa-solid fa-volume-high';
+      document.getElementById('muteLabel').textContent = 'SOUND ON';
+    }
     showToast(mutedSound ? 'Sound muted' : 'Sound on', 'info');
 };
 
-// ── Keyboard shortcuts ────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
     if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
     if (e.key === 'P' || e.key === 'p') {
@@ -487,608 +477,378 @@ document.addEventListener('keydown', e => {
     }
 });
 
-// ── Edit modal ────────────────────────────────────────────────────────────────
+// ── Modals & Merging ──
 window.openEditModal = function(key) {
     const order = globalOrders[key];
     if (!order) return;
-    editKey   = key;
-    editItems = JSON.parse(JSON.stringify(order.items||[]));
+    editKey = key; editItems = JSON.parse(JSON.stringify(order.items||[]));
     document.getElementById('editTableLabel').textContent = 'Table ' + order.table;
-
     const wrap = document.getElementById('editItemsWrap');
     wrap.innerHTML = editItems.map((item, idx) => `
-        <div class="flex items-center gap-3" id="editRow-${idx}">
-            <button onclick="removeEditItem(${idx})"
-                    class="text-red-500 hover:text-red-400 text-xs cursor-pointer w-5 flex-shrink-0">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <span class="flex-1 text-xs text-slate-300">${esc(item.name)}</span>
-            <div class="flex items-center gap-1">
-                <button onclick="changeEditQty(${idx},-1)"
-                        class="w-6 h-6 bg-slate-800 rounded text-slate-300 hover:bg-slate-700 cursor-pointer text-xs">−</button>
-                <span class="w-6 text-center text-xs font-bold text-amber-400" id="editQty-${idx}">${item.quantity}</span>
-                <button onclick="changeEditQty(${idx},1)"
-                        class="w-6 h-6 bg-slate-800 rounded text-slate-300 hover:bg-slate-700 cursor-pointer text-xs">+</button>
+        <div class="flex items-center gap-3 bg-surface-low border border-surface-dim p-2.5 rounded-8" id="editRow-${idx}">
+            <button onclick="removeEditItem(${idx})" class="text-secondary hover:text-error transition text-xs w-6 flex-shrink-0 cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+            <span class="flex-1 text-sm font-medium text-primary">${esc(item.name)}</span>
+            <div class="flex items-center gap-2">
+                <button onclick="changeEditQty(${idx},-1)" class="w-6 h-6 bg-surface-bright border border-surface-dim rounded hover:border-secondary cursor-pointer flex items-center justify-center font-medium">−</button>
+                <span class="w-5 text-center text-sm font-bold text-primary" id="editQty-${idx}">${item.quantity}</span>
+                <button onclick="changeEditQty(${idx},1)" class="w-6 h-6 bg-surface-bright border border-surface-dim rounded hover:border-secondary cursor-pointer flex items-center justify-center font-medium">+</button>
             </div>
-        </div>
-    `).join('');
+        </div>`).join('');
     document.getElementById('editModal').classList.add('open');
 };
-
-window.removeEditItem = function(idx) {
-    editItems.splice(idx,1);
-    window.openEditModal(editKey);
-};
-
+window.removeEditItem = function(idx) { editItems.splice(idx,1); window.openEditModal(editKey); };
 window.changeEditQty = function(idx, delta) {
     editItems[idx].quantity = Math.max(1, Number(editItems[idx].quantity)+delta);
-    const el = document.getElementById('editQty-'+idx);
-    if (el) el.textContent = editItems[idx].quantity;
+    document.getElementById('editQty-'+idx).textContent = editItems[idx].quantity;
 };
-
-window.closeEditModal = function() {
-    document.getElementById('editModal').classList.remove('open');
-    editKey = null; editItems = [];
-};
-
+window.closeEditModal = function() { document.getElementById('editModal').classList.remove('open'); editKey = null; editItems = []; };
 window.saveEditModal = function() {
     if (!editKey) return;
-    if (editItems.length === 0) {
-        showToast('Cannot save empty order — remove from station instead', 'warn');
-        return;
-    }
-    update(ref(db, 'kitchen_orders/'+editKey), { items: editItems })
-        .then(() => { showToast('Order updated', 'ok'); closeEditModal(); });
+    if (editItems.length === 0) { showToast('Order is empty, delete it instead', 'warn'); return; }
+    update(ref(db, 'kitchen_orders/'+editKey), { items: editItems }).then(() => { showToast('Order updated', 'ok'); closeEditModal(); });
 };
 
-// ── Merge orders ──────────────────────────────────────────────────────────────
 window.mergeOrders = function(primaryKey) {
     const primary = globalOrders[primaryKey];
     if (!primary) return;
-    const tableOrders = Object.entries(globalOrders)
-        .filter(([k,o]) => k !== primaryKey && o.table === primary.table);
-
+    const tableOrders = Object.entries(globalOrders).filter(([k,o]) => k !== primaryKey && o.table === primary.table);
     if (tableOrders.length === 0) { showToast('No other orders for this table', 'warn'); return; }
 
     const mergedItems = JSON.parse(JSON.stringify(primary.items||[]));
-    const deletions   = [];
+    const deletions = [];
     tableOrders.forEach(([k,o]) => {
         (o.items||[]).forEach(ni => {
             const ex = mergedItems.find(i => i.name === ni.name);
             if (ex) ex.quantity = Number(ex.quantity)+Number(ni.quantity);
-            else    mergedItems.push({...ni});
+            else mergedItems.push({...ni});
         });
         deletions.push(remove(ref(db,'kitchen_orders/'+k)));
         deletions.push(remove(ref(db,'order_status/'+k)));
     });
-
     update(ref(db,'kitchen_orders/'+primaryKey), { items: mergedItems, merged: true })
-        .then(() => Promise.all(deletions))
-        .then(() => showToast('Orders merged for Table '+primary.table, 'ok'));
+        .then(() => Promise.all(deletions)).then(() => showToast('Orders merged', 'ok'));
 };
 
-// ── Rush / urgent flag ────────────────────────────────────────────────────────
 window.toggleRush = function(zone, key) {
-    const path  = zone==='incoming' ? 'kitchen_orders/'+key : 'prep_orders/'+key;
-    const order = zone==='incoming' ? globalOrders[key]     : globalPrep[key];
+    const path = zone==='incoming' ? 'kitchen_orders/'+key : 'prep_orders/'+key;
+    const order = zone==='incoming' ? globalOrders[key] : globalPrep[key];
     if (!order) return;
     const newRush = !order.urgent;
-    update(ref(db, path), { urgent: newRush })
-        .then(() => showToast(newRush ? '⚡ Marked as RUSH' : 'Rush cleared', newRush?'warn':'info'));
+    update(ref(db, path), { urgent: newRush }).then(() => showToast(newRush ? 'Marked as RUSH' : 'Rush cleared', newRush?'warn':'info'));
 };
 
-/**
- * FIX: Move to preparation.
- *
- * Stores the originalKey (kitchen_orders key) inside the prep_orders record.
- * This is the key the customer app uses to listen on order_status/<originalKey>.
- * Without this, markReady and moveToHistory could not write to the correct status mirror.
- *
- * Order of operations:
- * 1. Write status mirror "Preparing" (customer sees update immediately)
- * 2. Push to prep_orders with originalKey embedded
- * 3. Remove from kitchen_orders
- */
 window.moveToPreparation = function(key) {
     const order = globalOrders[key];
     if (!order) return;
-
-    writeOrderStatus(key, 'Preparing')
-        .then(() => {
-            // Embed originalKey so we can write status updates later using the correct path
-            const prepData = {
-                ...order,
-                originalKey:    key,          // ← THE FIX: preserve kitchen order key
-                prepStartedAt:  Date.now(),
-                itemChecks:     {}
-            };
-            return push(ref(db,'prep_orders'), prepData);
-        })
-        .then(() => remove(ref(db,'kitchen_orders/'+key)))
-        .then(() => showToast('Order sent to kitchen prep', 'ok'))
-        .catch(() => showToast('Error moving order to prep', 'warn'));
+    writeOrderStatus(key, 'Preparing').then(() => {
+        const prepData = { ...order, originalKey: key, prepStartedAt: Date.now(), itemChecks: {} };
+        return push(ref(db,'prep_orders'), prepData);
+    }).then(() => remove(ref(db,'kitchen_orders/'+key))).then(() => showToast('Moved to kitchen prep', 'ok')).catch(() => showToast('Error moving order', 'warn'));
 };
 
-/**
- * FIX: Mark as Ready.
- * Uses order.originalKey (the kitchen_orders key) for the status mirror,
- * not the prep_orders key.
- */
 window.markReady = function(prepKey) {
     const order = globalPrep[prepKey];
     if (!order) return;
-    const originalKey = order.originalKey || prepKey; // fallback for old records
-    writeOrderStatus(originalKey, 'Ready')
-        .then(() => update(ref(db, 'prep_orders/'+prepKey), { status: 'Ready' }))
-        .then(() => showToast('Order marked ready for collection!', 'ok'));
+    const originalKey = order.originalKey || prepKey;
+    writeOrderStatus(originalKey, 'Ready').then(() => update(ref(db, 'prep_orders/'+prepKey), { status: 'Ready' })).then(() => showToast('Ready for collection', 'ok'));
 };
 
-/**
- * FIX: Move to history (paid).
- * Uses order.originalKey for the status mirror write.
- * Cleans up status mirror after 30s so customer can see "Paid" before it disappears.
- */
 window.moveToHistory = function(prepKey, fromKbd) {
     const order = globalPrep[prepKey];
     if (!order) return;
     const originalKey = order.originalKey || prepKey;
-    const ls       = localState(prepKey);
-    const raw      = calcTotal(order.items);
-    const discount = Number(ls.discount)||0;
-    const total    = Math.round(raw*(1-discount/100));
+    const ls = localState(prepKey);
+    const raw = calcTotal(order.items);
+    const total = Math.round(raw*(1-(Number(ls.discount)||0)/100));
+    
     const entry = {
-        ...order,
-        date:       todayStr(),
-        time:       new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
-        paidTotal:  total,
-        discount:   discount,
-        splitCount: Number(ls.split)||1,
-        payMethod:  ls.method || 'cash',  // FIX: default cash if unset
-        itemChecks: ls.checks||{}
+        ...order, date: todayStr(), time: new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
+        paidTotal: total, discount: Number(ls.discount)||0, payMethod: ls.method || 'cash', itemChecks: ls.checks||{}
     };
 
     writeOrderStatus(originalKey, 'Paid')
         .then(() => push(ref(db,'order_history'), entry))
         .then(() => remove(ref(db,'prep_orders/'+prepKey)))
         .then(() => {
-            // Clean up status mirror after 30s (customer gets the update first)
-            setTimeout(() => remove(ref(db,'order_status/'+originalKey)), 30_000);
-            delete payConfirmed[prepKey];
-            delete LOCAL[prepKey];
-        })
-        .catch(() => showToast('Error completing order', 'warn'));
+            setTimeout(() => remove(ref(db,'order_status/'+originalKey)), 30000);
+            delete payConfirmed[prepKey]; delete LOCAL[prepKey];
+        }).catch(() => showToast('Error settling order', 'warn'));
 
-    if (fromKbd) showToast('Order marked paid (keyboard shortcut)', 'ok');
+    if (fromKbd) showToast('Paid (Shortcut)', 'ok');
 };
 
-// ── Print KOT ─────────────────────────────────────────────────────────────────
 window.printKOT = function(key, zone) {
     const order = zone==='incoming' ? globalOrders[key] : globalPrep[key];
     if (!order) return;
     const el = document.getElementById('kotPrint');
     el.innerHTML = `
-        <div style="padding:20px;max-width:300px;font-family:monospace">
-            <h2 style="text-align:center;font-size:16px;margin-bottom:4px">SEKUWA BY KILO</h2>
-            <p style="text-align:center;font-size:11px;margin:0">Kitchen Order Ticket</p>
-            <hr style="margin:10px 0">
-            <p style="font-size:12px">Table: <b>${esc(order.table)}</b></p>
-            <p style="font-size:11px">Time: ${new Date().toLocaleString()}</p>
-            ${order.urgent ? '<p style="font-size:13px;font-weight:bold">⚡ RUSH ORDER</p>' : ''}
-            <hr style="margin:8px 0">
-            <table style="width:100%;font-size:12px;border-collapse:collapse">
-                ${(order.items||[]).map(i => `
-                    <tr>
-                        <td style="padding:3px 0">${esc(i.name)}</td>
-                        <td style="text-align:right;padding:3px 0">× ${esc(i.quantity)}</td>
-                        <td style="text-align:right;padding:3px 0">${fmt(i.price*i.quantity)}</td>
-                    </tr>`).join('')}
+        <div style="padding:15px;width:280px;font-family:monospace;color:#000;">
+            <h2 style="text-align:center;font-size:18px;margin:0 0 5px 0">SEKUWA BY KILO</h2>
+            <p style="text-align:center;font-size:12px;margin:0;border-bottom:1px dashed #000;padding-bottom:10px;">Kitchen Order Ticket</p>
+            <p style="font-size:14px;margin:10px 0 5px;">Table: <b style="font-size:16px;">${esc(order.table)}</b></p>
+            <p style="font-size:11px;margin:0 0 10px;">${new Date().toLocaleString()}</p>
+            ${order.urgent ? '<p style="font-size:14px;font-weight:bold;text-align:center;border:1px solid #000;padding:5px;">*** RUSH ***</p>' : ''}
+            <table style="width:100%;font-size:13px;border-top:1px dashed #000;border-bottom:1px dashed #000;margin:10px 0;padding:5px 0;border-collapse:collapse;">
+                ${(order.items||[]).map(i => `<tr><td style="padding:4px 0">${esc(i.name)}</td><td style="text-align:right;padding:4px 0">x${esc(i.quantity)}</td></tr>`).join('')}
             </table>
-            <hr style="margin:8px 0">
-            <p style="text-align:right;font-size:13px;font-weight:bold">TOTAL: ${fmt(calcTotal(order.items))}</p>
-            ${order.notes ? `<p style="font-size:11px;font-style:italic">Note: ${esc(order.notes)}</p>` : ''}
-        </div>
-    `;
+            ${order.notes ? `<p style="font-size:12px;font-style:italic">Note: ${esc(order.notes)}</p>` : ''}
+        </div>`;
     window.print();
 };
 
-// ── Live elapsed timer tick ───────────────────────────────────────────────────
 setInterval(() => {
     document.querySelectorAll('[data-elapsed]').forEach(el => {
-        const createdAt = parseTs(el.dataset.elapsed);
-        const ms = Date.now() - createdAt;
-        el.textContent = 'Waiting ' + formatElapsed(ms);
-        el.className = 'text-[10px] ' + elapsedClass(ms);
+        const ms = Date.now() - parseTs(el.dataset.elapsed);
+        el.textContent = formatElapsed(ms);
+        el.className = `text-xs font-semibold ${elapsedClass(ms)}`;
     });
 }, 1000);
 
-// ── Status stages ─────────────────────────────────────────────────────────────
-function stageHTML(status) {
-    const stages = ['Received','Being Prepared','Ready','Paid'];
-    const idxMap  = { incoming:0, prep:1, ready:2, paid:3 };
-    const cur = idxMap[status]||0;
-    return stages.map((s,i) => {
-        let cls = i < cur ? 'done' : i === cur ? 'active' : '';
-        return `<span class="stage-pill ${cls}">
-            ${i < cur ? '<i class="fa-solid fa-check text-[8px]"></i>' : ''}${s}</span>
-            ${i<stages.length-1 ? '<i class="fa-solid fa-chevron-right text-[8px] text-slate-700 mx-1"></i>' : ''}`;
-    }).join('');
-}
-
-// ── Renderers ─────────────────────────────────────────────────────────────────
+// ── Renderers ──
 function renderCalls() {
     const entries = Object.entries(globalCalls);
-    document.getElementById('bell-container').innerHTML = entries.length === 0
-        ? `<div class="col-span-4 text-center py-6 text-slate-600 bg-slate-900/40 border
-                       border-slate-900/50 rounded-2xl text-xs">No service requests currently active.</div>`
-        : entries.map(([key,call]) => `
-            <div class="bg-slate-900 border border-red-500/30 p-4 rounded-2xl flex flex-col justify-between shadow-xl">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] bg-red-600 text-white font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">
-                            <i class="fa-solid fa-bell mr-1"></i>Waiter Call
-                        </span>
-                        <span class="text-[9px] text-slate-500">${esc(call.time)}</span>
-                    </div>
-                    <p class="text-xs text-slate-300 mb-2">
-                        Request from Table No.&nbsp;<b class="text-red-400 text-sm">${esc(call.table)}</b>
-                    </p>
+    const container = document.getElementById('bell-container');
+    if(entries.length === 0) {
+        container.innerHTML = `<div class="col-span-full dashed-container rounded-8 p-8 flex items-center justify-center text-secondary text-sm font-medium" style="background-color: #fff5f5; border-color: #feb2b2;">No service requests currently active.</div>`;
+        return;
+    }
+    
+    container.innerHTML = entries.map(([key,call]) => `
+        <div class="bg-surface-bright border border-surface-dim border-l-4 border-l-error rounded-8 p-5 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[10px] bg-error/10 text-error font-bold px-2 py-1 rounded-sm uppercase tracking-wide border border-error/20">
+                        <i class="fa-solid fa-bell mr-1"></i> Table ${esc(call.table)}
+                    </span>
+                    <span class="text-[10px] text-secondary font-medium">${esc(call.time)}</span>
                 </div>
-                <button onclick="dismissCall('${key}')"
-                        class="w-full bg-slate-800 text-slate-400 hover:text-red-400 text-[10px] font-bold
-                               py-2.5 rounded-xl border border-slate-700/60 transition-all cursor-pointer">
-                    Dismiss
-                </button>
-            </div>`).join('');
+                <p class="text-sm text-primary mb-5 font-medium">Waiter requested at table.</p>
+            </div>
+            <button onclick="dismissCall('${key}')" class="w-full bg-surface-container-low border border-surface-dim hover:bg-error hover:border-error hover:text-white text-secondary text-xs font-bold py-2.5 rounded-8 transition-colors cursor-pointer">
+                Dismiss
+            </button>
+        </div>`).join('');
 }
 
 function renderOrders() {
     const entries = Object.entries(globalOrders);
-    document.getElementById('order-container').innerHTML = entries.length === 0
-        ? `<div class="col-span-3 text-center py-20 text-slate-600 bg-slate-900 border border-slate-800 rounded-3xl shadow-xl">
-               <i class="fa-solid fa-circle-check text-4xl mb-4 text-slate-800 block"></i>
-               <p class="font-bold text-slate-300 text-sm">All caught up!</p>
-               <p class="text-[10px] text-slate-500 mt-1">No pending orders found.</p>
-           </div>`
-        : entries.map(([key,order]) => {
-            const createdAtMs   = parseTs(order.createdAt);
-            const ageMs         = Date.now() - createdAtMs;
-            const isHighlighted = key === highlightedIncoming;
-            const sameTable     = entries.filter(([k,o]) => k!==key && o.table===order.table);
-
-            return `
-            <div class="bg-slate-900 border ${order.urgent?'rush-card':'border-slate-800'}
-                        ${isHighlighted?'border-amber-500/60':''} p-6 rounded-3xl shadow-2xl flex flex-col
-                        justify-between hover:border-amber-500/20 transition-all cursor-pointer"
-                 onclick="setHighlightIncoming('${key}')" id="incoming-${key}">
-
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex flex-col gap-1">
-                        <span class="text-[9px] bg-amber-500 text-slate-950 font-extrabold px-3 py-1
-                                     rounded-lg tracking-widest uppercase inline-block">
-                            <i class="fa-solid fa-utensils mr-1"></i>Table No: ${esc(order.table)}
-                            ${order.merged ? '<span class="ml-1 bg-blue-900 text-blue-300 px-1.5 py-0.5 rounded text-[8px]">MERGED</span>' : ''}
-                            ${order.urgent ? '<span class="ml-1 text-red-400">⚡ RUSH</span>' : ''}
-                        </span>
-                        <span class="text-[10px] ${elapsedClass(ageMs)}" data-elapsed="${createdAtMs}">
-                            Waiting ${formatElapsed(ageMs)}
-                        </span>
-                    </div>
+    const container = document.getElementById('order-container');
+    if(entries.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full bg-surface-bright border border-surface-dim rounded-8 p-16 flex flex-col items-center justify-center text-center shadow-sm" style="background-color: #fffaf0; border-color: #fbd38d;">
+                <div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center mb-4 text-secondary">
+                    <i class="fa-solid fa-check text-xl"></i>
                 </div>
-
-                <div class="mb-4">
-                    ${(order.items||[]).map(i => `
-                        <div class="item-row-incoming">
-                            <div class="flex items-center min-w-0">
-                                <span class="item-qty-badge">${esc(i.quantity)}</span>
-                                <span class="item-name-text truncate">${esc(i.name)}</span>
-                            </div>
-                            <span class="item-price-text flex-shrink-0 ml-3">${fmt(i.price*i.quantity)}</span>
-                        </div>`).join('')}
-                </div>
-                ${order.notes ? `<p class="text-[10px] text-slate-500 italic mb-3 border-l-2 border-slate-700 pl-2">${esc(order.notes)}</p>` : ''}
-
-                <div class="flex justify-between items-center border-t border-slate-800/80 pt-3 mb-4">
-                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Total Amount</span>
-                    <span class="text-base font-black text-amber-500">${fmt(calcTotal(order.items))}</span>
-                </div>
-
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="event.stopPropagation(); moveToPreparation('${key}')"
-                            class="flex-1 bg-amber-500 text-slate-950 text-[10px] font-extrabold py-3
-                                   px-4 rounded-xl hover:bg-amber-400 transition-all shadow-md cursor-pointer">
-                        <i class="fa-solid fa-fire-burner mr-1"></i>Prepare <kbd style="background:rgba(0,0,0,0.2);border-color:rgba(0,0,0,0.3);color:#1c1917">P</kbd>
-                    </button>
-                    <button onclick="event.stopPropagation(); toggleRush('incoming','${key}')"
-                            class="px-3 py-3 rounded-xl border text-[10px] font-bold cursor-pointer transition
-                                   ${order.urgent ? 'bg-red-950 border-red-700 text-red-400 hover:bg-red-900'
-                                                  : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-red-600 hover:text-red-400'}">
-                        ⚡${order.urgent?'Rush!':'Rush'}
-                    </button>
-                    <button onclick="event.stopPropagation(); openEditModal('${key}')"
-                            class="px-3 py-3 rounded-xl border border-slate-700 bg-slate-800 text-slate-400
-                                   hover:text-amber-400 text-[10px] cursor-pointer transition">
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
-                    ${sameTable.length > 0 ? `
-                    <button onclick="event.stopPropagation(); mergeOrders('${key}')"
-                            class="px-3 py-3 rounded-xl border border-blue-700/50 bg-blue-950/40 text-blue-400
-                                   hover:bg-blue-900/50 text-[10px] font-bold cursor-pointer transition">
-                        <i class="fa-solid fa-code-merge mr-1"></i>Merge ${sameTable.length}
-                    </button>` : ''}
-                    <button onclick="event.stopPropagation(); printKOT('${key}','incoming')"
-                            class="px-3 py-3 rounded-xl border border-slate-700 bg-slate-800 text-slate-400
-                                   hover:text-white text-[10px] cursor-pointer transition"
-                            title="Print KOT">
-                        <i class="fa-solid fa-print"></i>
-                    </button>
-                </div>
+                <h3 class="font-serif text-xl font-bold text-primary mb-1">All caught up!</h3>
+                <p class="text-secondary text-sm">No pending orders found.</p>
             </div>`;
-        }).join('');
+        return;
+    }
+
+    container.innerHTML = entries.map(([key,order]) => {
+        const createdAtMs = parseTs(order.createdAt);
+        const isHigh = key === highlightedIncoming;
+        const sameTable = entries.filter(([k,o]) => k!==key && o.table===order.table);
+
+        return `
+        <div class="bg-surface-bright border ${order.urgent ? 'border-error rush-card' : 'border-surface-dim'} ${isHigh?'ring-2 ring-primary':''} rounded-8 p-6 shadow-sm cursor-pointer transition-shadow hover:shadow-md flex flex-col" onclick="setHighlightIncoming('${key}')">
+            
+            <div class="flex justify-between items-start border-b border-surface-dim pb-4 mb-4">
+                <div>
+                    <span class="font-serif text-2xl font-bold text-primary">T-${esc(order.table)}</span>
+                    ${order.merged ? '<span class="ml-2 bg-surface-container-low text-secondary border border-surface-dim px-1.5 py-0.5 rounded text-[9px] font-bold">MERGE</span>' : ''}
+                    ${order.urgent ? '<span class="ml-2 bg-error/10 text-error border border-error/20 px-1.5 py-0.5 rounded text-[9px] font-bold">RUSH</span>' : ''}
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] text-secondary uppercase font-semibold tracking-wider">Wait</div>
+                    <div data-elapsed="${createdAtMs}">...</div>
+                </div>
+            </div>
+
+            <div class="mb-4 space-y-1.5 flex-grow">
+                ${(order.items||[]).map(i => `
+                    <div class="flex justify-between items-start border-b border-surface-dim pb-1.5 last:border-0 last:pb-0">
+                        <div class="flex items-start min-w-0">
+                            <span class="bg-surface-container-low border border-surface-dim text-secondary text-[10px] font-bold min-w-[22px] h-[22px] rounded flex items-center justify-center mr-2.5 flex-shrink-0">${esc(i.quantity)}</span>
+                            <span class="text-sm font-medium text-primary mt-0.5 leading-snug">${esc(i.name)}</span>
+                        </div>
+                        <span class="text-xs font-bold text-secondary flex-shrink-0 ml-3 mt-1">${fmt(i.price*i.quantity)}</span>
+                    </div>`).join('')}
+            </div>
+            
+            ${order.notes ? `<div class="bg-surface-container-low border-l-2 border-surface-dim text-secondary text-xs p-2.5 rounded-r mb-5 italic">📝 ${esc(order.notes)}</div>` : ''}
+
+            <div class="flex justify-between items-center mb-5 mt-auto text-sm pt-2">
+                <span class="font-semibold text-secondary uppercase tracking-widest text-[10px]">Total</span>
+                <span class="font-bold text-primary text-lg font-serif">${fmt(calcTotal(order.items))}</span>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <button onclick="event.stopPropagation(); moveToPreparation('${key}')" class="flex-1 bg-primary text-primary-on hover:bg-primary-container text-xs font-bold py-2.5 rounded-8 transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-fire"></i> Prep <kbd class="ml-1 !bg-surface-container-high !border-none !text-primary !px-1.5 !py-0.5 font-sans">P</kbd>
+                </button>
+                <button onclick="event.stopPropagation(); toggleRush('incoming','${key}')" class="w-10 flex justify-center items-center rounded-8 border ${order.urgent ? 'bg-error/10 border-error/30 text-error' : 'bg-surface-bright border-surface-dim text-secondary'} hover:border-error hover:text-error transition cursor-pointer" title="Toggle Rush"><i class="fa-solid fa-bolt text-xs"></i></button>
+                <button onclick="event.stopPropagation(); openEditModal('${key}')" class="w-10 flex justify-center items-center rounded-8 border border-surface-dim bg-surface-bright text-secondary hover:text-primary transition cursor-pointer"><i class="fa-solid fa-pen text-xs"></i></button>
+                <button onclick="event.stopPropagation(); printKOT('${key}','incoming')" class="w-10 flex justify-center items-center rounded-8 border border-surface-dim bg-surface-bright text-secondary hover:text-primary transition cursor-pointer" title="Print KOT"><i class="fa-solid fa-print text-xs"></i></button>
+            </div>
+            ${sameTable.length > 0 ? `<button onclick="event.stopPropagation(); mergeOrders('${key}')" class="w-full mt-2 bg-surface-container-low border border-surface-dim hover:bg-surface-dim text-primary text-xs font-bold py-2 rounded-8 transition flex items-center justify-center cursor-pointer"><i class="fa-solid fa-code-merge mr-2"></i> Merge ${sameTable.length} orders</button>` : ''}
+        </div>`;
+    }).join('');
 }
 
-window.setHighlightIncoming = function(key) {
-    highlightedIncoming = key;
-    renderOrders();
-};
+window.setHighlightIncoming = key => { highlightedIncoming = key; renderOrders(); };
 
 function renderPrep() {
     const entries = Object.entries(globalPrep);
-    document.getElementById('prep-container').innerHTML = entries.length === 0
-        ? `<div class="col-span-3 text-center py-10 text-slate-700 bg-slate-900/50 border
-                       border-slate-900 rounded-2xl text-xs">No orders in the kitchen preparation queue.</div>`
-        : entries.map(([key,order]) => {
-            const ls  = localState(key);
-            const raw = calcTotal(order.items);
-            const disc  = Number(ls.discount)||0;
-            const total = Math.round(raw*(1-disc/100));
+    const container = document.getElementById('prep-container');
+    if(entries.length === 0) {
+        container.innerHTML = `<div class="col-span-full dashed-container rounded-8 p-12 flex flex-col items-center justify-center text-center text-secondary text-sm font-medium" style="background-color: #f0fff4; border-color: #9ae6b4;">No orders in the kitchen preparation queue.</div>`;
+        return;
+    }
 
-            const createdAtMs = parseTs(order.createdAt);
-            const ageMs       = Date.now() - createdAtMs;
-            const isHigh      = key === highlightedPrep;
-            const allDone     = (order.items||[]).length > 0 && (order.items||[]).every((_,i) => ls.checks[i]);
-            const isReady     = order.status === 'Ready' || allDone;
-            const confirmed   = !!payConfirmed[key];
+    container.innerHTML = entries.map(([key,order]) => {
+        const ls = localState(key);
+        const raw = calcTotal(order.items);
+        const disc = Number(ls.discount)||0;
+        const total = Math.round(raw*(1-disc/100));
+        const createdAtMs = parseTs(order.createdAt);
+        const ageMs = Date.now() - createdAtMs;
+        const isHigh = key === highlightedPrep;
+        const allDone = (order.items||[]).length > 0 && (order.items||[]).every((_,i) => ls.checks[i]);
+        const isReady = order.status === 'Ready' || allDone;
+        const confirmed = !!payConfirmed[key];
 
-            return `
-            <div class="bg-slate-900/80 border ${order.urgent?'rush-card': isReady?'ready-card':'border-amber-500/30'}
-                        ${isHigh?'ring-1 ring-amber-400/40':''} p-5 rounded-2xl flex flex-col justify-between shadow-lg cursor-pointer"
-                 onclick="setHighlightPrep('${key}')" id="prep-${key}">
-
-                <div class="flex justify-between text-[9px] text-slate-500 mb-3">
-                    <div class="flex flex-col gap-0.5">
-                        <span>Table No:&nbsp;<b class="text-amber-500 font-bold text-sm">${esc(order.table)}</b>
-                            ${order.urgent ? '<span class="text-red-400 ml-1">⚡ RUSH</span>' : ''}
-                            ${order.merged ? '<span class="text-blue-400 ml-1 text-[8px]">MERGED</span>' : ''}
-                            ${isReady ? '<span class="text-green-400 ml-1 text-[8px] font-bold">✅ READY</span>' : ''}
-                        </span>
-                        <span class="${elapsedClass(ageMs)}" data-elapsed="${createdAtMs}">
-                            Waiting ${formatElapsed(ageMs)}
-                        </span>
-                    </div>
-                    <div class="text-right flex items-start gap-2">
-                        <button onclick="event.stopPropagation(); printKOT('${key}','prep')"
-                                class="text-slate-500 hover:text-white cursor-pointer transition">
-                            <i class="fa-solid fa-print text-xs"></i>
-                        </button>
-                    </div>
+        return `
+        <div class="bg-surface-bright border ${order.urgent?'border-error rush-card': isReady?'border-green-600 ready-card bg-green-50/30':'border-surface-dim'} ${isHigh?'ring-2 ring-amber-500':''} rounded-8 p-6 shadow-sm cursor-pointer transition-shadow hover:shadow-md flex flex-col" onclick="setHighlightPrep('${key}')" id="prep-${key}">
+            
+            <div class="flex justify-between items-start border-b border-surface-dim pb-4 mb-4">
+                <div>
+                    <span class="font-serif text-2xl font-bold text-primary">T-${esc(order.table)}</span>
+                    ${isReady ? '<span class="ml-2 bg-green-100 border border-green-300 text-green-700 px-1.5 py-0.5 rounded text-[9px] font-bold">READY</span>' : ''}
                 </div>
-
-                <div class="flex flex-wrap items-center gap-1 mb-3 text-[9px]">
-                    ${stageHTML(isReady ? 'ready' : 'prep')}
+                <div class="text-right flex items-center gap-3">
+                    <div>
+                        <div class="text-[10px] text-secondary uppercase font-semibold tracking-wider">Elapsed</div>
+                        <div data-elapsed="${createdAtMs}" class="text-xs font-bold text-secondary">...</div>
+                    </div>
+                    <button onclick="event.stopPropagation(); printKOT('${key}','prep')" class="w-8 h-8 rounded border border-surface-dim bg-surface-container-low text-secondary hover:text-primary transition flex items-center justify-center cursor-pointer"><i class="fa-solid fa-print text-xs"></i></button>
                 </div>
+            </div>
 
-                <div class="mb-4">
-                    ${(order.items||[]).map((i,idx) => `
-                        <div class="item-row-prep ${ls.checks[idx]?'item-row-done':''}"
-                             onclick="event.stopPropagation(); toggleItemCheck('${key}',${idx})">
-                            <div class="flex items-center gap-2 flex-1 min-w-0">
-                                <div class="item-check ${ls.checks[idx]?'checked':''}">
-                                    ${ls.checks[idx]?'<i class="fa-solid fa-check text-white" style="font-size:10px"></i>':''}
-                                </div>
-                                <span class="item-qty-badge" style="${ls.checks[idx]?'opacity:0.3':''}">
-                                    ${esc(i.quantity)}
-                                </span>
-                                <span class="${ls.checks[idx]?'item-done':''} truncate"
-                                      style="${ls.checks[idx]?'color:#334155;font-size:13px;font-weight:500':'font-size:13px;font-weight:600;color:#f1f5f9'}">
-                                    ${esc(i.name)}
-                                </span>
+            <div class="mb-5 flex-grow space-y-1">
+                ${(order.items||[]).map((i,idx) => `
+                    <div class="flex items-center gap-3 py-1.5 cursor-pointer group" onclick="event.stopPropagation(); toggleItemCheck('${key}',${idx})">
+                        <div class="item-check ${ls.checks[idx]?'checked':''} group-hover:border-primary">${ls.checks[idx]?'<i class="fa-solid fa-check text-white text-[10px]"></i>':''}</div>
+                        <div class="flex-1 flex justify-between items-start min-w-0">
+                            <div class="flex items-start min-w-0">
+                                <span class="text-[10px] border border-surface-dim rounded px-1.5 py-0.5 mr-2.5 font-bold ${ls.checks[idx]?'text-surface-dim bg-transparent':'text-secondary bg-surface-container-low'}">${esc(i.quantity)}</span>
+                                <span class="text-sm mt-0.5 leading-snug font-medium ${ls.checks[idx]?'item-done':'text-primary'}">${esc(i.name)}</span>
                             </div>
-                            <span class="flex-shrink-0 ml-3"
-                                  style="${ls.checks[idx]?'color:#334155;font-size:12px':'color:#94a3b8;font-size:12px;font-weight:700'}">
-                                ${fmt(i.price*i.quantity)}
-                            </span>
-                        </div>`).join('')}
-                </div>
-                ${order.notes ? `<p class="text-[10px] text-slate-500 italic mb-3 border-l-2 border-slate-700 pl-2">${esc(order.notes)}</p>` : ''}
-
-                ${allDone && !isReady ? `
-                <button onclick="event.stopPropagation(); markReady('${key}')"
-                        class="w-full mb-3 bg-green-600 hover:bg-green-500 text-white text-xs font-bold
-                               py-2.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-check-circle"></i> Mark as Ready for Collection
-                </button>` : ''}
-
-                <div class="border-t border-slate-900/80 pt-3 space-y-3">
-                    <div class="flex justify-between text-xs font-bold text-slate-300">
-                        <span class="text-[10px] text-slate-500 uppercase tracking-widest">
-                            ${disc > 0 ? `After ${disc}% discount` : 'Payment Remaining'}
-                        </span>
-                        <span class="text-amber-500">${fmt(total)}
-                            ${disc > 0 ? `<span class="text-slate-600 line-through text-[9px] ml-1">${fmt(raw)}</span>` : ''}
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-2 text-[10px] text-slate-500">
-                        <label>Discount:</label>
-                        <input type="number" min="0" max="100" value="${disc}"
-                               class="w-14 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-amber-400 text-center"
-                               oninput="setDiscount('${key}',this.value)" placeholder="0">
-                        <span>%</span>
-                    </div>
-
-                    <div class="flex items-center gap-1.5 text-[10px]">
-                        <span class="text-slate-500 mr-1">Method:</span>
-                        ${['cash','card','qr'].map(m => `
-                            <button onclick="event.stopPropagation(); setMethod('${key}','${m}')"
-                                    class="px-2.5 py-1 rounded-lg border font-bold uppercase tracking-wider cursor-pointer transition
-                                           ${ls.method===m
-                                               ? m==='cash'  ? 'bg-green-950 border-green-700 text-green-400'
-                                               : m==='card'  ? 'bg-blue-950 border-blue-700 text-blue-400'
-                                               :               'bg-purple-950 border-purple-700 text-purple-400'
-                                               : 'bg-slate-800 border-slate-700 text-slate-500 hover:border-slate-500'}">
-                                ${m}
-                            </button>`).join('')}
-                    </div>
-
-                    <div class="pay-track ${confirmed ? 'confirmed' : ''}" id="pt-${key}" data-key="${key}">
-                        <div class="pay-fill"  id="pf-${key}"></div>
-                        <div class="pay-label" id="pl-${key}">
-                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                            SLIDE TO MARK PAID &nbsp;<kbd style="font-size:8px">H</kbd>
                         </div>
-                        <div class="paid-label" id="pd-${key}">
-                            <i class="fa-solid fa-check mr-1"></i>PAID — SENDING TO LEDGER…
-                        </div>
-                        <div class="pay-thumb ${confirmed ? '' : ''}" id="pb-${key}">
-                            <i class="fa-solid ${confirmed ? 'fa-check' : 'fa-wallet'}"></i>
-                        </div>
-                    </div>
+                    </div>`).join('')}
+            </div>
+            
+            ${order.notes ? `<div class="bg-surface-container-low border-l-2 border-surface-dim text-secondary text-xs p-2.5 rounded-r mb-5 italic">📝 ${esc(order.notes)}</div>` : ''}
 
-                    <div class="flex justify-between">
-                        <button onclick="event.stopPropagation(); toggleRush('prep','${key}')"
-                                class="text-[10px] px-3 py-1.5 rounded-lg border font-bold cursor-pointer transition
-                                       ${order.urgent ? 'bg-red-950 border-red-700 text-red-400' : 'bg-slate-800 border-slate-700 text-slate-500 hover:border-red-600 hover:text-red-400'}">
-                            ⚡ ${order.urgent ? 'Rush Active' : 'Mark Rush'}
-                        </button>
+            ${allDone && !isReady ? `<button onclick="event.stopPropagation(); markReady('${key}')" class="w-full mb-4 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-3 rounded-8 transition shadow-sm flex justify-center items-center gap-2 cursor-pointer"><i class="fa-solid fa-bell-concierge text-sm"></i> Call Ready</button>` : ''}
+
+            <div class="bg-surface-container-low border border-surface-dim rounded-8 p-4 mt-auto">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold text-secondary uppercase tracking-widest">Disc%</span>
+                        <input type="number" min="0" max="100" value="${disc}" class="w-14 h-8 bg-surface-bright border border-surface-dim rounded px-2 text-xs text-primary font-bold text-center outline-none focus:border-primary focus:ring-1 focus:ring-primary transition" oninput="setDiscount('${key}',this.value)" placeholder="0">
+                    </div>
+                    <div class="text-right">
+                        <span class="font-serif text-xl font-bold ${isReady ? 'text-green-700' : 'text-primary'}">${fmt(total)}</span>
+                        ${disc > 0 ? `<span class="block text-[10px] text-secondary line-through">${fmt(raw)}</span>` : ''}
                     </div>
                 </div>
-            </div>`;
-        }).join('');
+                
+                <div class="flex gap-1.5 mb-3">
+                    ${['cash','card','qr'].map(m => `
+                        <button onclick="event.stopPropagation(); setMethod('${key}','${m}')" class="flex-1 text-[10px] py-1.5 rounded border font-bold uppercase transition cursor-pointer ${ls.method===m ? (m==='cash'?'bg-green-100 border-green-300 text-green-800':m==='card'?'bg-blue-100 border-blue-300 text-blue-800':'bg-purple-100 border-purple-300 text-purple-800') : 'bg-surface-bright border-surface-dim text-secondary hover:border-secondary'}">${m}</button>
+                    `).join('')}
+                </div>
 
-    /**
-     * FIX: Pay slider re-attachment strategy.
-     *
-     * renderPrep() fully replaces the DOM, so all existing slider event listeners
-     * are gone. We must re-attach every time. However we need to avoid triggering
-     * double-payment if the slider was already confirmed.
-     *
-     * payConfirmed[key] persists across re-renders in memory. If confirmed, we
-     * render the track with class 'confirmed' (handled in HTML above) and skip
-     * re-attaching a new functional slider.
-     */
-    entries.forEach(([key]) => {
-        if (!payConfirmed[key]) {
-            attachPaySlider(key);
-        }
-    });
+                <div class="pay-track ${confirmed ? 'confirmed' : ''}" id="pt-${key}" data-key="${key}">
+                    <div class="pay-fill" id="pf-${key}"></div>
+                    <div class="pay-label" id="pl-${key}">
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i><i class="fa-solid fa-chevron-right text-[10px]"></i> SLIDE TO PAY <kbd class="ml-2 font-sans !bg-surface-bright !border-surface-dim text-primary">H</kbd>
+                    </div>
+                    <div class="paid-label" id="pd-${key}"><i class="fa-solid fa-check mr-1.5"></i>PAID</div>
+                    <div class="pay-thumb ${confirmed ? '' : ''}" id="pb-${key}"><i class="fa-solid ${confirmed ? 'fa-check' : 'fa-chevron-right'}"></i></div>
+                </div>
 
-    // Clean up memory for keys no longer in prep
-    Object.keys(payConfirmed).forEach(k => {
-        if (!globalPrep[k]) delete payConfirmed[k];
-    });
+                <div class="mt-3 text-right">
+                    <button onclick="event.stopPropagation(); toggleRush('prep','${key}')" class="text-[10px] px-2.5 py-1 rounded border font-bold cursor-pointer transition ${order.urgent ? 'bg-error/10 border-error/30 text-error' : 'bg-surface-bright border-surface-dim text-secondary hover:text-error'}">
+                        ⚡ ${order.urgent ? 'RUSH ACTIVE' : 'MARK RUSH'}
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    entries.forEach(([key]) => { if (!payConfirmed[key]) attachPaySlider(key); });
+    Object.keys(payConfirmed).forEach(k => { if (!globalPrep[k]) delete payConfirmed[k]; });
 }
 
-window.setHighlightPrep = function(key) {
-    highlightedPrep = key;
-    renderPrep();
-};
-
+window.setHighlightPrep = key => { highlightedPrep = key; renderPrep(); };
 window.toggleItemCheck = function(key, idx) {
-    const ls = localState(key);
-    ls.checks[idx] = !ls.checks[idx];
-
+    const ls = localState(key); ls.checks[idx] = !ls.checks[idx];
     const order = globalPrep[key];
     if (order) {
         const allDone = (order.items||[]).length > 0 && (order.items||[]).every((_,i) => ls.checks[i]);
-        if (allDone && order.status !== 'Ready') {
-            markReady(key);
-            showToast('All items ready! Notifying customer.', 'ok');
-        }
+        if (allDone && order.status !== 'Ready') { markReady(key); showToast('Order ready!', 'ok'); }
     }
     renderPrep();
 };
-
-window.setDiscount = function(key, val) {
-    localState(key).discount = Math.min(100, Math.max(0, Number(val)||0));
-    renderPrep();
-};
-
-window.setMethod = function(key, method) {
-    localState(key).method = method;
-    renderPrep();
-};
+window.setDiscount = (key, val) => { localState(key).discount = Math.min(100, Math.max(0, Number(val)||0)); renderPrep(); };
+window.setMethod = (key, method) => { localState(key).method = method; renderPrep(); };
 
 function renderHistory() {
     let entries = Object.entries(globalHistory);
     entries.sort(([,a],[,b]) => (b.date+b.time||'').localeCompare(a.date+a.time||''));
+    
+    const container = document.getElementById('history-container');
+    if(entries.length === 0) {
+        container.innerHTML = `<div class="col-span-full dashed-container rounded-8 p-12 flex items-center justify-center text-secondary text-sm font-medium">No records available yet.</div>`;
+        return;
+    }
 
-    document.getElementById('history-container').innerHTML = entries.length === 0
-        ? `<div class="col-span-3 text-center py-10 text-slate-700 bg-slate-900/50 border border-slate-900 rounded-2xl">
-               <p class="text-xs">No records available yet.</p>
-           </div>`
-        : entries.map(([key,h]) => {
-            const methodColor = h.payMethod==='cash' ? 'text-green-400' : h.payMethod==='card' ? 'text-blue-400' : 'text-purple-400';
-            const disc     = h.discount||0;
-            const paidTotal = h.paidTotal || calcTotal(h.items);
-            return `
-            <div class="bg-slate-900/60 border border-slate-900/80 p-5 rounded-2xl">
-                <div class="flex justify-between items-center text-[10px] text-slate-500 mb-3 border-b border-slate-900 pb-2">
-                    <span>Table No:&nbsp;<b class="text-amber-500 font-bold">${esc(h.table)}</b>
-                        ${h.urgent ? '<span class="text-red-400 ml-1 text-[8px]">⚡ RUSH</span>' : ''}
-                        ${h.merged ? '<span class="text-blue-400 ml-1 text-[8px]">MERGED</span>' : ''}
-                    </span>
-                    <span>${h.date||''} ${h.time||''}</span>
+    container.innerHTML = entries.map(([key,h]) => {
+        const mColor = h.payMethod==='cash' ? 'text-green-600' : h.payMethod==='card' ? 'text-blue-600' : 'text-purple-600';
+        return `
+        <div class="bg-surface-container-low border border-surface-dim p-5 rounded-8 opacity-90 hover:opacity-100 transition-opacity flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-3 border-b border-surface-dim pb-2">
+                    <span class="font-serif font-bold text-lg text-primary">T-${esc(h.table)}</span>
+                    <span class="text-[10px] text-secondary font-medium">${h.time||''}</span>
                 </div>
-                <div class="mb-3">
+                <div class="text-xs text-secondary mb-4 space-y-1">
                     ${(h.items||[]).map(i => `
-                        <div class="item-row-incoming">
-                            <div class="flex items-center min-w-0">
-                                <span class="item-qty-badge">${esc(i.quantity)}</span>
-                                <span class="item-name-text truncate" style="color:#94a3b8;font-weight:500">${esc(i.name)}</span>
-                            </div>
-                            <span class="item-price-text flex-shrink-0 ml-3">${fmt(i.price*i.quantity)}</span>
-                        </div>`).join('')}
+                        <div class="flex justify-between border-b border-surface-dim/50 pb-1 last:border-0">
+                            <span class="truncate pr-2">${esc(i.quantity)}x ${esc(i.name)}</span>
+                            <span class="text-text-faint">${fmt(i.price*i.quantity)}</span>
+                        </div>
+                    `).join('')}
                 </div>
-                ${h.notes ? `<p class="text-[10px] text-slate-500 italic mb-2 border-l-2 border-slate-700 pl-2">${esc(h.notes)}</p>` : ''}
-                <div class="border-t border-slate-900/80 pt-3 space-y-1">
-                    <div class="flex justify-between text-xs font-extrabold text-slate-300">
-                        <span class="text-[10px] text-slate-500 uppercase tracking-widest">Total Received</span>
-                        <span class="text-amber-500">${fmt(paidTotal)}</span>
-                    </div>
-                    ${disc > 0 ? `<div class="text-[10px] text-green-600 text-right">${disc}% discount applied</div>` : ''}
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-[10px] ${methodColor} uppercase font-bold">
-                            <i class="fa-solid ${h.payMethod==='cash' ? 'fa-money-bill' : h.payMethod==='card' ? 'fa-credit-card' : 'fa-qrcode'} mr-1"></i>
-                            ${h.payMethod||'cash'}
-                        </span>
-                    </div>
+            </div>
+            <div class="flex justify-between items-end mt-4 pt-3 border-t border-surface-dim">
+                <span class="text-[10px] ${mColor} bg-surface-bright px-2 py-1 rounded border border-surface-dim uppercase font-bold tracking-wider"><i class="fa-solid fa-circle text-[6px] align-middle mr-1.5"></i>${h.payMethod||'cash'}</span>
+                <div class="text-right">
+                    ${h.discount > 0 ? `<div class="text-[9px] text-green-600 font-bold mb-0.5">-${h.discount}%</div>` : ''}
+                    <span class="text-base font-serif font-bold text-primary">${fmt(h.paidTotal || calcTotal(h.items))}</span>
                 </div>
-            </div>`;
-        }).join('');
+            </div>
+        </div>`;
+    }).join('');
 }
 
-// ── Actions ───────────────────────────────────────────────────────────────────
 window.dismissCall   = key => remove(ref(db,`waiter_calls/${key}`));
 window.clearAllCalls = ()  => remove(ref(db,'waiter_calls'));
-window.clearHistory  = ()  => {
-    if (confirm('Clear the entire completed order ledger from the cloud?'))
-        remove(ref(db,'order_history'));
-};
-window.factoryReset  = ()  => {
-    if (confirm('DANGER: This will delete ALL data across the entire database. Proceed?'))
-        remove(ref(db,'/'));
-};
+window.clearHistory  = ()  => { if (confirm('Clear the entire completed order ledger from the cloud?')) remove(ref(db,'order_history')); };
+window.factoryReset  = ()  => { if (confirm('DANGER: This will delete ALL data across the entire database. Proceed?')) remove(ref(db,'/')); };
 
-/**
- * FIX: Pay slider — attached fresh every render (DOM is replaced by renderPrep).
- *
- * Uses element-scoped listeners on the track element for mouseleave,
- * but mousemove/touchmove/mouseup/touchend must be on document.
- *
- * To prevent listener accumulation on document across renders, we store the
- * handlers on the track element itself and remove the old ones before adding new ones.
- * This is safe because each key gets a fresh DOM element each render.
- */
 function attachPaySlider(key) {
     const track = document.getElementById(`pt-${key}`);
     const thumb = document.getElementById(`pb-${key}`);
@@ -1097,17 +857,17 @@ function attachPaySlider(key) {
     if (!track || !thumb) return;
 
     let dragging = false, startX = 0, currentX = 0;
-    const maxLeft = () => track.offsetWidth - 54;
+    const maxLeft = () => track.offsetWidth - 48;
 
     function setPos(x) {
         const c = Math.max(0, Math.min(x, maxLeft()));
         currentX = c;
-        thumb.style.left  = (4+c)+'px';
-        fill.style.width  = (52+c)+'px';
+        thumb.style.left = (4+c)+'px';
+        fill.style.width = (48+c)+'px';
         if (label) label.style.opacity = Math.max(0, 1-c/maxLeft()*1.8);
     }
 
-    const onStart = (e) => {
+    const onStart = e => {
         if (payConfirmed[key]) return;
         dragging = true;
         startX = (e.touches ? e.touches[0].clientX : e.clientX) - currentX;
@@ -1115,7 +875,7 @@ function attachPaySlider(key) {
         e.preventDefault();
     };
 
-    const onMove = (e) => {
+    const onMove = e => {
         if (!dragging) return;
         setPos((e.touches ? e.touches[0].clientX : e.clientX) - startX);
         if (e.cancelable) e.preventDefault();
@@ -1124,37 +884,29 @@ function attachPaySlider(key) {
     const onEnd = () => {
         if (!dragging) return;
         dragging = false;
-        thumb.style.transition = fill.style.transition = '';
+        thumb.style.transition = fill.style.transition = 'left 0.2s, width 0.2s';
         if (currentX >= maxLeft() * 0.85) {
-            payConfirmed[key] = true;
-            track.classList.add('confirmed');
+            payConfirmed[key] = true; track.classList.add('confirmed');
             thumb.innerHTML = '<i class="fa-solid fa-check"></i>';
             if (label) label.style.opacity = 0;
-            setTimeout(() => window.moveToHistory(key, false), 600);
+            setTimeout(() => window.moveToHistory(key, false), 500);
         } else {
-            setPos(0);
-            if (label) label.style.opacity = 1;
+            setPos(0); if (label) label.style.opacity = 1;
         }
     };
 
-    // Remove previously attached document listeners for this key (if any)
     if (track._moveHandler)  document.removeEventListener('mousemove', track._moveHandler);
     if (track._tmoveHandler) document.removeEventListener('touchmove', track._tmoveHandler);
     if (track._upHandler)    document.removeEventListener('mouseup',   track._upHandler);
     if (track._tendHandler)  document.removeEventListener('touchend',  track._tendHandler);
 
-    // Store handlers on element for cleanup
-    track._moveHandler  = onMove;
-    track._tmoveHandler = onMove;
-    track._upHandler    = onEnd;
-    track._tendHandler  = onEnd;
-
-    thumb.addEventListener('mousedown',  onStart, { passive: false });
+    track._moveHandler = onMove; track._tmoveHandler = onMove; track._upHandler = onEnd; track._tendHandler = onEnd;
+    thumb.addEventListener('mousedown', onStart, { passive: false });
     thumb.addEventListener('touchstart', onStart, { passive: false });
-    document.addEventListener('mousemove', onMove,  { passive: false });
-    document.addEventListener('touchmove', onMove,  { passive: false });
-    document.addEventListener('mouseup',   onEnd);
-    document.addEventListener('touchend',  onEnd);
+    document.addEventListener('mousemove', onMove, { passive: false });
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
     track.addEventListener('mouseleave', onEnd);
 }
 </script>
