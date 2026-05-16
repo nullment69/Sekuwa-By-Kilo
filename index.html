@@ -152,6 +152,11 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .fade-up{opacity:0;animation:fadeUp .5s ease forwards}
 .d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}.d4{animation-delay:.35s}.d5{animation-delay:.45s}
 
+/* ── WELCOME / TABLE SELECT SHARED CARD ── */
+.welcome-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:48px;max-width:640px;width:100%;box-shadow:0 20px 60px var(--shadow)}
+.badge-pill{display:inline-flex;align-items:center;gap:6px;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--surface-mid);color:var(--accent);border:1px solid var(--border);padding:5px 14px;border-radius:6px}
+.welcome-divider{height:1px;background:var(--border);margin:28px 0}
+
 /* ══════════════════════════════════════════════
    TABLE SELECT SCREEN (FLAVOR UPGRADED)
 ══════════════════════════════════════════════ */
@@ -204,11 +209,6 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
     letter-spacing: .04em;
     position: relative; z-index: 2;
 }
-
-/* ── WELCOME / TABLE SELECT SHARED CARD ── */
-.welcome-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:48px;max-width:640px;width:100%;box-shadow:0 20px 60px var(--shadow)}
-.badge-pill{display:inline-flex;align-items:center;gap:6px;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--surface-mid);color:var(--accent);border:1px solid var(--border);padding:5px 14px;border-radius:6px}
-.welcome-divider{height:1px;background:var(--border);margin:28px 0}
 
 /* ══════════════════════════════════════════════
    MENU SCREEN
@@ -865,7 +865,7 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
       </div>
     </div>
     <div id="status-orders-list" style="display:flex;flex-direction:column;gap:16px"></div>
-    <button class="btn-outline" style="width:100%;justify-content:center" onclick="backToMenu()"><i class="fa-solid fa-arrow-left"></i>Place Another Order</button>
+    <button class="btn-primary-full" style="width:100%;justify-content:center;margin-top:10px" onclick="backToMenu()"><i class="fa-solid fa-plus"></i>Place Another Order</button>
   </div>
 </div>
 
@@ -886,7 +886,7 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
         <div>
           <label class="auth-input-label">Email Address</label>
           <input id="auth-email" type="email" class="auth-input" placeholder="you@example.com" autocomplete="email" maxlength="100"/>
-          <p style="font-size:.75rem;color:var(--text-faint);margin-top:8px;line-height:1.5">We'll send an itemised bill the moment your order is marked paid. No account, no password.</p>
+          <p style="font-size:.75rem;color:var(--text-faint);margin-top:8px;line-height:1.5"> We'll send an itemised bill the moment your order is marked paid. No account, no password.</p>
         </div>
       </div>
       <button class="btn-primary-full" style="width:100%;justify-content:center;margin-bottom:10px" onclick="saveAccount()"><i class="fa-solid fa-check"></i>Save &amp; Continue</button>
@@ -956,6 +956,7 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
 <nav id="mobile-nav">
   <button class="mob-nav-btn active" id="mob-menu-btn" onclick="showMobileNav('menu')"><i class="fa-solid fa-utensils"></i>Menu</button>
   <button class="mob-nav-btn" id="mob-cart-btn" onclick="showMobileNav('cart')"><i class="fa-solid fa-basket-shopping"></i>Cart</button>
+  <button class="mob-nav-btn" id="mob-order-btn" onclick="placeOrder()"><i class="fa-solid fa-circle-check"></i>Order</button>
   <button class="mob-nav-btn" id="mob-status-btn" onclick="openOrderStatus()"><i class="fa-solid fa-circle-info"></i>Status</button>
   <button class="mob-nav-btn" id="mob-profile-btn" onclick="openAuthModal(hasAccount()? 'edit':'signin')"><i class="fa-solid fa-person"></i>Profile</button>
 </nav>
@@ -1026,8 +1027,8 @@ function showScreen(id){
 
   // Show/hide footer and mobile nav
   const footer=document.querySelector('#welcome-screen footer');
-  // Mobile nav: only on menu screen
-  document.getElementById('mobile-nav').style.display=(id==='menu-screen')?'flex':'none';
+  // Mobile nav: only on menu, confirmation and status screens
+  document.getElementById('mobile-nav').style.display=(id==='menu-screen'||id==='confirmation-screen'||id==='status-screen')?'flex':'none';
   window.scrollTo(0,0);
 }
 
@@ -1506,14 +1507,18 @@ window.backToMenu=function(){showScreen('menu-screen')};
 // ── Mobile nav ────────────────────────────────────────────
 let mobileCartVisible=false;
 window.showMobileNav=function(tab){
-  ['mob-menu-btn','mob-cart-btn'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  ['mob-menu-btn','mob-cart-btn','mob-order-btn'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
   const drawer=document.getElementById('mobile-cart-drawer');
   if(tab==='cart'){
     document.getElementById('mob-cart-btn').classList.add('active');
     if(drawer){drawer.classList.add('open');mobileCartVisible=true}
-  }else{
+  } else if(tab==='order'){
+    // Just trigger order confirmation flow directly, this clears button active states smoothly
+    placeOrder(); 
+  } else {
     document.getElementById('mob-menu-btn').classList.add('active');
     if(drawer){drawer.classList.remove('open');mobileCartVisible=false}
+    showScreen('menu-screen');
   }
 };
 window.closeMobileCart=function(){
@@ -1521,6 +1526,7 @@ window.closeMobileCart=function(){
   if(drawer)drawer.classList.remove('open');
   mobileCartVisible=false;
   document.getElementById('mob-cart-btn')?.classList.remove('active');
+  document.getElementById('mob-order-btn')?.classList.remove('active');
   document.getElementById('mob-menu-btn')?.classList.add('active');
 };
 
@@ -1538,7 +1544,7 @@ function initSlider(){
   function onEnd(){
     if(!dragging)return;dragging=false;
     thumb.style.transition=fill.style.transition='';
-    if(curX>=maxLeft()*.85){
+    if(curX >= maxLeft()*.85){
       sliderConfirmed=true;track.classList.add('confirmed');
       thumb.innerHTML='<i class="fa-solid fa-check"></i>';
       label.style.opacity=0;
