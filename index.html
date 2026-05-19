@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sekuwa by Kilo — Lazimpat</title>
+<link rel="icon" type="image/jpeg" href="sekuwa by kilo.jpg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
@@ -74,16 +75,83 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .screen-center{min-height:calc(100svh - 64px);align-items:center;justify-content:center;padding:24px;background:var(--bg)}
 
 /* ══════════════════════════════════════════════
+   GEO-GATE SCREEN
+══════════════════════════════════════════════ */
+#geo-screen{
+  position:fixed;inset:0;z-index:100;
+  background:var(--bg);
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:32px;
+  text-align:center;
+  gap:0;
+}
+.geo-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:48px 40px;
+  max-width:440px;
+  width:100%;
+  box-shadow:0 24px 80px var(--shadow-lg);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
+}
+.geo-icon-wrap{
+  width:72px;height:72px;
+  border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;
+  margin-bottom:4px;
+}
+.geo-icon-wrap.checking{background:var(--surface-low);border:1px solid var(--border);color:var(--text-faint)}
+.geo-icon-wrap.success{background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a}
+.geo-icon-wrap.error{background:#fff1f2;border:1px solid #fecdd3;color:var(--accent)}
+.geo-icon-wrap.denied{background:#fffbeb;border:1px solid #fde68a;color:#d97706}
+.geo-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--text);line-height:1.2}
+.geo-desc{font-size:.875rem;color:var(--text-muted);line-height:1.7;max-width:340px}
+.geo-distance-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.75rem;font-weight:800;letter-spacing:.04em;
+  padding:8px 18px;border-radius:100px;
+}
+.geo-distance-chip.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a}
+.geo-distance-chip.far{background:#fff1f2;border:1px solid #fecdd3;color:var(--accent)}
+.geo-distance-chip.unknown{background:var(--surface-low);border:1px solid var(--border);color:var(--text-faint)}
+
+/* Pulsing location dot */
+@keyframes geoPulse{
+  0%{transform:scale(1);opacity:.9}
+  50%{transform:scale(1.15);opacity:.6}
+  100%{transform:scale(1);opacity:.9}
+}
+.geo-pulse{animation:geoPulse 1.4s ease-in-out infinite}
+
+/* Spinner */
+@keyframes spin{to{transform:rotate(360deg)}}
+.geo-spinner{
+  width:48px;height:48px;
+  border:3px solid var(--border);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin .9s linear infinite;
+  margin-bottom:4px;
+}
+
+/* ══════════════════════════════════════════════
    WELCOME SCREEN — NEW DESIGN
 ══════════════════════════════════════════════ */
 #welcome-screen{flex-direction:column;min-height:calc(100svh - 64px)}
 
 /* Hero */
-.hero-section{position:relative;overflow:hidden;min-height:400px;display:flex;align-items:flex-end;flex-shrink:0}
+.hero-section{position:relative;overflow:hidden;min-height:450px;display:flex;align-items:flex-end;flex-shrink:0}
 .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.48) saturate(.9);transform:scale(1.04);animation:heroZoom 18s ease-in-out infinite alternate}
 @keyframes heroZoom{from{transform:scale(1.04)}to{transform:scale(1.13)}}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(27,28,25,.2) 0%,rgba(27,28,25,.08) 40%,rgba(251,249,244,.97) 100%)}
-.hero-body{position:relative;z-index:2;max-width:1280px;margin-inline:auto;width:100%;padding:0 24px 44px}
+.hero-body{position:relative;z-index:2;max-width:1280px;margin-inline:auto;width:100%;padding:0 24px 64px}
 .location-badge-hero{display:inline-flex;align-items:center;gap:6px;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(8px);padding:5px 14px;border-radius:6px;margin-bottom:16px}
 .hero-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,6vw,4.2rem);font-weight:800;line-height:1.06;letter-spacing:-.03em;color:#fff;text-shadow:0 4px 32px rgba(0,0,0,.28)}
 .hero-title em{font-style:italic;color:var(--amber-light)}
@@ -94,7 +162,7 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .welcome-left{display:flex;flex-direction:column;gap:28px}
 
 /* Subtitle */
-.welcome-subtitle{padding-top:32px;display:flex;flex-direction:column;gap:12px}
+.welcome-subtitle{padding-top:12px;display:flex;flex-direction:column;gap:12px}
 .welcome-subtitle p{font-size:1rem;color:var(--text-muted);line-height:1.7;max-width:520px}
 
 /* Info pills */
@@ -122,7 +190,7 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 @media(max-width:480px){.gallery-item:last-child{display:none}}
 
 /* Action card (right column) */
-.action-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;box-shadow:0 12px 40px var(--shadow);position:sticky;top:84px;display:flex;flex-direction:column;gap:20px; align-items: center; text-align: center;}
+.action-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;box-shadow:0 12px 40px var(--shadow);position:sticky;top:84px;display:flex;flex-direction:column;gap:20px; align-items: center; text-align: center; margin-top: 12px;}
 .action-card-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--text);line-height:1.25}
 .action-card-title em{font-style:italic;color:var(--accent)}
 .action-divider{height:1px;background:var(--border); width: 100%;}
@@ -133,14 +201,25 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .trust-note{text-align:center;font-size:.7rem;color:var(--text-faint);display:flex;align-items:center;justify-content:center;gap:6px; width: 100%;}
 .trust-note i{color:var(--accent);font-size:.65rem}
 
-/* Get Started Button specific */
+/* Get Started Button */
 .btn-get-started {
-    padding: 18px 36px;
-    font-size: 1rem;
+    padding: 16px 36px;
+    font-size: 1.05rem;
+    font-weight: 800;
     border-radius: 100px;
-    box-shadow: 0 8px 24px rgba(183, 16, 42, 0.3);
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    box-shadow: 0 8px 24px rgba(183, 16, 42, 0.4);
     animation: pulseAccent 2.5s infinite;
+    cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.2s;
 }
+.btn-get-started:hover { transform: translateY(-2px); }
+
 @keyframes pulseAccent {
     0% { box-shadow: 0 0 0 0 rgba(183, 16, 42, 0.5); }
     70% { box-shadow: 0 0 0 15px rgba(183, 16, 42, 0); }
@@ -152,14 +231,18 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .fade-up{opacity:0;animation:fadeUp .5s ease forwards}
 .d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}.d4{animation-delay:.35s}.d5{animation-delay:.45s}
 
+/* Screen transitions */
+@keyframes screenFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes screenFadeOut{from{opacity:1}to{opacity:0}}
+.screen.fade-in{animation:screenFadeIn .4s ease forwards}
+.screen.fade-out{animation:screenFadeOut .3s ease forwards}
+
 /* ── WELCOME / TABLE SELECT SHARED CARD ── */
 .welcome-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:48px;max-width:640px;width:100%;box-shadow:0 20px 60px var(--shadow)}
 .badge-pill{display:inline-flex;align-items:center;gap:6px;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--surface-mid);color:var(--accent);border:1px solid var(--border);padding:5px 14px;border-radius:6px}
 .welcome-divider{height:1px;background:var(--border);margin:28px 0}
 
-/* ══════════════════════════════════════════════
-   TABLE SELECT SCREEN (FLAVOR UPGRADED)
-══════════════════════════════════════════════ */
+/* TABLE SELECT SCREEN */
 .table-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px; width: 100%;}
 .table-btn {
     background: var(--surface);
@@ -210,14 +293,11 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
     position: relative; z-index: 2;
 }
 
-/* ══════════════════════════════════════════════
-   MENU SCREEN
-══════════════════════════════════════════════ */
+/* MENU SCREEN */
 #menu-screen{flex-direction:column}
 .menu-grid-wrap{display:grid;grid-template-columns:1fr;gap:32px;padding:48px 0 80px}
 .menu-main{display:flex;flex-direction:column;gap:28px}
 
-/* Hero banner inside menu (FLAVOR UPGRADED) */
 .hero {
     background: linear-gradient(140deg, #2a080c 0%, #111111 100%);
     border-radius: 20px;
@@ -262,16 +342,13 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
     max-width: 500px;
 }
 
-/* How to order */
 .how-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:flex-start;gap:18px;box-shadow:0 4px 16px var(--shadow)}
 .how-icon{width:42px;height:42px;border-radius:10px;background:var(--surface-low);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1rem;flex-shrink:0}
 .no-charge-pill{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:700;background:var(--surface-low);border:1px solid var(--border);color:var(--text-muted);padding:5px 14px;border-radius:100px;margin-top:10px}
 
-/* Section header */
 .section-hd{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .live-badge{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:800;letter-spacing:.04em;color:var(--accent);background:var(--surface);border:1px solid var(--border);padding:6px 14px;border-radius:8px}
 
-/* Search */
 .search-wrap{position:relative}
 .search-input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:13px 44px 13px 42px;font-size:.875rem;color:var(--text);outline:none;transition:border-color .15s;font-family:'Plus Jakarta Sans',sans-serif}
 .search-input:focus{border-color:var(--accent)}
@@ -286,16 +363,13 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .search-badge{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:800;background:var(--accent);color:#fff;padding:4px 12px;border-radius:100px}
 .match-hl{background:var(--amber-light);color:var(--amber);border-radius:3px;padding:0 3px}
 
-/* Filter pills */
 .filter-row{display:flex;gap:8px;flex-wrap:wrap}
 .filter-pill{background:var(--surface-high);border:1px solid var(--border);color:var(--text-muted);font-size:.7rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:8px 18px;border-radius:100px;cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
 .filter-pill:hover,.filter-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
 
-/* Menu grid */
 .menu-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 @media(max-width:640px){.menu-cards{grid-template-columns:1fr}}
 
-/* Menu card */
 .menu-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px;box-shadow:0 4px 16px var(--shadow);transition:border-color .15s,transform .2s}
 .menu-card:hover{border-color:var(--border-dark);transform:translateY(-2px)}
 .cat-tag{display:inline-flex;align-items:center;font-size:.65rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--surface-low);border:1px solid var(--border);padding:4px 10px;border-radius:5px}
@@ -312,12 +386,10 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .qty-btn.plus:hover{background:var(--accent);color:#fff}
 .qty-num{font-size:.85rem;font-weight:900;color:var(--text);min-width:28px;text-align:center}
 
-/* Empty state */
 .empty-state{grid-column:1/-1;text-align:center;padding:64px 0;color:var(--text-faint)}
 .empty-state i{font-size:2.2rem;margin-bottom:16px;display:block;opacity:.4}
 .empty-state p{font-size:1rem;font-weight:700;color:var(--text-muted)}
 
-/* Proof section */
 .section-gap{margin-top:56px;padding-top:56px;border-top:1px solid var(--border)}
 .proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
 @media(max-width:640px){.proof-grid{grid-template-columns:1fr}}
@@ -334,7 +406,6 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .stat-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--text);line-height:1}
 .stat-card p{font-size:.75rem;color:var(--text-faint);font-weight:500}
 
-/* Cart sidebar */
 .cart-sidebar{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;position:sticky;top:84px;max-height:calc(100svh - 100px);display:flex;flex-direction:column;box-shadow:0 8px 32px var(--shadow)}
 .cart-hd{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:20px}
 .cart-hd h3{font-size:1rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
@@ -363,18 +434,15 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .btn-status{width:100%;background:var(--surface-low);color:var(--accent);border:1px solid var(--border);font-size:.82rem;font-weight:700;padding:13px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Plus Jakarta Sans',sans-serif;transition:border-color .15s}
 .btn-status:hover{border-color:var(--accent)}
 
-/* ── OVERLAYS ── */
 .overlay{position:fixed;inset:0;z-index:50;background:rgba(27,28,25,.7);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
 .overlay.hidden{display:none}
 .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px;width:100%;max-width:420px;box-shadow:0 24px 80px rgba(0,0,0,.2)}
 
-/* Auth modal */
 .auth-input-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);display:block;margin-bottom:8px}
 .auth-input{width:100%;background:var(--surface-low);border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;font-size:.875rem;color:var(--text);outline:none;transition:border-color .15s;font-family:'Plus Jakarta Sans',sans-serif}
 .auth-input:focus{border-color:var(--accent)}
 .auth-input::placeholder{color:var(--text-faint)}
 
-/* Confirmation screen */
 #confirmation-screen{position:fixed;inset:0;z-index:30;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;background:var(--bg);padding:24px}
 .confirm-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:20px;box-shadow:0 20px 60px var(--shadow)}
 .confirm-header{text-align:center}
@@ -398,7 +466,6 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .btn-edit-order{width:100%;background:var(--surface-low);color:var(--text-muted);border:1px solid var(--border);padding:14px;border-radius:12px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:color .15s}
 .btn-edit-order:hover{color:var(--text)}
 
-/* Slide to confirm */
 .slide-track{position:relative;width:100%;height:54px;background:var(--surface-low);border:1.5px solid var(--border);border-radius:100px;overflow:hidden;user-select:none;touch-action:none}
 .slide-fill{position:absolute;left:0;top:0;bottom:0;width:54px;background:var(--accent);border-radius:100px;transition:width .05s linear;pointer-events:none}
 .slide-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;letter-spacing:.08em;color:var(--text-faint);pointer-events:none;transition:opacity .2s;text-transform:uppercase}
@@ -408,7 +475,6 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .slide-track.confirmed .slide-label{opacity:0}
 .slide-track.confirmed .slide-thumb{background:var(--accent-dark);cursor:default}
 
-/* Order status */
 #status-screen{position:fixed;inset:0;z-index:30;flex-direction:column;align-items:center;overflow-y:auto;background:var(--bg);padding:24px 24px 80px}
 .status-inner{max-width:480px;width:100%;padding:40px 0;display:flex;flex-direction:column;gap:20px}
 .status-header{text-align:center;margin-bottom:8px}
@@ -430,11 +496,9 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .step-col{display:flex;flex-direction:column;align-items:center;gap:5px}
 .step-name{font-size:.62rem;font-weight:700;color:var(--text-faint);white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
 
-/* Email sent overlay */
 .email-sent-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:40px 32px;width:100%;max-width:380px;text-align:center}
 .email-sent-icon{width:72px;height:72px;border-radius:18px;background:var(--surface-low);border:1px solid var(--border);color:var(--accent);font-size:1.6rem;display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px}
 
-/* Account panel */
 .account-wrap{position:relative}
 .account-panel{position:absolute;top:calc(100%+10px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;width:240px;box-shadow:0 12px 40px var(--shadow);display:none;z-index:60}
 .account-panel.open{display:block}
@@ -447,10 +511,8 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .panel-btn.danger:hover{background:#fef2f2;color:#ef4444}
 .panel-note{font-size:.7rem;color:var(--text-faint);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5}
 
-/* Toast */
 #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:70;background:var(--primary);color:#fff;font-size:.82rem;font-weight:700;padding:13px 22px;border-radius:100px;opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;max-width:calc(100% - 48px);text-align:center}
 
-/* Bill toast */
 #bill-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:65;max-width:340px;width:calc(100% - 48px);opacity:1;transition:opacity .2s}
 #bill-toast.hidden{opacity:0;pointer-events:none}
 .bill-toast-inner{background:var(--surface);border:1.5px solid var(--accent);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 24px var(--shadow)}
@@ -458,40 +520,65 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;
 .bill-toast-text p:first-child{font-size:.8rem;font-weight:800;color:var(--accent);line-height:1.3}
 .bill-toast-text p:last-child{font-size:.72rem;color:var(--text-faint);margin-top:3px}
 
-/* Waiter btn */
 #call-waiter-btn{display:none;background:var(--accent);color:#fff;font-size:.75rem;font-weight:800;padding:9px 16px;border-radius:100px;border:none;cursor:pointer;align-items:center;gap:7px;letter-spacing:.04em;font-family:'Plus Jakarta Sans',sans-serif;transition:opacity .15s}
 #call-waiter-btn:hover{opacity:.88}
 
-/* Mobile nav */
-#mobile-nav{display:none;position:fixed;bottom:0;left:0;width:100%;z-index:40;background:var(--surface);border-top:1px solid var(--border);padding:10px 8px 14px;justify-content:space-around;align-items:center;box-shadow:0 -4px 20px var(--shadow)}
-.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.6rem;font-weight:700;letter-spacing:.04em;color:var(--text-faint);background:none;border:none;cursor:pointer;padding:6px 16px;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;text-transform:uppercase}
-.mob-nav-btn i{font-size:1.1rem}
+#mobile-nav{display:none;position:fixed;bottom:0;left:0;width:100%;z-index:40;background:var(--surface);border-top:1px solid var(--border);padding:8px 4px 10px;justify-content:space-around;align-items:center;box-shadow:0 -4px 20px var(--shadow)}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.55rem;font-weight:700;letter-spacing:.02em;color:var(--text-faint);background:none;border:none;cursor:pointer;padding:4px 12px;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;text-transform:uppercase}
+.mob-nav-btn i{font-size:.95rem}
 .mob-nav-btn.active{background:var(--accent);color:#fff}
 
-/* Shared buttons */
+.mob-nav-order-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: #fff !important;
+    width: 68px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    position: relative;
+    z-index: 10;
+    margin: 0 2px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: .02em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    box-shadow: 0 4px 12px rgba(183, 16, 42, 0.3);
+    animation: pulseOrderBtn 2s infinite;
+    text-transform: uppercase;
+    transition: all .2s ease;
+}
+.mob-nav-order-btn:active { transform: scale(0.95); }
+.mob-nav-order-btn i { font-size: 0.8rem; z-index: 2; }
+.mob-nav-order-btn span { z-index: 2; display: flex; align-items: center; }
+@keyframes pulseOrderBtn {
+    0%, 100% { box-shadow: 0 4px 12px rgba(183, 16, 42, 0.3); }
+    50% { box-shadow: 0 6px 18px rgba(183, 16, 42, 0.4); }
+}
+
 .btn-primary-full{background:var(--primary);color:#fff;border:none;padding:16px 36px;border-radius:12px;font-size:.9rem;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:10px;letter-spacing:.04em;transition:opacity .15s,transform .15s,box-shadow .15s;white-space:nowrap}
 .btn-primary-full:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 8px 24px rgba(28,27,27,.25)}
 .btn-outline{background:none;color:var(--text-muted);border:1px solid var(--border);padding:14px 28px;border-radius:12px;font-size:.85rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .15s,color .15s}
 .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
 
-/* Mobile cart drawer */
 .mobile-cart-drawer{display:none;position:fixed;inset:0;top:64px;z-index:35;flex-direction:column;border-radius:0;max-height:calc(100svh - 64px)}
 .mobile-cart-drawer.open{display:flex}
 .mobile-cart-close{display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:0;font-family:'Plus Jakarta Sans',sans-serif;transition:color .15s}
 .mobile-cart-close:hover{color:var(--accent)}
 
-/* Footer */
 footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;text-align:center;font-size:.78rem;font-weight:500;margin-top:auto}
 .footer-brand{font-family:'Playfair Display',serif;font-size:1.15rem;font-style:italic;color:rgba(255,255,255,.95);margin-bottom:6px;letter-spacing:-.01em}
 .footer-tagline{font-size:.72rem;color:rgba(255,255,255,.4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
 .footer-divider{width:40px;height:1px;background:rgba(255,255,255,.15);margin:16px auto}
 .footer-copy{font-size:.72rem;color:rgba(255,255,255,.35)}
 
-/* Shake animation */
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .shake{animation:shake .42s ease}
 
-/* Utility */
 .hidden{display:none!important}
 
 @media(max-width:768px){
@@ -507,6 +594,7 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
   .hero-body{padding:0 20px 36px}
   .action-card{position:static}
   .feat-cards{grid-template-columns:1fr 1fr}
+  #account-nav-wrap{display:none !important}
 }
 @media(max-width:480px){
   .hero-title{font-size:2.2rem}
@@ -519,8 +607,15 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
 </head>
 <body>
 
+<!-- ═══ GEO-GATE SCREEN ══════════════════════════════════════════════════ -->
+<div id="geo-screen" class="screen active" style="display:flex">
+  <div class="geo-card" id="geo-card">
+    <!-- Content injected by JS -->
+  </div>
+</div>
+
 <!-- ═══ TOP NAV ═══════════════════════════════════════════════════════════ -->
-<nav id="top-nav">
+<nav id="top-nav" style="display:none">
   <div class="max-w nav-inner">
     <div class="brand">Sekuwa by Kilo</div>
     <div class="nav-actions">
@@ -552,10 +647,9 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
   </div>
 </nav>
 
-<!-- ═══ WELCOME SCREEN — NEW DESIGN ══════════════════════════════════════ -->
-<div id="welcome-screen" class="screen active" style="flex-direction:column">
+<!-- ═══ WELCOME SCREEN ════════════════════════════════════════════════════ -->
+<div id="welcome-screen" class="screen" style="flex-direction:column">
 
-  <!-- Hero image -->
   <section class="hero-section">
     <img class="hero-img"
       src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCdGxlzqsvQkAn0F9v_JRPeMcDoT5WcR_aNHJtREPOYyeGSY7oz6O0gfz5Uh6ei2GeR5Clhp0u-PW6u8PdzfRDBTE4DpXagmzeM_xP4rRnkqzsRTgAEOb88LzxX4vsEYN3FNcJmwNgf40LawNDEKuOrj6_zsiHJ5T8TgADRq9Sdm0lObbPJrHm5F8I1m5ppWh6sC46oMlrVYzxCmp-AzPU_sXx2s3lMNJ_84DHg0-aABL8_w1owBlRW7ot22kxQzcUqEBQmz2H2Mk"
@@ -569,13 +663,13 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
       <h1 class="hero-title fade-up d2">
         Freshly Grilled,<br/><em>Sold by the Kilo.</em>
       </h1>
+      <button class="btn-get-started fade-up d3" style="margin-top:24px;" onclick="proceedToTableSelect()">
+        Get Started <i class="fa-solid fa-chevron-right" style="margin-left:8px;font-size:.85rem"></i>
+      </button>
     </div>
   </section>
 
-  <!-- Content grid -->
   <div class="welcome-main">
-
-    <!-- Left column -->
     <div class="welcome-left">
       <div class="welcome-subtitle fade-up d1">
         <p>Table dining with freshly prepared charcoal-grilled recipes. Real-time ordering, live kitchen updates — no waiting, no guessing.</p>
@@ -620,7 +714,6 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
       </div>
     </div>
 
-    <!-- Right: action card -->
     <div class="action-card fade-up d2">
       <div style="text-align: center;">
         <p style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">
@@ -648,20 +741,12 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
         </div>
       </div>
       <div class="action-divider"></div>
-
-      <!-- CENTERED AND PULSING "GET STARTED" BUTTON -->
-      <button class="btn-primary-full btn-get-started" style="width:100%; justify-content:center; position: relative;" onclick="proceedToTableSelect()">
-        Get Started 
-        <i class="fa-solid fa-chevron-right" style="font-size:.75rem; position: absolute; right: 28px;"></i>
-      </button>
-
       <p class="trust-note">
         <i class="fa-solid fa-shield-halved"></i>
         No account needed &nbsp;·&nbsp; No service charge
       </p>
     </div>
-
-  </div><!-- /welcome-main -->
+  </div>
 
   <footer>
     <p class="footer-brand">Sekuwa by Kilo</p>
@@ -670,15 +755,12 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
     <p class="footer-copy">© 2026 Sekuwa by Kilo. Primal Grilling, Modern Metrics.</p>
   </footer>
 
-</div><!-- /welcome-screen -->
+</div>
 
 <!-- ═══ TABLE SELECT SCREEN ════════════════════════════════════════════════ -->
 <div id="table-screen" class="screen screen-center" style="flex-direction:column; position:relative; z-index:1;">
-  
-  <!-- Ambient glowing backgrounds for "flavor" -->
   <div style="position:absolute; top:-20%; left:-10%; width:60vh; height:60vh; background:radial-gradient(circle, rgba(183, 16, 42, 0.08) 0%, transparent 70%); z-index:-1; pointer-events:none;"></div>
   <div style="position:absolute; bottom:-10%; right:-10%; width:50vh; height:50vh; background:radial-gradient(circle, rgba(187, 115, 54, 0.08) 0%, transparent 70%); z-index:-1; pointer-events:none;"></div>
-
   <div style="max-width:560px;width:100%;text-align:center;display:flex;flex-direction:column;height:100%; z-index:2;">
     <div style="flex-shrink:0">
       <div class="badge-pill" style="margin-bottom:24px; background:var(--surface); border:1px solid var(--accent); color:var(--accent); box-shadow:0 4px 16px rgba(183,16,42,0.1); padding:8px 18px;">
@@ -695,10 +777,7 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
 <div id="menu-screen" class="screen">
   <div class="max-w" style="width:100%">
     <div class="menu-grid-wrap">
-      <!-- Left column -->
       <div class="menu-main">
-        
-        <!-- Hero banner - Enhanced with richer background -->
         <div class="hero">
           <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCdGxlzqsvQkAn0F9v_JRPeMcDoT5WcR_aNHJtREPOYyeGSY7oz6O0gfz5Uh6ei2GeR5Clhp0u-PW6u8PdzfRDBTE4DpXagmzeM_xP4rRnkqzsRTgAEOb88LzxX4vsEYN3FNcJmwNgf40LawNDEKuOrj6_zsiHJ5T8TgADRq9Sdm0lObbPJrHm5F8I1m5ppWh6sC46oMlrVYzxCmp-AzPU_sXx2s3lMNJ_84DHg0-aABL8_w1owBlRW7ot22kxQzcUqEBQmz2H2Mk" alt="Grill" onerror="this.style.display='none'"/>
           <div class="hero-body-menu">
@@ -707,7 +786,6 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
           </div>
         </div>
 
-        <!-- How to order -->
         <div class="how-card">
           <div class="how-icon"><i class="fa-solid fa-book-open"></i></div>
           <div>
@@ -717,96 +795,42 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
           </div>
         </div>
 
-        <!-- Section heading -->
         <div class="section-hd">
           <div>
             <h2 class="display-sm">Charcoal &amp; BBQ</h2>
             <p style="font-size:.875rem;color:var(--text-muted);margin-top:4px">Pick from our freshly prepared categories</p>
           </div>
-          <div class="live-badge"><i class="fa-solid fa-fire" style="color:var(--accent)"></i>Live grill</div>
         </div>
 
-        <!-- Search -->
         <div class="search-wrap">
           <i class="fa-solid fa-magnifying-glass search-ico"></i>
           <input id="search-input" type="text" class="search-input" placeholder="Search dishes… e.g. pork sekuwa, fish, paneer" autocomplete="off" maxlength="80" oninput="handleSearch(this.value)"/>
           <button id="search-clear-btn" class="search-clear-btn" onclick="clearSearch()" title="Clear"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- Search info -->
         <div id="search-info-bar" class="search-info">
           <span class="search-badge"><i class="fa-solid fa-magnifying-glass" style="font-size:.65rem"></i><span id="search-count-text">0 results</span></span>
           <button onclick="clearSearch()" style="font-size:.78rem;font-weight:600;color:var(--text-faint);background:none;border:none;cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-faint)'">Clear search</button>
         </div>
 
-        <!-- Filter pills -->
         <div class="filter-row" id="filter-row"></div>
-
-        <!-- Menu grid -->
         <div class="menu-cards" id="menu-cards"></div>
 
-        <!-- Proof section -->
         <div class="section-gap">
           <div style="margin-bottom:28px">
             <h2 class="display-sm">The Real Thing</h2>
             <p style="font-size:.875rem;color:var(--text-muted);margin-top:6px;line-height:1.7">Real charcoal. Real smoke. No shortcuts. Here's what comes off our grill every day.</p>
           </div>
           <div class="proof-grid">
-            <div class="proof-card">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Sekuwa.jpg/640px-Sekuwa.jpg" alt="Sekuwa" onerror="this.parentElement.style.display='none'"/>
-              <div class="proof-caption"><strong>Sekuwa</strong> — charcoal-grilled on open flame, the traditional Dharane way.</div>
-            </div>
-            <div class="proof-card">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chicken_sekuwa.jpg/640px-Chicken_sekuwa.jpg" alt="Chicken Sekuwa" onerror="this.parentElement.style.display='none'"/>
-              <div class="proof-caption"><strong>Chicken Sekuwa</strong> — marinated overnight, grilled to order.</div>
-            </div>
-            <div class="proof-card">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Nepali_food.jpg/640px-Nepali_food.jpg" alt="Nepali food" onerror="this.parentElement.style.display='none'"/>
-              <div class="proof-caption"><strong>Full Spread</strong> — sekuwa, khaja sets, curry, and sides.</div>
-            </div>
-          </div>
-          <div class="info-note">
-            <i class="fa-solid fa-circle-info"></i>
-            <p><strong style="color:var(--text)">Replace these with your own photos.</strong> Swap the <code style="color:var(--accent)">src</code> URLs with your real filenames (e.g. <code style="color:var(--accent)">grill1.jpg</code>).</p>
+            <div class="proof-card"><img src="screen.png" alt="Sekuwa" onerror="this.parentElement.style.display='none'"/><div class="proof-caption"><strong>Sekuwa</strong> — charcoal-grilled on open flame, the traditional Dharane way.</div></div>
+            <div class="proof-card"><img src="stick.jpg" alt="Chicken Sekuwa" onerror="this.parentElement.style.display='none'"/><div class="proof-caption"><strong>Chicken Sekuwa</strong> — marinated overnight, grilled to order.</div></div>
+            <div class="proof-card"><img src="Sekuwa-Grilled-Meat.webp" alt="Nepali food" onerror="this.parentElement.style.display='none'"/><div class="proof-caption"><strong>Full Spread</strong> — sekuwa, khaja sets, curry, and sides.</div></div>
           </div>
           <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div>
-              <p class="stat-num">4.8 / 5</p>
-              <p>342+ Google reviews</p>
-            </div>
-            <div class="stat-card">
-              <i class="fa-solid fa-fire" style="color:var(--amber);font-size:1.1rem"></i>
-              <p class="stat-num">Live Grill</p>
-              <p>Every order grilled fresh — no reheating</p>
-            </div>
-            <div class="stat-card">
-              <i class="fa-solid fa-bolt" style="color:var(--amber);font-size:1.1rem"></i>
-              <p class="stat-num">No Charge</p>
-              <p>No service charge. Pay only for what you order.</p>
-            </div>
+            <div class="stat-card"><div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div><p class="stat-num">4.8 / 5</p><p>342+ Google reviews</p></div>
+            <div class="stat-card"><i class="fa-solid fa-fire" style="color:var(--amber);font-size:1.1rem"></i><p class="stat-num">Live Grill</p><p>Every order grilled fresh — no reheating</p></div>
+            <div class="stat-card"><i class="fa-solid fa-bolt" style="color:var(--amber);font-size:1.1rem"></i><p class="stat-num">No Charge</p><p>No service charge. Pay only for what you order.</p></div>
           </div>
-        </div>
-      </div><!-- /menu-main -->
-
-      <!-- Cart sidebar -->
-      <div class="cart-sidebar">
-        <div class="cart-hd">
-          <h3><i class="fa-solid fa-basket-shopping"></i>Your Order</h3>
-          <span class="cart-session-tag">Session</span>
-        </div>
-        <div class="cart-items" id="cart-items">
-          <div class="empty-cart-msg" id="empty-cart-msg">
-            <i class="fa-solid fa-basket-shopping"></i>
-            <p>Your basket is empty</p>
-          </div>
-        </div>
-        <textarea id="special-notes" class="notes-area" rows="2" placeholder="Special requests or allergies…"></textarea>
-        <div class="cart-totals">
-          <div class="total-row"><span>Subtotal</span><span id="cart-subtotal" style="font-weight:700;color:var(--text)">Rs. 0</span></div>
-          <div class="grand-row"><span>Total</span><span id="cart-total">Rs. 0</span></div>
-          <button class="btn-order" id="order-now-btn" onclick="placeOrder()">ORDER NOW</button>
-          <button class="btn-status" onclick="openOrderStatus()"><i class="fa-solid fa-circle-info"></i>Check Order Status</button>
         </div>
       </div>
     </div>
@@ -840,6 +864,7 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
       </div>
       <button class="btn-edit-email" onclick="openAuthModal('edit')">Edit</button>
     </div>
+    <button class="btn-edit-order" style="width:100%;margin-bottom:12px;background:var(--surface-mid);color:var(--text-muted);border:1.5px solid var(--border)" onclick="openSpecialInstructions()"><i class="fa-solid fa-note-sticky" style="margin-right:8px"></i>Add Special Instructions</button>
     <div class="slide-track" id="slide-track">
       <div class="slide-fill" id="slide-fill"></div>
       <div class="slide-label" id="slide-label"><span>SLIDE TO SEND &nbsp;›&nbsp;›&nbsp;›</span></div>
@@ -869,10 +894,25 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
   </div>
 </div>
 
+<!-- ═══ SPECIAL INSTRUCTIONS MODAL ════════════════════════════════════════ -->
+<div class="overlay hidden" id="instructions-overlay" onclick="if(event.target===this)closeInstructionsModal()">
+  <div class="modal-box" id="instructions-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <h3 style="font-size:1rem;font-weight:800;color:var(--text)"><i class="fa-solid fa-note-sticky" style="margin-right:8px;color:var(--accent)"></i>Special Instructions</h3>
+      <button onclick="closeInstructionsModal()" style="color:var(--text-faint);background:none;border:none;cursor:pointer;font-size:1.1rem;padding:4px"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6">Tell the kitchen about allergies, preferences, spice levels, or any special requests for your order.</p>
+    <textarea id="instructions-input" class="auth-input" rows="5" placeholder="e.g., Extra spicy, No onions, Gluten-free, Cut into smaller pieces..." style="resize:vertical;font-family:'Plus Jakarta Sans',sans-serif"></textarea>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn-outline" style="flex:1;justify-content:center" onclick="closeInstructionsModal()">Cancel</button>
+      <button class="btn-primary-full" style="flex:1;justify-content:center" onclick="saveInstructions()"><i class="fa-solid fa-check" style="margin-right:6px"></i>Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ AUTH OVERLAY ═══════════════════════════════════════════════════════ -->
 <div class="overlay hidden" id="auth-overlay" onclick="handleOverlayClick(event)">
   <div class="modal-box" id="auth-box">
-    <!-- Sign-in view -->
     <div id="auth-signin-view">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
         <div class="how-icon"><i class="fa-solid fa-envelope"></i></div>
@@ -886,17 +926,16 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
         <div>
           <label class="auth-input-label">Email Address</label>
           <input id="auth-email" type="email" class="auth-input" placeholder="you@example.com" autocomplete="email" maxlength="100"/>
-          <p style="font-size:.75rem;color:var(--text-faint);margin-top:8px;line-height:1.5"> We'll send an itemised bill the moment your order is marked paid. No account, no password.</p>
+          <p style="font-size:.75rem;color:var(--text-faint);margin-top:8px;line-height:1.5">We'll send an itemised bill the moment your order is marked paid. No account, no password.</p>
         </div>
       </div>
       <button class="btn-primary-full" style="width:100%;justify-content:center;margin-bottom:10px" onclick="saveAccount()"><i class="fa-solid fa-check"></i>Save &amp; Continue</button>
       <button class="btn-outline" style="width:100%;justify-content:center" onclick="skipAuth()">Skip — I don't need an email bill</button>
     </div>
-    <!-- Edit view -->
     <div id="auth-edit-view" class="hidden">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
         <h3 style="font-size:1rem;font-weight:800;color:var(--text)">Edit Profile</h3>
-        <button onclick="closeAuthModal()" style="color:var(--text-faint);background:none;border:none;cursor:pointer;font-size:1.1rem;padding:4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-faint)'"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="closeAuthModal()" style="color:var(--text-faint);background:none;border:none;cursor:pointer;font-size:1.1rem;padding:4px"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:24px">
         <div><label class="auth-input-label">Name</label><input id="edit-name" type="text" class="auth-input" placeholder="Your name" maxlength="60"/></div>
@@ -935,10 +974,7 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
     <button class="mobile-cart-close" onclick="closeMobileCart()"><i class="fa-solid fa-xmark"></i>Close</button>
   </div>
   <div class="cart-items" id="cart-items-mobile">
-    <div class="empty-cart-msg">
-      <i class="fa-solid fa-basket-shopping"></i>
-      <p>Your basket is empty</p>
-    </div>
+    <div class="empty-cart-msg"><i class="fa-solid fa-basket-shopping"></i><p>Your basket is empty</p></div>
   </div>
   <textarea id="special-notes-mobile" class="notes-area" rows="2" placeholder="Special requests or allergies…"></textarea>
   <div class="cart-totals">
@@ -956,7 +992,7 @@ footer{background:var(--primary);color:rgba(255,255,255,.5);padding:40px 24px;te
 <nav id="mobile-nav">
   <button class="mob-nav-btn active" id="mob-menu-btn" onclick="showMobileNav('menu')"><i class="fa-solid fa-utensils"></i>Menu</button>
   <button class="mob-nav-btn" id="mob-cart-btn" onclick="showMobileNav('cart')"><i class="fa-solid fa-basket-shopping"></i>Cart</button>
-  <button class="mob-nav-btn" id="mob-order-btn" onclick="placeOrder()"><i class="fa-solid fa-circle-check"></i>Order</button>
+  <button class="mob-nav-order-btn" id="mob-order-btn" onclick="showMobileNav('order')"><i class="fa-solid fa-check"></i><span>Order</span></button>
   <button class="mob-nav-btn" id="mob-status-btn" onclick="openOrderStatus()"><i class="fa-solid fa-circle-info"></i>Status</button>
   <button class="mob-nav-btn" id="mob-profile-btn" onclick="openAuthModal(hasAccount()? 'edit':'signin')"><i class="fa-solid fa-person"></i>Profile</button>
 </nav>
@@ -967,14 +1003,14 @@ import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.8.1/fireb
 import { getDatabase, ref, push, onValue, get, update }
   from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-// ── EmailJS config ───────────────────────────────────────
+// ── EmailJS config ─────────────────────────────────────────────────────────
 const EMAILJS_PUBLIC_KEY  = 'B7TxLhcukvBJeNDLu';
 const EMAILJS_SERVICE_ID  = 'service_py2n2bm';
 const EMAILJS_TEMPLATE_ID = 'template_ruuryg5';
 const EMAIL_CONFIGURED = ![EMAILJS_PUBLIC_KEY,EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID].some(v=>v.startsWith('YOUR_'));
 if(EMAIL_CONFIGURED) emailjs.init({publicKey:EMAILJS_PUBLIC_KEY});
 
-// ── Firebase config ──────────────────────────────────────
+// ── Firebase config ────────────────────────────────────────────────────────
 const firebaseConfig={
   apiKey:"AIzaSyAdQtFwyOHoixp2rALMKBllaeqg2jvCl5w",
   authDomain:"sekuwa-by-kilo.firebaseapp.com",
@@ -985,7 +1021,138 @@ const firebaseConfig={
 const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
 
-// ── Helpers ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// GEOLOCATION GATE
+// Restaurant coords: Sekuwa by Kilo, Lazimpat, Kathmandu
+// ══════════════════════════════════════════════════════════════════════════
+const RESTAURANT_LAT  = 27.7170;   // Lazimpat latitude
+const RESTAURANT_LNG  = 85.3170;   // Lazimpat longitude
+const MAX_DISTANCE_M  = 100;       // 100 metres
+
+function haversineMetres(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const φ1 = lat1 * Math.PI / 180, φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function setGeoCard(html) {
+  document.getElementById('geo-card').innerHTML = html;
+}
+
+function showCheckingUI() {
+  setGeoCard(`
+    <div class="geo-spinner"></div>
+    <h2 class="geo-title">Checking Location…</h2>
+    <p class="geo-desc">We need to confirm you're dining at Sekuwa by Kilo, Lazimpat before you can order.</p>
+    <span class="geo-distance-chip unknown"><i class="fa-solid fa-location-crosshairs"></i>Locating you…</span>
+  `);
+}
+
+function showSuccessUI(distM) {
+  setGeoCard(`
+    <div class="geo-icon-wrap success"><i class="fa-solid fa-location-dot geo-pulse"></i></div>
+    <h2 class="geo-title">You're at the restaurant!</h2>
+    <p class="geo-desc">Location confirmed. Welcome to Sekuwa by Kilo, Lazimpat. Browse the menu and enjoy your meal.</p>
+    <span class="geo-distance-chip ok"><i class="fa-solid fa-circle-check"></i>${Math.round(distM)} m from the kitchen</span>
+    <button class="btn-primary-full" style="width:100%;justify-content:center;margin-top:4px" onclick="unlockApp()">
+      <i class="fa-solid fa-utensils"></i> Open Menu
+    </button>
+  `);
+  // Auto-proceed after 1.5s
+  setTimeout(unlockApp, 1500);
+}
+
+function showTooFarUI(distM) {
+  const distDisplay = distM >= 1000
+    ? (distM/1000).toFixed(1) + ' km'
+    : Math.round(distM) + ' m';
+  setGeoCard(`
+    <div class="geo-icon-wrap error"><i class="fa-solid fa-location-dot"></i></div>
+    <h2 class="geo-title">You're not at the restaurant</h2>
+    <p class="geo-desc">This menu is only accessible from inside <strong>Sekuwa by Kilo, Lazimpat</strong>. Please visit us to place an order.</p>
+    <span class="geo-distance-chip far"><i class="fa-solid fa-circle-xmark"></i>~${distDisplay} away</span>
+    <div style="width:100%;background:var(--surface-low);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:left;font-size:.8rem;color:var(--text-muted);line-height:1.7">
+      <p style="font-weight:700;color:var(--text);margin-bottom:4px"><i class="fa-solid fa-map-pin" style="color:var(--accent);margin-right:6px"></i>Find us at</p>
+      <p>Lazimpat, Kathmandu, Nepal</p>
+    </div>
+    <button class="btn-outline" style="width:100%;justify-content:center" onclick="startGeoCheck()">
+      <i class="fa-solid fa-rotate-right"></i> Try Again
+    </button>
+  `);
+}
+
+function showDeniedUI() {
+  setGeoCard(`
+    <div class="geo-icon-wrap denied"><i class="fa-solid fa-location-slash"></i></div>
+    <h2 class="geo-title">Location Access Needed</h2>
+    <p class="geo-desc">We couldn't access your location. This menu only works when you're physically dining at our restaurant. Please enable location access and try again.</p>
+    <div style="width:100%;background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px 16px;font-size:.78rem;color:#92400e;line-height:1.6">
+      <p style="font-weight:700;margin-bottom:4px"><i class="fa-solid fa-circle-info" style="margin-right:6px"></i>How to enable location</p>
+      <p>Tap the lock/info icon in your browser's address bar → Allow Location.</p>
+    </div>
+    <button class="btn-primary-full" style="width:100%;justify-content:center" onclick="startGeoCheck()">
+      <i class="fa-solid fa-location-crosshairs"></i> Allow &amp; Retry
+    </button>
+  `);
+}
+
+function showErrorUI(msg) {
+  setGeoCard(`
+    <div class="geo-icon-wrap denied"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h2 class="geo-title">Location Error</h2>
+    <p class="geo-desc">${msg || 'Something went wrong checking your location.'}</p>
+    <button class="btn-primary-full" style="width:100%;justify-content:center" onclick="startGeoCheck()">
+      <i class="fa-solid fa-rotate-right"></i> Try Again
+    </button>
+  `);
+}
+
+window.unlockApp = function() {
+  const geo = document.getElementById('geo-screen');
+  geo.style.opacity = '0';
+  geo.style.transition = 'opacity 0.4s ease';
+  setTimeout(() => {
+    geo.style.display = 'none';
+    document.getElementById('top-nav').style.display = '';
+    showScreen('welcome-screen');
+  }, 400);
+};
+
+window.startGeoCheck = function() {
+  showCheckingUI();
+  if (!navigator.geolocation) {
+    showErrorUI('Your browser does not support location services.');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude, longitude, accuracy } = pos.coords;
+      const dist = haversineMetres(latitude, longitude, RESTAURANT_LAT, RESTAURANT_LNG);
+      // Add accuracy buffer: if accuracy radius + distance still within threshold, allow
+      const effectiveDist = Math.max(0, dist - (accuracy || 0));
+      if (effectiveDist <= MAX_DISTANCE_M) {
+        showSuccessUI(dist);
+      } else {
+        showTooFarUI(dist);
+      }
+    },
+    err => {
+      if (err.code === 1) showDeniedUI();         // PERMISSION_DENIED
+      else if (err.code === 2) showErrorUI('Location unavailable. Ensure GPS is on and try again.');
+      else if (err.code === 3) showErrorUI('Location request timed out. Please try again.');
+      else showErrorUI(err.message);
+    },
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+  );
+};
+
+// Start geo check immediately on load
+startGeoCheck();
+
+// ── Helpers ───────────────────────────────────────────────────────────────
 function esc(s){if(!s&&s!==0)return '';return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c])}
 function fmt(n){return 'Rs.\u00a0'+Number(n).toLocaleString()}
 function nowStamp(){return{time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}),date:new Date().toISOString().split('T')[0],createdAt:new Date().toISOString()}}
@@ -995,44 +1162,30 @@ let _toastTimer;
 function showToast(msg,dur=3500){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>t.style.opacity='0',dur)}
 window.showToast=showToast;
 
-// ── Screens ──────────────────────────────────────────────
+// ── Screens ───────────────────────────────────────────────────────────────
 const ALL_SCREENS=['welcome-screen','table-screen','menu-screen','confirmation-screen','status-screen'];
 
 function showScreen(id){
-  ALL_SCREENS.forEach(s=>{
-    const el=document.getElementById(s);
-    el.classList.remove('active');
-    el.style.display='none';
-  });
-  const el=document.getElementById(id);
-  el.classList.add('active');
-
-  // Set display type per screen
-  if(id==='welcome-screen'){
-    el.style.display='flex';
-    el.style.flexDirection='column';
-  } else if(id==='table-screen'){
-    el.style.display='flex';
-    el.style.flexDirection='column';
-  } else if(id==='menu-screen'){
-    el.style.display='flex';
-    el.style.flexDirection='column';
-  } else if(id==='confirmation-screen'){
-    el.style.display='flex';
-    el.style.flexDirection='column';
-  } else if(id==='status-screen'){
-    el.style.display='flex';
-    el.style.flexDirection='column';
+  const currentActive=document.querySelector('.screen.active');
+  if(currentActive&&currentActive.id!==id){
+    currentActive.classList.remove('fade-in');
+    currentActive.classList.add('fade-out');
+    setTimeout(()=>{
+      ALL_SCREENS.forEach(s=>{const el=document.getElementById(s);el.classList.remove('active','fade-in','fade-out');el.style.display='none'});
+      const el=document.getElementById(id);el.classList.add('active','fade-in');setScreenDisplay(el,id);window.scrollTo(0,0);
+    },300);
+  }else{
+    ALL_SCREENS.forEach(s=>{const el=document.getElementById(s);el.classList.remove('active');el.style.display='none'});
+    const el=document.getElementById(id);el.classList.add('active','fade-in');setScreenDisplay(el,id);window.scrollTo(0,0);
   }
-
-  // Show/hide footer and mobile nav
-  const footer=document.querySelector('#welcome-screen footer');
-  // Mobile nav: only on menu, confirmation and status screens
-  document.getElementById('mobile-nav').style.display=(id==='menu-screen'||id==='confirmation-screen'||id==='status-screen')?'flex':'none';
-  window.scrollTo(0,0);
 }
 
-// ── Account ──────────────────────────────────────────────
+function setScreenDisplay(el,id){
+  const col='flex';el.style.display=col;el.style.flexDirection='column';
+  document.getElementById('mobile-nav').style.display=(id==='menu-screen'||id==='confirmation-screen'||id==='status-screen')?'flex':'none';
+}
+
+// ── Account ───────────────────────────────────────────────────────────────
 let account={name:localStorage.getItem('sbk_name')||'',email:localStorage.getItem('sbk_email')||''};
 function persistAccount(name,email){account.name=name.trim();account.email=email.trim().toLowerCase();localStorage.setItem('sbk_name',account.name);localStorage.setItem('sbk_email',account.email)}
 function hasAccount(){return !!(account.email&&isValidEmail(account.email))}
@@ -1053,20 +1206,12 @@ function refreshAccountUI(){
   if(ses){ses.classList.toggle('hidden',!hasAccount());if(hasAccount()&&sed)sed.textContent=account.email}
 }
 
-// ── Auth modal ───────────────────────────────────────────
 window.openAuthModal=function(mode='signin'){
   document.getElementById('auth-overlay').classList.remove('hidden');
   document.getElementById('auth-signin-view').classList.toggle('hidden',mode!=='signin');
   document.getElementById('auth-edit-view').classList.toggle('hidden',mode!=='edit');
-  if(mode==='signin'){
-    document.getElementById('auth-name').value=account.name||'';
-    document.getElementById('auth-email').value=account.email||'';
-    setTimeout(()=>document.getElementById('auth-name').focus(),50);
-  } else {
-    document.getElementById('edit-name').value=account.name||'';
-    document.getElementById('edit-email').value=account.email||'';
-    setTimeout(()=>document.getElementById('edit-name').focus(),50);
-  }
+  if(mode==='signin'){document.getElementById('auth-name').value=account.name||'';document.getElementById('auth-email').value=account.email||'';setTimeout(()=>document.getElementById('auth-name').focus(),50)}
+  else{document.getElementById('edit-name').value=account.name||'';document.getElementById('edit-email').value=account.email||'';setTimeout(()=>document.getElementById('edit-name').focus(),50)}
 };
 window.closeAuthModal=function(){document.getElementById('auth-overlay').classList.add('hidden')};
 window.handleOverlayClick=function(e){if(e.target===document.getElementById('auth-overlay'))closeAuthModal()};
@@ -1096,8 +1241,7 @@ window.saveEditAccount=function(){
 };
 window.signOut=function(){
   if(!confirm('Remove your saved email from this device?'))return;
-  account={name:'',email:''};
-  localStorage.removeItem('sbk_name');localStorage.removeItem('sbk_email');
+  account={name:'',email:''};localStorage.removeItem('sbk_name');localStorage.removeItem('sbk_email');
   refreshAccountUI();showToast('Signed out. No bill will be emailed.');
 };
 
@@ -1109,7 +1253,7 @@ document.addEventListener('click',e=>{const w=document.getElementById('account-n
 window.openEmailInfoModal=function(){document.getElementById('info-modal-email').textContent=account.email;document.getElementById('email-info-overlay').classList.remove('hidden')};
 window.closeEmailInfoModal=function(){document.getElementById('email-info-overlay').classList.add('hidden')};
 
-// ── Email billing ─────────────────────────────────────────
+// ── Email billing ─────────────────────────────────────────────────────────
 const billedKeys=new Set();
 function sendBillEmail(entry){
   if(!hasAccount())return;
@@ -1119,28 +1263,21 @@ function sendBillEmail(entry){
   const items=(d.items||[]).map(i=>`${i.name} × ${i.quantity}  —  ${fmt(i.price*i.quantity)}`).join('\n');
   const total=(d.items||[]).reduce((s,i)=>s+i.price*i.quantity,0);
   const params={
-    to_name:account.name||'Valued Customer',
-    to_email:account.email,
-    table_number:String(d.table||selectedTable||'—'),
-    order_items:items||'—',
-    order_total:fmt(total),
-    order_date:d.date||nowStamp().date,
-    order_time:d.time||nowStamp().time,
-    order_notes:d.notes||'—',
-    restaurant_name:'Sekuwa by Kilo — Lazimpat'
+    to_name:account.name||'Valued Customer',to_email:account.email,
+    table_number:String(d.table||selectedTable||'—'),order_items:items||'—',
+    order_total:fmt(total),order_date:d.date||nowStamp().date,order_time:d.time||nowStamp().time,
+    order_notes:d.notes||'—',restaurant_name:'Sekuwa by Kilo — Lazimpat'
   };
   if(!EMAIL_CONFIGURED)return;
   emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,params)
     .then(()=>{
       document.getElementById('bill-toast-email').textContent=`Sent to ${account.email}`;
-      const bt=document.getElementById('bill-toast');
-      bt.classList.remove('hidden');
-      setTimeout(()=>bt.classList.add('hidden'),7000);
+      const bt=document.getElementById('bill-toast');bt.classList.remove('hidden');setTimeout(()=>bt.classList.add('hidden'),7000);
     })
     .catch(err=>{console.error('EmailJS:',err);showToast('⚠️ Bill email failed. Please ask for a printed receipt.',5000)});
 }
 
-// ── Menu data ─────────────────────────────────────────────
+// ── Menu data ─────────────────────────────────────────────────────────────
 const menuData=[
   {id:1,name:'Chicken Butter Masala',price:469,category:'Curry'},
   {id:2,name:'Paneer Butter Masala',price:489,category:'Curry'},
@@ -1224,15 +1361,12 @@ const menuData=[
 let cart=[],selectedTable=null,sessionOrders=[],activeFilter='All',searchQuery='',tableCount=6,waiterCooldown=0,sliderConfirmed=false;
 
 async function fetchTableCount(){
-  try{const s=await get(ref(db,'config/tableCount'));if(s.exists()&&typeof s.val()==='number'&&s.val()>0)tableCount=s.val()}
-  catch(_){}
+  try{const s=await get(ref(db,'config/tableCount'));if(s.exists()&&typeof s.val()==='number'&&s.val()>0)tableCount=s.val()}catch(_){}
 }
 
-// ── Search ────────────────────────────────────────────────
 window.handleSearch=function(val){
   searchQuery=val.trim().toLowerCase();
-  const cb=document.getElementById('search-clear-btn');
-  const ib=document.getElementById('search-info-bar');
+  const cb=document.getElementById('search-clear-btn');const ib=document.getElementById('search-info-bar');
   if(searchQuery){cb.classList.add('visible');if(activeFilter!=='All'){activeFilter='All';updateFilterUI()}ib.classList.add('visible')}
   else{cb.classList.remove('visible');ib.classList.remove('visible')}
   renderMenu();
@@ -1252,7 +1386,6 @@ function hl(text,q){
   return esc(text.slice(0,idx))+`<span class="match-hl">${esc(text.slice(idx,idx+q.length))}</span>`+esc(text.slice(idx+q.length));
 }
 
-// ── Filters ───────────────────────────────────────────────
 const categories=['All',...new Set(menuData.map(m=>m.category))];
 function buildFilters(){
   document.getElementById('filter-row').innerHTML=categories.map(cat=>
@@ -1267,9 +1400,7 @@ window.setFilter=function(cat){
   updateFilterUI();renderMenu();
 };
 
-// ── Welcome → Table select ────────────────────────────────
 window.proceedToTableSelect=function(){showScreen('table-screen');generateTableBtns()};
-
 function generateTableBtns(){
   document.getElementById('table-grid').innerHTML=Array.from({length:tableCount},(_,i)=>i+1).map(n=>`
     <button class="table-btn" onclick="selectTable(${n})">
@@ -1279,13 +1410,11 @@ function generateTableBtns(){
 }
 
 window.selectTable=function(num){
-  selectedTable=num;
-  sessionStorage.setItem('sbk_table',num);
+  selectedTable=num;sessionStorage.setItem('sbk_table',num);
   document.getElementById('nav-table-tag').style.display='flex';
   document.getElementById('nav-table-num').textContent=num;
   document.getElementById('call-waiter-btn').style.display='flex';
-  showScreen('menu-screen');
-  buildFilters();renderMenu();refreshAccountUI();
+  showScreen('menu-screen');buildFilters();renderMenu();refreshAccountUI();
   setTimeout(()=>document.getElementById('search-input').focus(),100);
 };
 
@@ -1299,17 +1428,11 @@ window.callWaiter=function(){
     .catch(()=>showToast('❌ Connection error. Please try again.'));
 };
 
-// ── Menu rendering ────────────────────────────────────────
 function getQty(id){return(cart.find(c=>c.id===id)||{}).quantity||0}
-
 function cardActionsHTML(id){
   const qty=getQty(id);
   if(qty===0)return`<button class="btn-add" onclick="addItem(${id})"><i class="fa-solid fa-plus" style="font-size:.65rem"></i>Add</button>`;
-  return`<div class="qty-pill">
-    <button class="qty-btn minus" onclick="decItem(${id})">−</button>
-    <span class="qty-num">${qty}</span>
-    <button class="qty-btn plus" onclick="incItem(${id})">+</button>
-  </div>`;
+  return`<div class="qty-pill"><button class="qty-btn minus" onclick="decItem(${id})">−</button><span class="qty-num">${qty}</span><button class="qty-btn plus" onclick="incItem(${id})">+</button></div>`;
 }
 function updateCardAction(id){const el=document.getElementById(`card-actions-${id}`);if(el)el.innerHTML=cardActionsHTML(id)}
 
@@ -1338,7 +1461,6 @@ function renderMenu(){
     </div>`).join('');
 }
 
-// ── Cart ──────────────────────────────────────────────────
 window.addItem=function(id){const e=cart.find(c=>c.id===id);if(e)e.quantity++;else cart.push({...menuData.find(m=>m.id===id),quantity:1});updateCardAction(id);updateCartUI()};
 window.incItem=window.addItem;
 window.decItem=function(id){const e=cart.find(c=>c.id===id);if(!e)return;if(e.quantity>1)e.quantity--;else cart=cart.filter(c=>c.id!==id);updateCardAction(id);updateCartUI()};
@@ -1349,10 +1471,7 @@ function cartItemsHTML(){
   if(cart.length===0)return'<div class="empty-cart-msg"><i class="fa-solid fa-basket-shopping"></i><p>Your basket is empty</p></div>';
   return cart.map(item=>`
     <div class="cart-item-row">
-      <div class="cart-item-info">
-        <p>${esc(item.name)}</p>
-        <span>${item.quantity} × ${fmt(item.price)}</span>
-      </div>
+      <div class="cart-item-info"><p>${esc(item.name)}</p><span>${item.quantity} × ${fmt(item.price)}</span></div>
       <span class="cart-item-price">${fmt(item.price*item.quantity)}</span>
       <button class="cart-remove" onclick="removeFromCart(${item.id})" title="Remove"><i class="fa-solid fa-trash" style="font-size:.75rem"></i></button>
     </div>`).join('');
@@ -1369,7 +1488,6 @@ function updateCartUI(){
   ['order-now-btn','order-now-btn-mobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=cart.length===0});
 }
 
-// ── Order flow ────────────────────────────────────────────
 window.placeOrder=function(){
   if(cart.length===0){
     const b=document.getElementById('order-now-btn')||document.getElementById('order-now-btn-mobile');
@@ -1387,27 +1505,20 @@ window.placeOrder=function(){
   ).join('');
   document.getElementById('confirm-total').textContent=fmt(calcTotal());
   const nr=document.getElementById('confirm-notes-row');
-  if(notes){document.getElementById('confirm-notes-text').textContent=notes;nr.classList.remove('hidden')}
-  else nr.classList.add('hidden');
+  if(notes){document.getElementById('confirm-notes-text').textContent=notes;nr.classList.remove('hidden')}else nr.classList.add('hidden');
   closeMobileCart();refreshAccountUI();showScreen('confirmation-screen');resetSlider();
 };
 
 window.confirmFinalOrder=function(){
   if(cart.length===0){showToast('Basket is empty.');return}
-  const notes=document.getElementById('special-notes').value.trim();
+  const notesEl=document.getElementById('special-notes');const notes=notesEl?notesEl.value.trim():'';
   const snap=[...cart];const{time,date,createdAt}=nowStamp();
-  const payload={
-    table:selectedTable,items:snap,notes:notes||null,
-    time,date,createdAt,status:'Pending',
-    customerEmail:account.email||null,customerName:account.name||null
-  };
+  const payload={table:selectedTable,items:snap,notes:notes||null,time,date,createdAt,status:'Pending',customerEmail:account.email||null,customerName:account.name||null};
   push(ref(db,'kitchen_orders'),payload).then(orderRef=>{
     const key=orderRef.key;
     const entry={originalKey:key,data:{...payload},unsubscribe:null};
     function handleUpdate(live){
-      if(!live)return;
-      const prev=entry.data.status;
-      entry.data={...entry.data,...live};
+      if(!live)return;const prev=entry.data.status;entry.data={...entry.data,...live};
       if(!document.getElementById('status-screen').classList.contains('active'))return;
       renderStatusScreen();
       if(live.status&&live.status!==prev){
@@ -1418,22 +1529,26 @@ window.confirmFinalOrder=function(){
     }
     const u1=onValue(ref(db,`order_status/${key}`),s=>handleUpdate(s.val()));
     const u2=onValue(ref(db,`kitchen_orders/${key}`),s=>handleUpdate(s.val()));
-    entry.unsubscribe=()=>{u1();u2()};
-    sessionOrders.push(entry);
-    cart=[];
-    ['special-notes','special-notes-mobile'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+    entry.unsubscribe=()=>{u1();u2()};sessionOrders.push(entry);
+    cart=[];['special-notes','special-notes-mobile'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
     updateCartUI();renderMenu();openOrderStatus();
-    if(!hasAccount())openAuthModal('signin');
-    else{openEmailInfoModal();sendBillEmail(entry)}
-  }).catch(()=>{
-    showToast('❌ Connection error. Order failed. Try again.');
-    resetSlider();showScreen('confirmation-screen');
-  });
+    if(!hasAccount())openAuthModal('signin');else{openEmailInfoModal();sendBillEmail(entry)}
+  }).catch(()=>{showToast('❌ Connection error. Order failed. Try again.');resetSlider();showScreen('confirmation-screen')});
 };
 
 window.editOrder=function(){showScreen('menu-screen')};
 
-// ── Status screen ─────────────────────────────────────────
+window.openSpecialInstructions=function(){
+  const notes=document.getElementById('special-notes');const input=document.getElementById('instructions-input');
+  if(input)input.value=notes?notes.value:'';
+  document.getElementById('instructions-overlay').classList.remove('hidden');setTimeout(()=>input.focus(),50);
+};
+window.closeInstructionsModal=function(){document.getElementById('instructions-overlay').classList.add('hidden')};
+window.saveInstructions=function(){
+  const input=document.getElementById('instructions-input');const notes=document.getElementById('special-notes');
+  if(input&&notes)notes.value=input.value;closeInstructionsModal();showToast('✓ Instructions saved!');
+};
+
 function statusBadge(status,rush){
   const map={Pending:['s-pending','fa-clock','Pending'],Preparing:['s-preparing','fa-fire','Preparing'],Ready:['s-ready','fa-check-circle','Ready'],Paid:['s-paid','fa-check-double','Paid']};
   const[cls,icon,label]=map[status]||['s-pending','fa-clock',status];
@@ -1441,8 +1556,7 @@ function statusBadge(status,rush){
   return`<span class="status-badge ${cls}"><i class="fa-solid ${icon}"></i>${label}</span>${r}`;
 }
 function statusSteps(status){
-  const stages=['Pending','Preparing','Ready','Paid'];
-  const labels=['Received','Preparing','Ready','Paid'];
+  const stages=['Pending','Preparing','Ready','Paid'],labels=['Received','Preparing','Ready','Paid'];
   const ci=stages.indexOf(status);const si=ci<0?0:ci;
   let html='<div class="step-row">';
   stages.forEach((_,i)=>{
@@ -1456,46 +1570,25 @@ function statusSteps(status){
 
 function renderStatusScreen(){
   refreshAccountUI();
-  const list=document.getElementById('status-orders-list');
-  const hl2=document.getElementById('status-headline');
-  const sl=document.getElementById('status-subline');
-  if(sessionOrders.length===0){
-    hl2.textContent='No Orders Yet';sl.textContent='Browse the menu and place an order first.';
-    list.innerHTML=`<div class="status-order-card" style="text-align:center;color:var(--text-faint);padding:40px 0"><i class="fa-solid fa-basket-shopping" style="font-size:2rem;margin-bottom:14px;display:block;opacity:.3"></i><p style="font-size:.875rem;font-weight:600">No orders placed this session.</p></div>`;
-    return;
-  }
+  const list=document.getElementById('status-orders-list'),hl2=document.getElementById('status-headline'),sl=document.getElementById('status-subline');
+  if(sessionOrders.length===0){hl2.textContent='No Orders Yet';sl.textContent='Browse the menu and place an order first.';list.innerHTML=`<div class="status-order-card" style="text-align:center;color:var(--text-faint);padding:40px 0"><i class="fa-solid fa-basket-shopping" style="font-size:2rem;margin-bottom:14px;display:block;opacity:.3"></i><p style="font-size:.875rem;font-weight:600">No orders placed this session.</p></div>`;return}
   const allPaid=sessionOrders.every(o=>o.data.status==='Paid');
   hl2.textContent=allPaid?'All Settled — Thank You! 🙏':'Your Orders';
   sl.textContent=allPaid?(hasAccount()?`Bill emailed to ${account.email}`:'We hope you enjoyed your meal.'):'Live updates from the kitchen.';
   list.innerHTML=sessionOrders.map((entry,idx)=>{
-    const d=entry.data;const items=d.items||[];
-    const total=items.reduce((s,i)=>s+i.price*i.quantity,0);
-    const ic=items.reduce((s,i)=>s+i.quantity,0);
-    const status=d.status||'Pending';
+    const d=entry.data,items=d.items||[];const total=items.reduce((s,i)=>s+i.price*i.quantity,0);
+    const ic=items.reduce((s,i)=>s+i.quantity,0);const status=d.status||'Pending';
     let waitLabel='';
-    if((status==='Pending'||status==='Preparing')&&d.createdAt){
-      const el=Math.floor((Date.now()-new Date(d.createdAt))/60000);
-      const rem=Math.max(1,15+ic*2-el);
-      waitLabel=`~${rem} min${rem!==1?'s':''}`;
-    }else waitLabel='~15 mins';
+    if((status==='Pending'||status==='Preparing')&&d.createdAt){const el=Math.floor((Date.now()-new Date(d.createdAt))/60000);const rem=Math.max(1,15+ic*2-el);waitLabel=`~${rem} min${rem!==1?'s':''}`}else waitLabel='~15 mins';
     const sColor={Ready:'#16a34a',Paid:'#7c3aed'}[status]||'var(--accent)';
     const sLine=status==='Ready'?'✅ Collect now!':status==='Paid'?'💜 Paid':waitLabel;
     return`<div class="status-order-card" style="border-color:${status==='Ready'?'var(--accent)':'var(--border)'}">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-        <span style="font-size:.9rem;font-weight:800;color:var(--text)">Order ${idx+1} · Table ${esc(String(d.table))}</span>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">${statusBadge(status,d.rush)}</div>
-      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><span style="font-size:.9rem;font-weight:800;color:var(--text)">Order ${idx+1} · Table ${esc(String(d.table))}</span><div style="display:flex;flex-wrap:wrap;gap:6px">${statusBadge(status,d.rush)}</div></div>
       ${statusSteps(status)}
       <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:.85rem">${items.map(i=>`<li style="display:flex;justify-content:space-between;color:var(--text-muted)"><span>${esc(i.name)} × ${i.quantity}</span><span style="color:var(--accent);font-weight:700">${fmt(i.price*i.quantity)}</span></li>`).join('')}</ul>
       ${d.notes?`<p style="font-size:.78rem;color:var(--text-faint);font-style:italic;border-top:1px solid var(--border);padding-top:10px;line-height:1.5">📝 ${esc(d.notes)}</p>`:''}
-      <div style="display:flex;justify-content:space-between;font-size:.85rem;border-top:1px solid var(--border);padding-top:10px">
-        <span style="color:var(--text-muted);font-weight:500">${(status==='Pending'||status==='Preparing')?'Est. wait':'Status'}</span>
-        <span style="font-weight:800;color:${sColor}">${sLine}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:.9rem">
-        <span style="color:var(--text-muted);font-weight:600">Total</span>
-        <span style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--accent)">${fmt(total)}</span>
-      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.85rem;border-top:1px solid var(--border);padding-top:10px"><span style="color:var(--text-muted);font-weight:500">${(status==='Pending'||status==='Preparing')?'Est. wait':'Status'}</span><span style="font-weight:800;color:${sColor}">${sLine}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.9rem"><span style="color:var(--text-muted);font-weight:600">Total</span><span style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--accent)">${fmt(total)}</span></div>
       ${status==='Paid'&&hasAccount()?`<div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border)"><i class="fa-solid fa-envelope-circle-check" style="color:var(--accent);font-size:.9rem;flex-shrink:0"></i><span style="font-size:.78rem;font-weight:500;color:var(--text-muted)">Bill emailed to <strong style="color:var(--text)">${esc(account.email)}</strong></span></div>`:''}
     </div>`;
   }).join('');
@@ -1504,87 +1597,53 @@ function renderStatusScreen(){
 window.openOrderStatus=function(){renderStatusScreen();showScreen('status-screen')};
 window.backToMenu=function(){showScreen('menu-screen')};
 
-// ── Mobile nav ────────────────────────────────────────────
 let mobileCartVisible=false;
 window.showMobileNav=function(tab){
   ['mob-menu-btn','mob-cart-btn','mob-order-btn'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
   const drawer=document.getElementById('mobile-cart-drawer');
-  if(tab==='cart'){
-    document.getElementById('mob-cart-btn').classList.add('active');
-    if(drawer){drawer.classList.add('open');mobileCartVisible=true}
-  } else if(tab==='order'){
-    // Just trigger order confirmation flow directly, this clears button active states smoothly
-    placeOrder(); 
-  } else {
-    document.getElementById('mob-menu-btn').classList.add('active');
-    if(drawer){drawer.classList.remove('open');mobileCartVisible=false}
-    showScreen('menu-screen');
-  }
+  if(tab==='cart'){document.getElementById('mob-cart-btn').classList.add('active');if(drawer){drawer.classList.add('open');mobileCartVisible=true}}
+  else if(tab==='order'){placeOrder()}
+  else{document.getElementById('mob-menu-btn').classList.add('active');if(drawer){drawer.classList.remove('open');mobileCartVisible=false}showScreen('menu-screen')}
 };
 window.closeMobileCart=function(){
   const drawer=document.getElementById('mobile-cart-drawer');
-  if(drawer)drawer.classList.remove('open');
-  mobileCartVisible=false;
+  if(drawer)drawer.classList.remove('open');mobileCartVisible=false;
   document.getElementById('mob-cart-btn')?.classList.remove('active');
   document.getElementById('mob-order-btn')?.classList.remove('active');
   document.getElementById('mob-menu-btn')?.classList.add('active');
 };
 
-// ── Slide to confirm ──────────────────────────────────────
 function initSlider(){
-  const track=document.getElementById('slide-track');
-  const thumb=document.getElementById('slide-thumb');
-  const fill=document.getElementById('slide-fill');
-  const label=document.getElementById('slide-label');
+  const track=document.getElementById('slide-track'),thumb=document.getElementById('slide-thumb'),fill=document.getElementById('slide-fill'),label=document.getElementById('slide-label');
   let dragging=false,startX=0,curX=0;
   const maxLeft=()=>track.offsetWidth-52;
   function setPos(x){const c=Math.max(0,Math.min(x,maxLeft()));curX=c;thumb.style.left=(3+c)+'px';fill.style.width=(52+c)+'px';label.style.opacity=Math.max(0,1-(c/maxLeft())*1.6)}
-  function onStart(e){if(sliderConfirmed)return;dragging=true;startX=(e.touches?e.touches[0].clientX:e.clientX)-curX;thumb.style.transition=fill.style.transition='none';e.preventDefault()}
-  function onMove(e){if(!dragging)return;setPos((e.touches?e.touches[0].clientX:e.clientX)-startX);e.preventDefault()}
+  function onStart(e){if(sliderConfirmed)return;dragging=true;startX=(e.touches?e.touches[0].clientX:e.clientX)-curX;thumb.style.transition=fill.style.transition='none'}
+  function onMove(e){if(!dragging)return;setPos((e.touches?e.touches[0].clientX:e.clientX)-startX)}
   function onEnd(){
-    if(!dragging)return;dragging=false;
-    thumb.style.transition=fill.style.transition='';
-    if(curX >= maxLeft()*.85){
-      sliderConfirmed=true;track.classList.add('confirmed');
-      thumb.innerHTML='<i class="fa-solid fa-check"></i>';
-      label.style.opacity=0;
-      setTimeout(confirmFinalOrder,420);
-    }else{setPos(0);label.style.opacity=1}
+    if(!dragging)return;dragging=false;thumb.style.transition=fill.style.transition='';
+    if(curX>=maxLeft()*.85){sliderConfirmed=true;track.classList.add('confirmed');thumb.innerHTML='<i class="fa-solid fa-check"></i>';label.style.opacity=0;setTimeout(confirmFinalOrder,420)}
+    else{setPos(0);label.style.opacity=1}
   }
-  thumb.addEventListener('mousedown',onStart,{passive:false});
-  thumb.addEventListener('touchstart',onStart,{passive:false});
-  document.addEventListener('mousemove',onMove,{passive:false});
-  document.addEventListener('touchmove',onMove,{passive:false});
-  document.addEventListener('mouseup',onEnd);
-  document.addEventListener('touchend',onEnd);
+  thumb.addEventListener('mousedown',onStart);thumb.addEventListener('touchstart',onStart,{passive:true});
+  document.addEventListener('mousemove',onMove);document.addEventListener('touchmove',onMove,{passive:true});
+  document.addEventListener('mouseup',onEnd);document.addEventListener('touchend',onEnd);
 }
 
 function resetSlider(){
   sliderConfirmed=false;
-  const track=document.getElementById('slide-track');
-  const thumb=document.getElementById('slide-thumb');
-  const fill=document.getElementById('slide-fill');
-  const label=document.getElementById('slide-label');
-  if(!track)return;
-  track.classList.remove('confirmed');
-  thumb.innerHTML='<i class="fa-solid fa-chevron-right"></i>';
-  thumb.style.left='3px';fill.style.width='52px';label.style.opacity=1;
+  const track=document.getElementById('slide-track'),thumb=document.getElementById('slide-thumb'),fill=document.getElementById('slide-fill'),label=document.getElementById('slide-label');
+  if(!track)return;track.classList.remove('confirmed');
+  thumb.innerHTML='<i class="fa-solid fa-chevron-right"></i>';thumb.style.left='3px';fill.style.width='52px';label.style.opacity=1;
 }
 
-// ── Init ──────────────────────────────────────────────────
 async function init(){
   await fetchTableCount();
-  // Hide all screens first
-  ALL_SCREENS.forEach(s=>{
-    const el=document.getElementById(s);
-    el.classList.remove('active');
-    el.style.display='none';
-  });
+  ALL_SCREENS.forEach(s=>{const el=document.getElementById(s);el.classList.remove('active');el.style.display='none'});
   document.getElementById('mobile-nav').style.display='none';
-  updateCartUI();
-  initSlider();
-  refreshAccountUI();
-  showScreen('welcome-screen');
+  document.getElementById('top-nav').style.display='none';
+  updateCartUI();initSlider();refreshAccountUI();
+  // Don't show welcome screen yet — geo check controls that
 }
 init();
 </script>
